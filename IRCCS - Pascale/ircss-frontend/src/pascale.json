@@ -1,0 +1,23 @@
+{
+    "Altri": {
+      "Mitica": "Studio prospettico su sorveglianza attiva vs chirurgia nel microcarcinoma papillare della tiroide.",
+      "proFFIT - task 3": "Sviluppo e validazione di uno strumento per la descrizione e la comprensione delle difficoltà economiche dei pazienti oncologici italiani-Validazione"
+    },
+    "Studi di fase 1":{
+      "Database Pazienti Fase 1": "Database dei pazienti screenati presso la S.C. Sperimentazioni Cliniche"
+    }
+}
+
+{
+    "table": [{
+        "section_description": "Altri",
+        "row": [{
+            "code": "",
+            "category_link": "",
+            "category": "",
+            "description": ""
+        }]
+    }]
+}
+
+

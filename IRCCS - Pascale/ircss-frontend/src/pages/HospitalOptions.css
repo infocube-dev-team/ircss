@@ -1,0 +1,70 @@
+.table-container-hospital-options {
+  width: 30% !important;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+
+.category-cell:hover {
+  background-color: #f5f5f5;
+}
+
+.category-row:hover {
+  background-color: #f5f5f5;
+}
+
+.centered-cell {
+  text-align: center;
+}
+
+.centered-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+th,
+td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #ebebeb;
+}
+
+.cell-button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.header:hover {
+  background-color: transparent;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.link-cell {
+  text-decoration: none;
+  color: #000;
+  cursor: pointer;
+}
