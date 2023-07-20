@@ -15,6 +15,7 @@
     "@types/node": "^16.18.37",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
+    "countries-list": "^2.6.1",
     "fhir-kit-client": "^1.9.2",
     "fhir.js": "^0.0.22",
     "fhirclient": "^2.5.2",

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ReactNode } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -23,7 +23,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     open?: boolean;
 }>(({ theme, open }) => ({
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(8),
     transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -66,18 +66,17 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
     background: '#FFFFFF',
 }));
 
 const OrangeIconButton = styled(IconButton)(({ theme }) => ({
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
 }));
 
 const OrangeChevronLeftIcon = styled(ChevronLeftIcon)(({ theme }) => ({
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.main,
 }));
 
 const selezionaComponente = (name: string): string => {
@@ -88,14 +87,20 @@ const selezionaComponente = (name: string): string => {
             return '/patients';
         case 'Nuovo Paziente':
             return '/new-patient';
-        case 'Organizations':
+        case 'Gestione Centri':
             return '/organizations';
+        case 'Back Office':
+            return '/backoffice';
         default:
             return '/';
     }
 };
 
-export default function NavBar() {
+interface NavBarProps {
+    child: ReactNode;
+}
+
+export default function NavBar(props: NavBarProps) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
 
@@ -152,7 +157,7 @@ export default function NavBar() {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    {['Home', 'Organizations'].map((text) => (
+                    {['Home', 'Back Office', 'Gestione Centri'].map((text) => (
                         <ListItem key={text} disablePadding>
                             <ListItemButton onClick={() => handleLinkClick(text)}>
                                 <ListItemText primary={text} />
@@ -162,6 +167,7 @@ export default function NavBar() {
                 </List>
             </Drawer>
             <Main open={open}>
+                {props.child}
             </Main>
         </Box>
 

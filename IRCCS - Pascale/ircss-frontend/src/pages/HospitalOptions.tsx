@@ -22,11 +22,15 @@ const selezionaComponente = (name: string): string => {
     }
 };
 
-const HospitalOptions: React.FC = () => {
-    const location = useLocation();
-    const state = location.state as { ospedale: string };
+interface HospitalProps {
+    ospedale?: string;
+}
+
+const HospitalOptions = (props: HospitalProps) => {
+
 
     const tableData: JsonTable[] = [];
+    const {state} = useLocation();
 
     const navigate = useNavigate();
 

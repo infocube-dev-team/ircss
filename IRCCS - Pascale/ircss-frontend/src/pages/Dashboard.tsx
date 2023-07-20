@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@m
 import { useNavigate } from 'react-router-dom';
 
 import './Dashboard.css';
-import { getOrganizations } from '../service/FhirHandler';
 
 
 interface Oggetto {
@@ -75,8 +74,6 @@ const Dashboard = () => {
     }));
   };
 
-
-  // Raggruppa gli oggetti per categoria
   const oggettiPerCategoria: { [categoria: string]: Oggetto[] } = {};
   arrayOggetti.forEach((oggetto) => {
     if (oggettiPerCategoria[oggetto.categoria]) {
@@ -87,8 +84,7 @@ const Dashboard = () => {
   });
 
   const handleLinkClick = (name: string) => {
-    getOrganizations();
-    navigate('hospital-options', { state: { ospedale: name } });
+    navigate('/hospital-options', { replace: true, state: { ospedale: name } });
   };
 
   return (

@@ -5,11 +5,10 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout= (props: LayoutProps) => {
   return (
     <div>
-      <NavbarLaterale />
-      <div style={{ 'marginTop': '40px' }}>{children}</div>
+      <NavbarLaterale child={props.children} />
     </div>
   );
 };

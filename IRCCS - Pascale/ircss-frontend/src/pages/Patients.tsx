@@ -1,30 +1,29 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './HospitalOptions.css';
-// import { getOrganizations } from '../controller/FhirHandler';
-import { Button, TextField } from '@mui/material';
+import { Button, Paper, TextField, Typography } from '@mui/material';
+import { getPatientFromId } from '../service/FhirHandler';
 
 const Patients: React.FC = () => {
     const location = useLocation();
     const state = location.state as { ospedale: string };
     const [patientId, setPatientId] = useState<string>('');
-    const [patientData] = useState(null);
+    const [patientData, setPatientData] = useState<{ id: any; name: any; identifier: any; } | null>(null);
 
     const fetchPatient = async () => {
-        // try {
-        //     const patientData = await getPatientById();
-        //     setPatientData(patientData);
-        // } catch (error) {
-        //     console.error(error);
-        // }
-
+        try {
+            const patientData = await getPatientFromId(patientId);
+            setPatientData(patientData);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleKeyPress = (event: { key: string; }) => {
         if (event.key === 'Enter') {
             fetchPatient();
         }
-    }
+    };
 
     return (
         <div className="centered-page">
@@ -40,12 +39,23 @@ const Patients: React.FC = () => {
                 Cerca paziente
             </Button>
 
-            {patientData && (
-                <div>
-                    <h2>Dettagli del paziente:</h2>
-                    <pre>{JSON.stringify(patientData, null, 2)}</pre>
-                </div>
+            {patientData && typeof patientData === 'object' && (
+                <Paper className="patient-paper">
+                    <Typography variant="h6" gutterBottom>
+                        Dettagli del paziente
+                    </Typography>
+                    <Typography variant="body1">
+                        <b>ID:</b> {patientData.id}
+                    </Typography>
+                    <Typography variant="body1">
+                        <b>Nome:</b> {patientData.name[0]?.given[0]} 
+                    </Typography>
+                    <Typography variant="body1">
+                        <b>Cognome:</b> {patientData.name[0]?.family}
+                    </Typography>
+                </Paper>
             )}
+
         </div>
     );
 }

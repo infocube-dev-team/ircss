@@ -1,0 +1,56 @@
+.backoffice-grid {
+  margin-top: 2%;
+}
+
+
+.backoffice-container {
+  min-height: 400px;
+  margin: 20px;
+}
+
+.backoffice-content {
+  min-height: 400px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.backoffice-title {
+  min-height: 400px;
+  color: #007BFF;
+  text-align: center;
+}
+
+.backoffice-grid {
+  min-height: 400px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.backoffice-item {
+  min-height: 400px;
+  text-decoration: none;
+  color: #007BFF;
+}
+
+.backoffice-item:hover {
+  min-height: 400px;
+  text-decoration: underline;
+}
+
+.backoffice-paper {
+  min-height: 200px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.backoffice-paper:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.backoffice-description {
+  margin-top: 10px;
+  text-align: center;
+}

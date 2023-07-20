@@ -19,6 +19,7 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import './Organizations.css';
+import { useNavigate } from 'react-router-dom';
 
 interface Organization {
     id: string;
@@ -27,7 +28,20 @@ interface Organization {
     city: string;
     responsible: string;
     country: string;
-}
+    description: string;
+    address: string;
+    postalCode: string;
+    province: string;
+    telephoneNumber: string;
+    fax: string;
+    referent: string;
+    ethicsCommittee: string;
+    group: string;
+    osscCode: string;
+    administrativeReferences: string;
+    notes: string;
+  }
+  
 
 const Organizations = () => {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -35,6 +49,7 @@ const Organizations = () => {
     const [filterValue, setFilterValue] = useState<string>('');
     const [filteredOrganizations, setFilteredOrganizations] = useState<Organization[]>([]);
     const [filterApplied, setFilterApplied] = useState<boolean>(false);
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -97,8 +112,6 @@ const Organizations = () => {
         if (filterParam) {
             const filteredOrgs = organizations.filter((org) => {
                 const paramValue = org[(param ?? filterParam) as keyof Organization] as string;
-                console.log("Il filterParam è: ", filterParam);
-                console.log("Il paramvalue è: ", paramValue);
 
                 if (paramValue == null) {
                     return false;
@@ -108,7 +121,6 @@ const Organizations = () => {
             setFilteredOrganizations(filteredOrgs);
             setFilterApplied(true);
         } else {
-            console.log("Non entro");
             setFilteredOrganizations([]);
             setFilterApplied(false);
         }
@@ -119,6 +131,9 @@ const Organizations = () => {
         window.history.back();
     };
 
+    const handleEdit = (id: string) => {
+        navigate('edit', { state: { id } });
+    };
 
     return (
         <div className="centered-page">
@@ -185,7 +200,7 @@ const Organizations = () => {
                                         <TableCell className="centered-cell cell-wrap">{entry.responsible}</TableCell>
                                         <TableCell className="centered-cell cell-wrap">{entry.country}</TableCell>
                                         <TableCell className="centered-cell cell-wrap">
-                                            <IconButton onClick={() => { /* Da aggiungere la logica dell'evento di clic */ }}>
+                                            <IconButton onClick={() => handleEdit(entry.id) }>
                                                 <EditIcon />
                                             </IconButton>
                                         </TableCell>
@@ -200,7 +215,7 @@ const Organizations = () => {
                                         <TableCell className="centered-cell cell-wrap">{entry.responsible}</TableCell>
                                         <TableCell className="centered-cell cell-wrap">{entry.country}</TableCell>
                                         <TableCell className="centered-cell cell-wrap">
-                                            <IconButton onClick={() => { /* Da aggiungere la logica dell'evento di clic */ }}>
+                                        <IconButton onClick={() => handleEdit(entry.id) }>
                                                 <EditIcon />
                                             </IconButton>
                                         </TableCell>

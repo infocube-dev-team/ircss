@@ -125,3 +125,8 @@ table {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.save-button {
+    padding-top: 12px;
+    padding-bottom: 30px; 
+  }
