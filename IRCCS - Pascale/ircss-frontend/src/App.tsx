@@ -10,6 +10,8 @@ import Patients from './pages/Patients';
 import Organizations from './pages/Organizations';
 import OrganizationsEdit from './pages/OrganizationsEdit';
 import BackOffice from './pages/BackOffice';
+import Studies from './pages/Studies';
+import StudiesEdit from './pages/StudiesEdit';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/organizations" element={<Organizations />} />
             <Route path="/organizations/edit" element={<OrganizationsEdit />} />
             <Route path="/backoffice" element={<BackOffice />} />
+            <Route path="/studies" element={<Studies />} />
+            <Route path="/studies/edit" element={<StudiesEdit />} />
           </Routes>
         </Layout>
       </Router>

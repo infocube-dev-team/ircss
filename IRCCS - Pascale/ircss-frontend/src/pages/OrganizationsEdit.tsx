@@ -273,7 +273,7 @@ const OrganizationsEdit = () => {
                             <TableRow className="category-row">
                                 <TableCell className="centered-cell cell-wrap">Nazione</TableCell>
                                 <TableCell className="centered-cell cell-wrap">
-                                    <FormControl variant="outlined" fullWidth>
+                                    <FormControl variant="outlined">
                                         <Select
                                             name="country"
                                             value={modifiedOrganization?.country}
@@ -281,7 +281,7 @@ const OrganizationsEdit = () => {
                                             label="Nazione"
                                         >
                                             {countries.map((country) => (
-                                                <MenuItem key={country.alpha2Code} value={country.name}>
+                                                <MenuItem  key={country.alpha2Code} value={country.name}>
                                                     {country.name}
                                                 </MenuItem>
                                             ))}

@@ -1,58 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { getOrganizations } from '../service/FhirHandler';
-import {
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    IconButton,
-    MenuItem,
-    FormControl,
-    Select,
-    Input,
-    Button,
-    Box,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { MenuItem, FormControl, Select, Input, Button, Box } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import './Organizations.css';
+import Tabella from '../components/Tabella';
 import { useNavigate } from 'react-router-dom';
 
+// Definiamo l'interfaccia per il tipo Organization
 interface Organization {
-    id: string;
-    name: string;
-    code: string;
-    city: string;
-    responsible: string;
-    country: string;
-    description: string;
-    address: string;
-    postalCode: string;
-    province: string;
-    telephoneNumber: string;
-    fax: string;
-    referent: string;
-    ethicsCommittee: string;
-    group: string;
-    osscCode: string;
-    administrativeReferences: string;
-    notes: string;
-  }
-  
+    id?: string;
+    name?: string;
+    code?: string;
+    city?: string;
+    responsible?: string;
+    country?: string;
+    description?: string;
+    address?: string;
+    postalCode?: string;
+    province?: string;
+    telephoneNumber?: string;
+    fax?: string;
+    referent?: string;
+    ethicsCommittee?: string;
+    group?: string;
+    osscCode?: string;
+    administrativeReferences?: string;
+    notes?: string;
+}
+
+// Interfaccia per le colonne della tabella
+interface TableColumn {
+    header: string;
+}
+
+// Definiamo le intestazioni delle colonne della tabella
+const headers: TableColumn[] = [
+    { header: 'ID' },
+    { header: 'Descrizione' },
+    { header: 'Codice' },
+    { header: 'Città' },
+    { header: 'Responsabile' },
+    { header: 'Nazione' }
+];
+
+// Tipo per le righe della tabella
+type TableRow = Array<string | number>;
 
 const Organizations = () => {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [filterParam, setFilterParam] = useState<string>('');
     const [filterValue, setFilterValue] = useState<string>('');
-    const [filteredOrganizations, setFilteredOrganizations] = useState<Organization[]>([]);
-    const [filterApplied, setFilterApplied] = useState<boolean>(false);
+    const [filteredOrganizations, setFilteredOrganizations] = useState<TableRow[]>([]);
     const navigate = useNavigate();
 
-
+    // Effettuiamo la chiamata per ottenere le organizzazioni
     useEffect(() => {
+        // Effettuiamo la chiamata per ottenere le organizzazioni
         const fetchOrganizations = async () => {
             try {
                 const response: Organization[] = await getOrganizations();
@@ -71,6 +76,7 @@ const Organizations = () => {
                 });
 
                 setOrganizations(sortedOrganizations);
+                setFilteredOrganizations(sortedOrganizations.map(convertToTableRow));
             } catch (error) {
                 console.error(error);
             }
@@ -79,60 +85,58 @@ const Organizations = () => {
         fetchOrganizations();
     }, []);
 
-
+    // Gestione del cambio del parametro di filtro
     const handleFilterParamChange = (event: SelectChangeEvent<string>) => {
         setFilterParam(event.target.value);
         applyFilter(filterValue ?? '', event.target.value);
     };
 
-
+    // Gestione del cambio del valore del filtro
     const handleFilterValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setFilterValue(value);
         applyFilter(value);
     };
 
-
-    const handleNewCenterClick = () => {
-        let filteredData: Organization[] = [];
-
-        if (filterParam && filterValue) {
-            filteredData = organizations.filter((entry: Organization) => {
-                const filterField = entry[filterParam as keyof Organization]?.toLowerCase();
-                return filterField?.includes(filterValue.toLowerCase());
-            });
-        }
-
-        setFilteredOrganizations(filteredData);
-        setFilterApplied(true);
+    // Funzione per convertire un oggetto Organization in TableRow
+    const convertToTableRow = (org: Organization): TableRow => {
+        return [
+            org.id || "",
+            org.name || "",
+            org.code || "",
+            org.city || "",
+            org.responsible || "",
+            org.country || "",
+        ];
     };
 
     // Funzione per applicare il filtro
     const applyFilter = (value?: string, param?: string) => {
-        if (filterParam) {
+        if (value && filterParam) {
             const filteredOrgs = organizations.filter((org) => {
                 const paramValue = org[(param ?? filterParam) as keyof Organization] as string;
 
                 if (paramValue == null) {
                     return false;
                 }
-                return paramValue.toLowerCase().includes((value || filterValue).toLowerCase());
+                return paramValue.toLowerCase().includes(value.toLowerCase());
             });
-            setFilteredOrganizations(filteredOrgs);
-            setFilterApplied(true);
+            setFilteredOrganizations(filteredOrgs.map(convertToTableRow));
         } else {
-            setFilteredOrganizations([]);
-            setFilterApplied(false);
+            // Se il valore del filtro è vuoto o il filtro stesso non è selezionato, mostriamo tutte le organizzazioni senza filtro
+            setFilteredOrganizations(organizations.map(convertToTableRow));
         }
     };
 
-
-    const handleGoBack = () => {
-        window.history.back();
+    // Gestione del click sul pulsante "Nuovo centro"
+    const handleNewCenterClick = () => {
+        // Implementare la gestione del click su "Nuovo centro"
+        navigate('newCenter');
     };
 
-    const handleEdit = (id: string) => {
-        navigate('edit', { state: { id } });
+    // Gestione del click sul pulsante di "Torna indietro"
+    const handleGoBack = () => {
+        window.history.back();
     };
 
     return (
@@ -177,52 +181,15 @@ const Organizations = () => {
                             </Button>
                         </div>
                     </div>
-                    <Table className="table-container">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell className="category-cell textContainer">ID</TableCell>
-                                <TableCell className="category-cell textContainer">Descrizione</TableCell>
-                                <TableCell className="category-cell textContainer">Codice</TableCell>
-                                <TableCell className="category-cell textContainer">Città</TableCell>
-                                <TableCell className="category-cell textContainer">Responsabile</TableCell>
-                                <TableCell className="category-cell textContainer">Nazione</TableCell>
-                                <TableCell className="category-cell textContainer">Edit</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filterApplied && filterValue
-                                ? filteredOrganizations.map((entry: Organization) => (
-                                    <TableRow key={entry.id} className="category-row">
-                                        <TableCell className="centered-cell cell-wrap">{entry.id}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.name}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.code}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.city}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.responsible}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.country}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">
-                                            <IconButton onClick={() => handleEdit(entry.id) }>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                                : organizations.map((entry: Organization) => (
-                                    <TableRow key={entry.id} className="category-row">
-                                        <TableCell className="centered-cell cell-wrap">{entry.id}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.name}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.code}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.city}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.responsible}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">{entry.country}</TableCell>
-                                        <TableCell className="centered-cell cell-wrap">
-                                        <IconButton onClick={() => handleEdit(entry.id) }>
-                                                <EditIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                        </TableBody>
-                    </Table>
+                    {/* Visualizziamo la tabella solo se ci sono organizzazioni da mostrare */}
+                    {filteredOrganizations.length > 0 ? (
+                        <Tabella
+                            rows={filteredOrganizations}
+                            headers={headers}
+                        />
+                    ) : (
+                        <div className="no-results">Nessun risultato trovato.</div>
+                    )}
                 </Box>
             </Box>
         </div>

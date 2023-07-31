@@ -1,3 +1,9 @@
+.table-container {
+    margin-bottom: 20px;
+    margin: auto;
+    width: 70% !important;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -46,6 +52,10 @@ table {
     flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.table-container .MuiTableCell-head:hover {
+    cursor: default;
 }
 
 .centered-page {
@@ -124,7 +134,3 @@ table {
   .edit-form{
     min-width: 30px;
   }
-
-.no-results{
-    margin-top: 100px;
-}

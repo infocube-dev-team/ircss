@@ -112,6 +112,42 @@ export async function getPatientFromId(id: string) {
   }
 }
 
+export async function getStudiesComplete() {
+  try {
+    const response = await fhirClient.search({ resourceType: 'ResearchStudy' });
+
+    if (response && response.entry) {
+
+      const studiesId = response.entry.filter((entry: any) => entry.resource.resourceType === 'ResearchStudy');
+
+      const studies = await Promise.all(studiesId.map(async (entry: any) => {
+
+        const resource = entry.resource;
+
+        const investigator = await getPractitionerFromId(resource?.principalInvestigator?.reference.split('/')[1])
+
+        return {
+          id: resource?.id,
+          title: resource?.title,
+          status: resource?.status,
+          sponsor: resource?.sponsor?.reference,
+          principalInvestigator: investigator?.name,
+          documentsLink: "Visualizza documenti",
+          numberOfPatientsEnrolled: resource?.meta?.versionId,
+        };
+      }));
+
+      console.log(studies);
+
+      return studies;
+    }
+
+    return [];
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 export async function getStudies(id: string) {
   try {
@@ -139,7 +175,7 @@ export async function getStudies(id: string) {
       }));
 
       console.log(studies);
-      
+
       return studies;
     }
 
@@ -150,22 +186,71 @@ export async function getStudies(id: string) {
   }
 }
 
+export async function getStudiesById(id: string) {
+  try {
+    const response = await fhirClient.search({ resourceType: 'ResearchStudy' });
+
+    if (response && response.entry) {
+
+      const studiesId = response.entry.filter((entry: any) => entry.resource.resourceType === 'ResearchStudy' && entry.resource.id.includes(id));
+
+      const studies = await Promise.all(studiesId.map(async (entry: any) => {
+
+        const resource = entry.resource;
+
+        let investigator = null;
+
+        if (resource?.principalInvestigator?.reference) {
+          console.log("ENTRO");
+
+          investigator = await getPractitionerFromId(resource?.principalInvestigator?.reference.split('/')[1])
+        }
+
+        return {
+          id: resource?.id,
+          title: resource?.title,
+          status: resource?.status,
+          sponsor: resource?.sponsor?.reference,
+          principalInvestigator: investigator?.name ?? '',
+          documentsLink: "Visualizza documenti",
+          numberOfPatientsEnrolled: resource?.meta?.versionId,
+        };
+      }));
+
+      console.log(studies);
+
+      return studies;
+    }
+
+    return [];
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 export async function getPractitionerFromId(id: string) {
   try {
-    const response = await fhirClient.read({ resourceType: 'Practitioner', id });
 
-    if (response) {
-      const practitionerData = {
-        id: response.id ?? '',
-        name: response.name?.[0]?.text ?? '',
-        identifier: response.identifier?.[0]?.value ?? '',
-      };
+    console.log("ID: ", id);
+    
 
-      return practitionerData;
+    if (id !== undefined) {
+      const response = await fhirClient.read({ resourceType: 'Practitioner', id });
+
+      if (response) {
+        const practitionerData = {
+          id: response.id ?? '',
+          name: response.name?.[0]?.text ?? '',
+          identifier: response.identifier?.[0]?.value ?? '',
+        };
+
+        return practitionerData;
+      }
     }
 
     return null;
+    
   } catch (error) {
     console.error(error);
     throw error;
