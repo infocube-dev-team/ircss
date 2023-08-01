@@ -85,7 +85,7 @@ const Studies = () => {
     };
 
     const applyFilter = (value?: string, param?: string) => {
-        if (filterParam) {
+        if (value && (filterParam || param)) {
             const filteredStudies = studies.filter((study) => {
                 const paramValue = study[(param ?? filterParam) as keyof Study] as string;
                 if (paramValue == null) {
@@ -95,7 +95,7 @@ const Studies = () => {
             });
             setFilteredStudies(filteredStudies.map(convertToTableRow));
         } else {
-            setFilteredStudies([]);
+            setFilteredStudies(studies.map(convertToTableRow));
         }
     };
 

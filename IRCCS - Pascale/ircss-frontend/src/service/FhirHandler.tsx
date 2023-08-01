@@ -137,8 +137,6 @@ export async function getStudiesComplete() {
         };
       }));
 
-      console.log(studies);
-
       return studies;
     }
 
@@ -174,8 +172,6 @@ export async function getStudies(id: string) {
         };
       }));
 
-      console.log(studies);
-
       return studies;
     }
 
@@ -201,7 +197,6 @@ export async function getStudiesById(id: string) {
         let investigator = null;
 
         if (resource?.principalInvestigator?.reference) {
-          console.log("ENTRO");
 
           investigator = await getPractitionerFromId(resource?.principalInvestigator?.reference.split('/')[1])
         }
@@ -217,8 +212,6 @@ export async function getStudiesById(id: string) {
         };
       }));
 
-      console.log(studies);
-
       return studies;
     }
 
@@ -231,8 +224,6 @@ export async function getStudiesById(id: string) {
 
 export async function getPractitionerFromId(id: string) {
   try {
-
-    console.log("ID: ", id);
     
 
     if (id !== undefined) {

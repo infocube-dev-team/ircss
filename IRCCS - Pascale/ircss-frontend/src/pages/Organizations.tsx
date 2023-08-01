@@ -88,6 +88,7 @@ const Organizations = () => {
     // Gestione del cambio del parametro di filtro
     const handleFilterParamChange = (event: SelectChangeEvent<string>) => {
         setFilterParam(event.target.value);
+        
         applyFilter(filterValue ?? '', event.target.value);
     };
 
@@ -112,13 +113,16 @@ const Organizations = () => {
 
     // Funzione per applicare il filtro
     const applyFilter = (value?: string, param?: string) => {
-        if (value && filterParam) {
+        
+        if (value && (filterParam || param)) {
+            
             const filteredOrgs = organizations.filter((org) => {
                 const paramValue = org[(param ?? filterParam) as keyof Organization] as string;
 
                 if (paramValue == null) {
                     return false;
                 }
+                
                 return paramValue.toLowerCase().includes(value.toLowerCase());
             });
             setFilteredOrganizations(filteredOrgs.map(convertToTableRow));
