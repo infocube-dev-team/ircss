@@ -15,7 +15,8 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public interface PersonController {
 
-    @GET()
+    @GET
+    @Path("/findAll")
     List<Person> findAll();
 
     @POST
