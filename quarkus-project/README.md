@@ -1,3 +1,35 @@
+### How to run quarkus to local
+
+This env-Setup build using this configuration:
+```
+    Apache Maven 3.9.4
+    Java version: 17.0.8
+```
+
+
+### Swagger documentation - SAMPLE
+
+If you application is started, go to:
+
+```
+    <hostname>:<port>/swagger-ui/index.html
+```
+
+And API-Docs
+
+```
+    <hostname>:<port>/v2/api-docs
+```
+
+
+### How to update component version
+Run
+```
+    mvn versions:set -DnewVersion="<You Version>-SNAPSHOT" -DgenerateBackupPoms=false
+```
+
+
+
 # quarkus-project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
@@ -33,12 +65,12 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 
 ## Creating a native executable
 
-You can create a native executable using: 
+You can create a native executable using:
 ```shell script
 ./mvnw package -Pnative
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
+Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
 ```shell script
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
