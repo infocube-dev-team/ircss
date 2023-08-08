@@ -1,3 +1,38 @@
+# How to setup local env
+
+## For Windows user
+
+```
+λ node --version
+v14.17.0
+```
+
+```
+λ npm --version
+6.14.13
+```
+
+
+
+## For Mac/Linux user
+```
+18.0.0
+```
+
+```
+8.6.0
+```
+
+Install a react-scripts
+```
+    npm install -g react-scripts@5.0.1
+```
+
+## How to install a specific version of node/npm
+
+run this: `nvm install <You Version>`
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
