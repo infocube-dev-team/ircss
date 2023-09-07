@@ -1,34 +1,17 @@
+import { Organization } from '../interfaces/Organization';
 import { Box, Button, Table, TableHead, TableRow, TableCell, TableBody, TextField, FormControl, Select, MenuItem } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { getOrganizationById, getStudies } from "../service/FhirHandler";
+import {getOrganizationById, getStudies, updateOrganizationById} from "../service/FhirHandler";
 import { useLocation } from "react-router-dom";
 
 import './Organizations.css';
 
-interface Organization {
-    id: string;
-    name: string;
-    code: string;
-    city: string;
-    responsible: string;
-    country: string;
-    description: string;
-    address: string;
-    postalCode: string;
-    province: string;
-    telephoneNumber: string;
-    fax: string;
-    referent: string;
-    ethicsCommittee: string;
-    group: string;
-    osscCode: string;
-    administrativeReferences: string;
-    notes: string;
-}
 
 const OrganizationsEdit = () => {
     const { state } = useLocation();
     const [organization, setOrganization] = useState<Organization>();
+
+
     const [modifiedOrganization, setModifiedOrganization] = useState<Organization>({
         id: '',
         name: '',
@@ -52,15 +35,14 @@ const OrganizationsEdit = () => {
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [studies, setStudies] = useState<any[]>([]);
 
-
     const fetchOrganizations = useCallback(async () => {
         try {
             const organizationResponse: Organization | null = await getOrganizationById(state.id);
-            const studiesResponse: any[] = await getStudies(organizationResponse.id);
+            //const studiesResponse: any[] = await getStudies(organizationResponse.id);
 
             setOrganization(organizationResponse ?? undefined);
             setModifiedOrganization(organizationResponse ?? undefined);
-            setStudies(studiesResponse);
+            //setStudies(studiesResponse);
         } catch (error) {
             console.error(error);
         }
@@ -92,12 +74,8 @@ const OrganizationsEdit = () => {
 
     const handleSaveChanges = () => {
         if (modifiedOrganization) {
-            saveModifiedOrganization(modifiedOrganization);
+            updateOrganizationById(modifiedOrganization).then(r => console.log(r));
         }
-    };
-
-    const saveModifiedOrganization = (modifiedOrganization: Organization) => {
-        console.log("Salvataggio dell'organizzazione modificata:", modifiedOrganization);
     };
 
     interface Country {
@@ -393,9 +371,6 @@ const OrganizationsEdit = () => {
                     ))}
                 </TableBody>
             </Table>
-
-
-
 
         </div>
     );

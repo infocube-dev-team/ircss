@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {Organization} from '../interfaces/Organization';
 import { getOrganizations } from '../service/FhirHandler';
 import { MenuItem, FormControl, Select, Input, Button, Box } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
@@ -8,29 +9,9 @@ import './Organizations.css';
 import Tabella from '../components/Tabella';
 import { useNavigate } from 'react-router-dom';
 
-// Definiamo l'interfaccia per il tipo Organization
-interface Organization {
-    id?: string;
-    name?: string;
-    code?: string;
-    city?: string;
-    responsible?: string;
-    country?: string;
-    description?: string;
-    address?: string;
-    postalCode?: string;
-    province?: string;
-    telephoneNumber?: string;
-    fax?: string;
-    referent?: string;
-    ethicsCommittee?: string;
-    group?: string;
-    osscCode?: string;
-    administrativeReferences?: string;
-    notes?: string;
-}
 
-// Interfaccia per le colonne della tabella
+
+
 interface TableColumn {
     header: string;
 }
@@ -135,7 +116,7 @@ const Organizations = () => {
     // Gestione del click sul pulsante "Nuovo centro"
     const handleNewCenterClick = () => {
         // Implementare la gestione del click su "Nuovo centro"
-        navigate('newCenter');
+        navigate('new-center');
     };
 
     // Gestione del click sul pulsante di "Torna indietro"

@@ -33,6 +33,12 @@ Install a react-scripts
 run this: `nvm install <You Version>`
 
 
+
+## Documentation fhir-kit-client
+See on this
+```
+    https://vermonster.github.io/fhir-kit-client/fhir-kit-client/1.9.2/module-fhir-kit-client-Client.html
+```
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

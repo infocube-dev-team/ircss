@@ -12,6 +12,7 @@ import OrganizationsEdit from './pages/OrganizationsEdit';
 import BackOffice from './pages/BackOffice';
 import Studies from './pages/Studies';
 import StudiesEdit from './pages/StudiesEdit';
+import NewCenter from './pages/NewCenter';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/hospital-options" element={<HospitalOptions/>} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/new-patient" element={<NewPatient />} />
+            <Route path="/organizations/new-center" element={<NewCenter />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/organizations" element={<Organizations />} />
             <Route path="/organizations/edit" element={<OrganizationsEdit />} />

@@ -7,7 +7,7 @@ class Logo extends React.Component {
     return (
       <div>
         <Link to="/">
-          <img alt='Pascale img' src="./Logo Pascale.png" className="responsive-image"></img>
+          <img alt='Pascale img' src="./LogoPascale.png" className="responsive-image"></img>
         </Link>
       </div>
     );
