@@ -1,5 +1,4 @@
 import { fhirClient } from './utils';
-import {FhirResource} from 'fhir-kit-client';
 import {Organization} from "../interfaces/Organization";
 
 export async function getOrganizations() {
@@ -10,7 +9,6 @@ export async function getOrganizations() {
 
   try {
     const response = await fhirClient.search({ resourceType: 'Organization', searchParams });
-    console.log(response);
     if (response && response.entry) {
       const organizations = response.entry.map((entry: any) => ({
         id: entry.resource?.id,
@@ -33,10 +31,39 @@ export async function getOrganizations() {
 }
 
 
+export async function createOrganization( organization : Organization) {
+
+  const createOrganization = {
+    name: organization.name,
+    code: organization.code,
+    city: organization.city,
+    responsible: organization.responsible,
+    country: organization.country,
+    description: organization.description,
+    address: organization.address,
+    postalCode: organization.postalCode,
+    province: organization.province,
+    telephoneNumber: organization.telephoneNumber,
+    fax: organization.fax,
+    referent: organization.referent,
+    ethicsCommittee: organization.ethicsCommittee,
+    group: organization.group,
+    osscCode: organization.osscCode,
+    administrativeReferences: organization.administrativeReferences,
+    notes: organization.notes,
+    resourceType: 'Organization'
+  }
+
+  return await fhirClient.create({resourceType: 'Organization', body: createOrganization})
+}
+
+
+
+
 export async function updateOrganizationById( organization : Organization) {
 
   const updateOrganization = {
-    id: 'test',
+    id: organization.id,
     name: organization.name,
     code: organization.code,
     city: organization.city,

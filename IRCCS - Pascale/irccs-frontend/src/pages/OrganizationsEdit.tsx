@@ -1,10 +1,13 @@
 import { Organization } from '../interfaces/Organization';
+import { Country } from '../interfaces/Country';
+import  '../service/ClientService';
 import { Box, Button, Table, TableHead, TableRow, TableCell, TableBody, TextField, FormControl, Select, MenuItem } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import {getOrganizationById, getStudies, updateOrganizationById} from "../service/FhirHandler";
 import { useLocation } from "react-router-dom";
 
 import './Organizations.css';
+import CountryService from "../service/ClientService";
 
 
 const OrganizationsEdit = () => {
@@ -78,10 +81,7 @@ const OrganizationsEdit = () => {
         }
     };
 
-    interface Country {
-        name: string;
-        alpha2Code: string;
-      }
+
 
     const [countries, setCountries] = useState<Country[]>([]);
 
@@ -94,6 +94,7 @@ const OrganizationsEdit = () => {
             console.error(error);
         }
     }, []);
+
 
     useEffect(() => {
         fetchCountries();
