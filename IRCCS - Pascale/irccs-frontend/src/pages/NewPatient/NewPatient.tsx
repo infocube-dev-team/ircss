@@ -1,7 +1,7 @@
 import { Button, FormControl, Grid, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import './HospitalOptions.css';
+import '../Options/HospitalOptions/HospitalOptions.css';
 
 const NewPatient: React.FC = () => {
   const location = useLocation();

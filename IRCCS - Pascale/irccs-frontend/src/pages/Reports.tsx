@@ -1,4 +1,4 @@
-import './HospitalOptions.css';
+import './Options/HospitalOptions/HospitalOptions.css';
 
 interface ReportsProps {
     ospedale?: string;

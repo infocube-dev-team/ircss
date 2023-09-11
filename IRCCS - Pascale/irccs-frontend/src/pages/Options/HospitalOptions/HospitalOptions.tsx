@@ -1,12 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@mui/material';
 import './HospitalOptions.css';
+import {JsonTable} from "../../../interfaces/JsonTable";
 
-interface JsonTable {
-    id: number;
-    name: string;
-    description: string;
-}
 
 
 const selezionaComponente = (name: string): string => {

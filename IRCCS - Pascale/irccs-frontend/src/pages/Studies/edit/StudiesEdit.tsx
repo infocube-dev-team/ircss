@@ -1,9 +1,9 @@
 import { Table, TableRow, TableCell, TableBody, Button, TextField } from "@mui/material";
 import { useCallback, useEffect, useState } from "react"; 
-import { getStudiesById } from "../service/FhirHandler"; 
+import { getStudiesById } from "../../../service/FhirHandler";
 import { useLocation } from "react-router-dom";
 
-import './Organizations.css';
+import '../../Organizations/Organizations.css';
 
 interface Study {
     id: string;

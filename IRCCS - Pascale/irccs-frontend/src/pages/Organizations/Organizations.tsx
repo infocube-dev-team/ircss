@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {Organization} from '../interfaces/Organization';
-import { getOrganizations } from '../service/FhirHandler';
+import {Organization} from '../../interfaces/Organization';
+import { getOrganizationsByName } from '../../service/FhirHandler';
 import { MenuItem, FormControl, Select, Input, Button, Box } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import './Organizations.css';
-import Tabella from '../components/Tabella';
+import Tabella from '../../components/Tabella';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -19,7 +19,7 @@ interface TableColumn {
 // Definiamo le intestazioni delle colonne della tabella
 const headers: TableColumn[] = [
     { header: 'ID' },
-    { header: 'Descrizione' },
+    { header: 'Nome' },
     { header: 'Codice' },
     { header: 'Città' },
     { header: 'Responsabile' },
@@ -33,15 +33,21 @@ const Organizations = () => {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [filterParam, setFilterParam] = useState<string>('');
     const [filterValue, setFilterValue] = useState<string>('');
+    const [searchOrganizations, setSearchOrganizations] = useState<string>('')
+
     const [filteredOrganizations, setFilteredOrganizations] = useState<TableRow[]>([]);
     const navigate = useNavigate();
 
-    // Effettuiamo la chiamata per ottenere le organizzazioni
+
     useEffect(() => {
+        findOrganizations();
+    }, []);
+
+    function findOrganizations() {
         // Effettuiamo la chiamata per ottenere le organizzazioni
         const fetchOrganizations = async () => {
             try {
-                const response: Organization[] = await getOrganizations();
+                const response: Organization[] = await getOrganizationsByName(searchOrganizations);
 
                 // Ordina gli elementi in base al codice in maniera ascendente, posizionando quelli senza codice alla fine
                 const sortedOrganizations = response.sort((a, b) => {
@@ -64,7 +70,10 @@ const Organizations = () => {
         };
 
         fetchOrganizations();
-    }, []);
+    }
+
+
+
 
     // Gestione del cambio del parametro di filtro
     const handleFilterParamChange = (event: SelectChangeEvent<string>) => {
@@ -79,6 +88,10 @@ const Organizations = () => {
         setFilterValue(value);
         applyFilter(value);
     };
+
+
+
+
 
     // Funzione per convertire un oggetto Organization in TableRow
     const convertToTableRow = (org: Organization): TableRow => {
@@ -130,7 +143,21 @@ const Organizations = () => {
                 <Box sx={{ width: "100%", display: "table", tableLayout: "fixed" }}>
                     <div className="header">
                         <h3>UOSC BackOffice</h3>
-                        <h4>Gestione Centri - Indice</h4>
+                        <div className="search-box">
+                            <Input
+                                placeholder="Ricerca Centro per nome"
+                                value={searchOrganizations}
+                                onChange={(event) => {
+                                    setSearchOrganizations(event.target.value)
+                                }}
+                                onKeyUp={(event) => {
+                                    if(event.key === 'Enter') {
+                                        findOrganizations();
+                                    }
+                                }}
+                                className="filter-input textContainer"
+                            />
+                        </div>
                     </div>
                     <div className="filters-container">
                         <ArrowBackIcon onClick={handleGoBack} className="back-icon" />
@@ -146,7 +173,7 @@ const Organizations = () => {
                                         Scegli il parametro di filtro
                                     </MenuItem>
                                     <MenuItem value="id">ID</MenuItem>
-                                    <MenuItem value="name">Descrizione</MenuItem>
+                                    <MenuItem value="name">Nome</MenuItem>
                                     <MenuItem value="code">Codice</MenuItem>
                                     <MenuItem value="city">Città</MenuItem>
                                     <MenuItem value="responsible">Responsabile</MenuItem>
@@ -160,6 +187,7 @@ const Organizations = () => {
                                 className="filter-input textContainer"
                             />
                         </div>
+
                         <div className="new-center-button">
                             <Button className='textContainer' variant="outlined" onClick={handleNewCenterClick}>
                                 Nuovo centro

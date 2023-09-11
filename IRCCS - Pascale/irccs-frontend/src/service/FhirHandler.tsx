@@ -1,10 +1,10 @@
 import { fhirClient } from './utils';
 import {Organization} from "../interfaces/Organization";
 
-export async function getOrganizations() {
+export async function getOrganizationsByName(name: string) {
 
   const searchParams = {
-
+     name: name
   };
 
   try {
@@ -19,7 +19,6 @@ export async function getOrganizations() {
         country: entry.resource?.address?.[0]?.country
       }));
 
-      console.log(organizations);
       return organizations;
     }
 
@@ -61,11 +60,9 @@ export async function createOrganization( organization : Organization) {
 
 
 //todo:: extends FhirResource
-export async function updateOrganizationById( organization : Organization) {
-
+export async function updateOrganizationById(organization: Organization ) {
   const updateOrganization = {
-    id: organization.id,
-    name: organization.description,
+    name: organization.name,
     code: organization.code,
     city: organization.city,
     responsible: organization.responsible,
@@ -140,6 +137,7 @@ export async function getOrganizationById(id: string) {
       osscCode: '',
       administrativeReferences: '',
       notes: '',
+      resourceType: ''
     }
 
     return organization;

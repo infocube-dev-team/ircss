@@ -128,3 +128,7 @@ table {
 .no-results{
     margin-top: 100px;
 }
+
+.search-box{
+    padding: 10px;
+}

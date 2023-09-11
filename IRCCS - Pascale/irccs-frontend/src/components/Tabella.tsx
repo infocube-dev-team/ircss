@@ -8,6 +8,8 @@ import {
   IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
+
 import { useNavigate } from 'react-router-dom';
 
 import './Tabella.css'
@@ -36,7 +38,11 @@ const Tabella = (props: TabellaProps) => {
   const handleEdit = (id: string) => {
     navigate('edit', { state: { id } });
   };
-  
+
+  const handleDelete = (id: string) => {
+      console.log("Call API to delete: " + id);
+  };
+
   return (
         <Table className="table-container">
           {(showHeaders == null || showHeaders) && (
@@ -66,6 +72,11 @@ const Tabella = (props: TabellaProps) => {
                       <IconButton onClick={() => handleEdit(row[0] as string)}>
                         <EditIcon />
                       </IconButton>
+
+                      <IconButton onClick={() => handleDelete(row[0] as string) }>
+                        <Delete />
+                      </IconButton>
+
                     </TableCell>
                   )}
                 </TableRow>

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import './HospitalOptions.css';
+import '../Options/HospitalOptions/HospitalOptions.css';
 import { Button, Paper, TextField, Typography } from '@mui/material';
-import { getPatientFromId } from '../service/FhirHandler';
+import { getPatientFromId } from '../../service/FhirHandler';
 
 const Patients: React.FC = () => {
     const location = useLocation();

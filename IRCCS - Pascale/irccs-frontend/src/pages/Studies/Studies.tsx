@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getStudiesComplete } from '../service/FhirHandler';
+import { getStudiesComplete } from '../../service/FhirHandler';
 import { MenuItem, FormControl, Select, Input, Button, Box } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import './Organizations.css';
-import Tabella from '../components/Tabella';
+import '../Organizations/Organizations.css';
+import Tabella from '../../components/Tabella';
 
 interface Study {
     id: string;
