@@ -7,7 +7,6 @@ import {getOrganizationById, getStudies, updateOrganizationById} from "../servic
 import { useLocation } from "react-router-dom";
 
 import './Organizations.css';
-import CountryService from "../service/ClientService";
 
 
 const OrganizationsEdit = () => {
@@ -35,6 +34,8 @@ const OrganizationsEdit = () => {
         administrativeReferences: '',
         notes: '',
     });
+
+
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [studies, setStudies] = useState<any[]>([]);
 
@@ -340,39 +341,6 @@ const OrganizationsEdit = () => {
                     Salva modifiche
                 </Button>
             </div>
-
-
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {headerNames.map((header) => (
-                            <TableCell className="category-cell textContainer" key={header}>
-                                {header}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {studies.map((study) => (
-                        <TableRow key={study.id}>
-                            <TableCell className="centered-cell cell-wrap">{study.title}</TableCell>
-                            <TableCell className="centered-cell cell-wrap">{study.status}</TableCell>
-                            <TableCell className="centered-cell cell-wrap">
-                                {study.documentsLink ? (
-                                    <a href={study.documentsLink} target="_blank" rel="noopener noreferrer">
-                                        Visualizza documenti
-                                    </a>
-                                ) : (
-                                    "Visualizza documenti"
-                                )}
-                            </TableCell>
-                            <TableCell className="centered-cell cell-wrap">{study.principalInvestigator}</TableCell>
-                            <TableCell className="centered-cell cell-wrap">{study.numberOfPatientsEnrolled}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
         </div>
     );
 }

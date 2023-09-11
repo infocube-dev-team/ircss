@@ -60,11 +60,12 @@ export async function createOrganization( organization : Organization) {
 
 
 
+//todo:: extends FhirResource
 export async function updateOrganizationById( organization : Organization) {
 
   const updateOrganization = {
     id: organization.id,
-    name: organization.name,
+    name: organization.description,
     code: organization.code,
     city: organization.city,
     responsible: organization.responsible,
