@@ -1,7 +1,7 @@
-//import { FhirResource } from "fhir-kit-client";
+import { FhirResource } from "fhir-kit-client";
 
 // Definiamo l'interfaccia per il tipo Organization
-export interface Organization {
+export interface Organization  {
     id: string;
     name?: string;
     code?: string;

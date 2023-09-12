@@ -4,13 +4,14 @@ import  '../../../service/ClientService';
 import { Box, Button, Table, TableHead, TableRow, TableCell, TableBody, TextField, FormControl, Select, MenuItem } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import {getOrganizationById, getStudies, updateOrganizationById} from "../../../service/FhirHandler";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 import '../Organizations.css';
 
 
 const OrganizationsEdit = () => {
     const { state } = useLocation();
+    const navigate = useNavigate();
     const [organization, setOrganization] = useState<Organization>();
     const [modifiedOrganization, setModifiedOrganization] = useState<Organization>({
         id: '',
@@ -76,7 +77,7 @@ const OrganizationsEdit = () => {
 
     const handleSaveChanges = () => {
         if (modifiedOrganization) {
-            updateOrganizationById(modifiedOrganization).then(r => console.log(r));
+            updateOrganizationById(modifiedOrganization).then(r => navigate('/organizations'));
         }
     };
 
