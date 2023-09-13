@@ -1,0 +1,73 @@
+{
+  "name": "sti-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "/sti-dashboard/",
+  "dependencies": {
+    "@craco/craco": "^7.1.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^16.18.35",
+    "@types/react": "^18.2.11",
+    "@types/react-dom": "^18.2.4",
+    "@types/react-router-dom": "^5.3.3",
+    "antd": "^5.6.1",
+    "apisauce": "^3.0.0",
+    "craco-antd": "^2.0.0",
+    "craco-less": "^2.0.0",
+    "env-cmd": "^10.1.0",
+    "i18next": "^22.5.1",
+    "js-file-download": "^0.4.12",
+    "less": "^4.1.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet-async": "^1.3.0",
+    "react-i18next": "^12.3.1",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "yarn": "^1.22.19"
+  },
+  "scripts": {
+    "start": "craco start",
+    "start:quality": "env-cmd -e quality yarn start",
+    "start:local": "env-cmd -e local yarn start",
+    "start:demo": "env-cmd -e demo yarn start",
+    "start:test": "env-cmd -e test yarn start",
+    "start:production": "env-cmd -e production yarn start",
+    "start:stage": "env-cmd -e stage yarn start",
+    "build": "craco build",
+    "build:quality": "env-cmd -e quality craco build",
+    "build:local": "env-cmd -e local craco build",
+    "build:test": "npm i --legacy-peer-deps env-cmd -e test craco build",
+    "build:production": "env-cmd -e production craco build",
+    "build:stage": "env-cmd -e stage craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

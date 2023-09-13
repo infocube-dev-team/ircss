@@ -1,0 +1,37 @@
+export interface Role {
+    id: number
+    name: string
+    capabilities: {id: number, name: string}[] | any[]
+}
+
+export interface Capability {
+    id: number,
+    name: string
+}
+
+export const Caps = {
+    'ME_VIEW': 'ME_VIEW',
+    'ME_EDIT': 'ME_EDIT',
+    'USER_VIEW': 'USER_VIEW',
+    'USER_CREATE': 'USER_CREATE',
+    'USER_EDIT': 'USER_EDIT',
+    'USER_DELETE': 'USER_DELETE',
+    'ROLE_VIEW': 'ROLE_VIEW',
+    'ROLE_CREATE': 'ROLE_CREATE',
+    'ROLE_EDIT': 'ROLE_EDIT',
+    'ROLE_DELETE': 'ROLE_DELETE',
+    'ORDER_VIEW': 'ORDER_VIEW',
+    'ORDER_CREATE': 'ORDER_CREATE',
+    'ORDER_EDIT': 'ORDER_EDIT',
+    'ORDER_DELETE': 'ORDER_DELETE',
+    'CUSTOMER_VIEW': 'CUSTOMER_VIEW',
+    'CUSTOMER_CREATE': 'CUSTOMER_CREATE',
+    'CUSTOMER_EDIT': 'CUSTOMER_EDIT',
+    'CUSTOMER_DELETE': 'CUSTOMER_DELETE',
+    'INTERVENTION_VIEW': 'INTERVENTION_VIEW',
+    'INTERVENTION_CREATE': 'INTERVENTION_CREATE',
+    'INTERVENTION_EDIT': 'INTERVENTION_EDIT',
+    'INTERVENTION_DELETE': 'INTERVENTION_DELETE',
+    'WAREHOUSE_VIEW': 'WAREHOUSE_VIEW',
+    'INVENTORY_VIEW': 'INVENTORY_VIEW'
+};

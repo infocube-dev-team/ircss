@@ -1,0 +1,111 @@
+h1, h2, h3, h4, h5, h6, label {
+  color: @sti-blue !important;
+}
+
+p {
+  color: @sti-paragraph-color;
+}
+
+.ant-card-bordered {
+  border-color: @sti-border-color;
+}
+
+.ant-divider {
+  background-color: @sti-border-color;
+}
+
+.ant-btn {
+  color: @sti-blue;
+  border-color: @sti-blue;
+  transition: all .2s;
+
+  &:hover {
+    background-color: @sti-red;
+    border-color: @sti-red !important;
+    color: #fff !important;
+  }
+}
+
+.ant-btn-primary {
+  background-color: @sti-blue;
+  color: #fff;
+
+  &:hover {
+    background-color: @sti-red !important;
+    color: #fff !important;
+  }
+}
+
+.ant-form-item .ant-form-item-label >label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+  color: @sti-red;
+}
+
+.ant-input-affix-wrapper {
+  border-color: @sti-border-color;
+}
+
+.ant-layout-header,
+.ant-layout-sider {
+  color: #fff;
+}
+
+.ant-layout {
+  background-color: #fff;
+
+  &-header {
+    background-color: #fff;
+    color: @sti-blue;
+    padding: 10px;
+    height: 65px;
+  }
+
+  &-sider {
+    background-color: @sti-blue !important;
+  }
+}
+
+.ant-menu-dark,
+.ant-layout-sider-trigger {
+  background-color: @sti-blue !important;
+}
+
+.ant-menu-item-selected,
+.ant-menu-submenu-selected {
+  background-color: @sti-red !important;
+}
+
+.dashboard {
+
+  &__bg {
+    // background-image: url('./sti/assets/images/logo-sti.png');
+  }
+
+}
+
+.ant-table-wrapper {
+  .ant-table-thead {
+    th {
+      background-color: @sti-blue !important;
+      color: #fff !important;
+
+      .ant-table-column-sorter {
+        color: #fff !important;
+      }
+    }
+  } 
+
+  .ant-table-tbody {
+    .ant-table-row {
+      
+      &:nth-child(even) {
+        background-color: @sti-blue-10-op !important;
+      }
+      
+      &:hover {
+        td {
+          background-color: @sti-blue-25-op !important;
+        }
+      }
+    }
+  }
+} 
