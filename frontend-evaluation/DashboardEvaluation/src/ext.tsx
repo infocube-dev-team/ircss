@@ -1,12 +1,12 @@
 import {EnvironmentManager, IService} from "./services/EnvironmentManager";
-// import stiEnvironmentManager from "./sti/services/StiEnvironmentManager";
+import irccsEnvironmentManager from "./irccs/services/IrccsEnvironmentManager";
 // import stiUserManager from "./sti/services/StiUserManager";
 
 class Ext implements IService {
 
     environmentManager: EnvironmentManager | undefined = undefined;
 
-    stiEnvironmentManager: any;
+    irccsEnvironmentManager: any;
     // stiUserManager: any;
 
     getServiceKey(): string {
@@ -16,7 +16,7 @@ class Ext implements IService {
     init = async (environmentManager: EnvironmentManager) => {
         this.environmentManager = environmentManager;
         // this.stiUserManager = stiUserManager;
-        // this.stiEnvironmentManager = stiEnvironmentManager;
+        this.irccsEnvironmentManager = irccsEnvironmentManager;
     }
 
 }

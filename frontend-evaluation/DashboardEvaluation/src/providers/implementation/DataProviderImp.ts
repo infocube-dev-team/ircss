@@ -75,10 +75,10 @@ class DataProviderImp implements DataProvider {
 
     async getList(limit?: number, offset?: number, parameters?: CallRequestConfig<any>, overrideModule?: string, mapRes: boolean = true): Promise<any> {
         let req = DataProviderImp.__initRequest(parameters, {
-            params: {
+            /* params: {
                 limit: limit,
                 offset: offset
-            }
+            } */
         });
         const {method, path, request} = this.applyPreRequestFilter('get_list', 'GET', this.__getEndpoint(overrideModule), req);
         const res = this.applyPostRequestFilter(
