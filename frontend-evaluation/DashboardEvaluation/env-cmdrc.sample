@@ -2,16 +2,16 @@
     "local":  {
         "REACT_APP_BACKEND_URL": "http://localhost:8080/",
         "REACT_APP_STORAGE_URL": "http://localhost:8080/",
-        "REACT_APP_BASENAME": "sti-dashboard"
+        "REACT_APP_BASENAME": "irccs-dashboard"
     },
     "quality": {
         "REACT_APP_BACKEND_URL": "https://api-sti.infocube.it/",
         "REACT_APP_STORAGE_URL": "https://app-sti.infocube.it/",
-        "REACT_APP_BASENAME": "sti-dashboard"
+        "REACT_APP_BASENAME": "irccs-dashboard"
     },
     "prod": {
         "REACT_APP_BACKEND_URL": "https://api.sti.it/",
         "REACT_APP_STORAGE_URL": "https://app.sti.it/",
-        "REACT_APP_BASENAME": "sti-dashboard"
+        "REACT_APP_BASENAME": "irccs-dashboard"
     }
 }

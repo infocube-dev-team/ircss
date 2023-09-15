@@ -13,6 +13,7 @@ import {__} from "../../translations/i18n";
 import {FormLayout} from "antd/es/form/Form";
 import {FormRow} from "../../components/form/DynamicForm";
 import IrccsCrudModule from "./IrccsCrudModule";
+import OrganizationDetail from "../components/OrganizationDetail";
 
 class CustomerModule extends IrccsCrudModule {
 
@@ -37,7 +38,7 @@ class CustomerModule extends IrccsCrudModule {
             return routes;
         });
 
-        // addFilter('crud_detail_view_component_' + this.getModuleKey(), this.getDetailsComponent);
+        addFilter('crud_detail_view_component_' + this.getModuleKey(), this.getDetailsComponent);
     }
 
     addMenu = (menu: MenuNode[]) => {
@@ -57,9 +58,9 @@ class CustomerModule extends IrccsCrudModule {
         return "Organization";
     }
 
-    /* getDetailsComponent = (component: ReactNode, entity: any) => {
-        return (<CustomerDetails entity={entity}/>);
-    } */
+    getDetailsComponent = (component: ReactNode, entity: any) => {
+        return (<OrganizationDetail entity={entity}/>);
+    }
 
     __getColumnsTable = () => {
         return [

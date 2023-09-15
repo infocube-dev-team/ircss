@@ -41,7 +41,7 @@ Nel caso in cui si voglia fare lo start del progetto per un determinato ambiente
 npm run start:ambiente
 ```
 
-La dashboard è ora visibile all'indirizzo http://localhost:3001/sti-dashboard
+La dashboard è ora visibile all'indirizzo http://localhost:3001/irccs-dashboard
 
 
 ## Avviare chrome per bypassare CORS 
