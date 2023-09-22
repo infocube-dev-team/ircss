@@ -2,8 +2,9 @@ import { useContext } from "react";
 import { TabContext } from "../../components/TabContext";
 import { Button, Card, Col, Row } from "antd";
 import Title from "antd/lib/typography/Title";
-import DateUtils from "../../utils/DateUtils";
 import { __i } from "../translations/i18n";
+import {EditOutlined} from "@ant-design/icons";
+import { __ } from "../../translations/i18n";
 
 interface Prop {
     entity: any;
@@ -12,7 +13,7 @@ interface Prop {
 const OrganizationDetail = (props: Prop) => {
 
     const {entity} = props;
-    // const key = useContext(TabContext);
+    const key = useContext(TabContext);
 
     return (
       <Row gutter={[24, 24]} justify="center">
@@ -30,9 +31,9 @@ const OrganizationDetail = (props: Prop) => {
                   <li><strong>{__i('organization.fields.responsible')}: </strong>{`${entity.contact?.[0]?.name?.given?.[0] || ''} ${entity.contact?.[0]?.name?.family || ''}`}</li>
                 </ul>
               </Col>
-              {/* <Col span={24} style={{textAlign: 'center'}}>
+              {<Col span={24} style={{textAlign: 'center'}}>
                   <Button style={{width: '100%', fontSize: 20, height: '50px'}} onClick={() => key.setActiveKey('edit')} type="primary" icon={<EditOutlined />}>{__("common.edit")}</Button>
-              </Col> */}
+              </Col>}
             </Row>
           </Card>
         </Col>

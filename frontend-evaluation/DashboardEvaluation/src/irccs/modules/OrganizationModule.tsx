@@ -4,16 +4,20 @@ import CrudModule from "../../components/CrudModule";
 import {MenuNode} from "../../components/MenuComponent";
 import PageViewer from "../../components/PageViewer";
 import {Caps} from "../../models/Role";
-import {addFilter} from "../../services/HooksManager";
+import {addFilter, applyFilters} from "../../services/HooksManager";
 import {__i} from "../translations/i18n";
 import {EyeOutlined, ReloadOutlined, SearchOutlined, GlobalOutlined} from "@ant-design/icons";
-import {navigate} from "../../shared/router";
+import {navigate, reloadApp} from "../../shared/router";
 import {Button} from "antd";
 import {__} from "../../translations/i18n";
 import {FormLayout} from "antd/es/form/Form";
 import {FormRow} from "../../components/form/DynamicForm";
 import IrccsCrudModule from "./IrccsCrudModule";
 import OrganizationDetail from "../components/OrganizationDetail";
+import environmentManager from "../../services/EnvironmentManager";
+import ErrorUtils from "../../utils/ErrorUtils";
+import OrganizationAdd from "../components/OrganizationAdd";
+import OrganizationEdit from "../components/OrganizationEdit";
 
 class CustomerModule extends IrccsCrudModule {
 
@@ -39,6 +43,8 @@ class CustomerModule extends IrccsCrudModule {
         });
 
         addFilter('crud_detail_view_component_' + this.getModuleKey(), this.getDetailsComponent);
+        addFilter('crud_create_component_' + this.getModuleKey(), this.getAddComponent);
+        addFilter('crud_detail_edit_component_' + this.getModuleKey(), this.getEditComponent);
     }
 
     addMenu = (menu: MenuNode[]) => {
@@ -60,6 +66,43 @@ class CustomerModule extends IrccsCrudModule {
 
     getDetailsComponent = (component: ReactNode, entity: any) => {
         return (<OrganizationDetail entity={entity}/>);
+    }
+
+    getAddComponent = () => {
+        return <OrganizationAdd module={this.getModuleKey()} add={(data) => this.add(data)}/>;
+    }
+
+    add = async (data: any) => {
+        const provider = environmentManager.getDataProvider();
+
+        /**
+         * Ritorna il payload da usare nella chiamata di modifica utente, permette la modifica da aprte di una verticalizzazione
+         * @hook organizations_edit_payload
+         * @param data : dati del payload
+         */
+        const payload = await applyFilters('organizations_add_payload', data);
+
+        const req = {
+            data: Object.assign({}, payload),
+        };
+
+        ErrorUtils.catchError(provider.addOne(req, 'Organizations'), __('common.successfulOperation'), reloadApp);
+    }
+
+    getEditComponent = (component: ReactNode, entity: any) => {
+        return (<OrganizationEdit entity={entity} module={this.getModuleKey()} edit={(data) => this.edit(data, entity)}/>);
+    }
+
+    edit = async (data: any, entity: any) => {
+
+        /**
+         * Ritorna il payload da usare nella chiamata di modifica utente, permette la modifica da aprte di una verticalizzazione
+         * @hook organizations_edit_payload
+         * @param data : dati del payload
+         */
+        const payload = await applyFilters('organizations_edit_payload', data);
+        const goBack = () => navigate(this.getRoute());
+        ErrorUtils.catchError(environmentManager.getUserDataProvider().update(entity.id, payload), __('common.successfulOperation'), goBack);
     }
 
     __getColumnsTable = () => {
