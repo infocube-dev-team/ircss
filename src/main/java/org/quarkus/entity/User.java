@@ -1,51 +1,27 @@
 package org.quarkus.entity;
 
 
+import java.util.Objects;
+
+import org.hl7.fhir.r5.model.Practitioner;
+
+import lombok.Getter;
+
+
 public class User {
-    private String name;
-    private String surname;
-    private String password;
-    private String email;
+    private final Practitioner practitioner;
+    @Getter
+    private final String password;
 
-    public String getName() {
-        return name;
+    public Practitioner getPractioner() {
+        return practitioner;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
+    public User(Practitioner practitioner, String password) {
+        Objects.requireNonNull(practitioner);
+        Objects.requireNonNull(password);
         this.password = password;
-    }
+        this.practitioner = practitioner;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public User() {
-    }
-
-    public User(String name, String surname, String password, String email) {
-        this.name = name;
-        this.surname = surname;
-        this.password = password;
-        this.email = email;
     }
 }

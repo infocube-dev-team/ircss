@@ -1,25 +1,24 @@
 package org.quarkus.unitTest;
 
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.quarkus.assembler.GroupBuilder;
 import org.quarkus.assembler.ProfileBuilder;
 import org.quarkus.assembler.UserBuilder;
 import org.quarkus.entity.FhirProfile;
 import org.quarkus.entity.Method;
 import org.quarkus.entity.ResourceType;
+import org.quarkus.service.UserService;
 
-import java.util.Arrays;
-import java.util.List;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 @QuarkusTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserTest {
 
     public static Integer userA;
@@ -31,8 +30,9 @@ public class UserTest {
     public static FhirProfile medici;
     public static FhirProfile tirocinanti;
 
+    @jakarta.inject.Inject
+    UserService userService;
     @Test
-    @Order(1)
     public void testUserACreate() {
         Response response = RestAssured
                 .given()
@@ -48,7 +48,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(2)
     public void testUserAGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -64,7 +63,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(3)
     public void testUserAPut() {
         RestAssured.given()
                 .contentType("application/json")
@@ -77,7 +75,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(4)
     public void testUserAEditedGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -91,7 +88,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(5)
     public void testUserBCreate() {
         Response response = RestAssured
                 .given()
@@ -107,7 +103,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(6)
     public void testUserBGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -123,7 +118,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(7)
     public void testGroupMediciCreate() {
         Response response = RestAssured
                 .given()
@@ -137,7 +131,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(8)
     public void testGroupMediciGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -153,7 +146,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(9)
     public void testGroupTirocinantiCreate() {
          RestAssured
                 .given()
@@ -167,7 +159,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(10)
     public void testGroupTirocinantiGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -183,7 +174,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(11)
     public void testProfileMediciCreate() {
         medici = new ProfileBuilder(List.of(new ResourceType("Patient", List.of(new Method("create", "enabled"), new Method("read", "enabled"))))).buildProfile();
 
@@ -199,7 +189,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(12)
     public void testProfileMediciGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -215,7 +204,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(13)
     public void testProfileTirocinantiCreate() {
         tirocinanti = new ProfileBuilder(List.of(new ResourceType("Patient", List.of(new Method("create", "enabled"), new Method("read", "enabled"))))).buildProfile();
         RestAssured
@@ -229,7 +217,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(14)
     public void testProfileTirocinantiGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -245,7 +232,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(15)
     public void testAssociationProfileMediciToGroup() {
         RestAssured.given()
                 .contentType("application/json")
@@ -256,7 +242,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(16)
     public void testAssociationProfileTirocinantiToGroup() {
         RestAssured.given()
                 .contentType("application/json")
@@ -267,7 +252,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(17)
     public void testAssociationProfileTirocinantiToGroupGet() {
         Response response = RestAssured.given()
                 .contentType("application/json")
@@ -281,9 +265,12 @@ public class UserTest {
     }
 
     @Test
-    @Order(18)
-    public void testCRUDPerson() {
-        // 1. add a Person to FHIR
+    public void testCRUDPractitioner() {
+        Practitioner practitioner = new Practitioner();
+        practitioner.setId("Cazz008");
+        userService.createUser(practitioner, "pass008!!##");
+        userService.getUserById("Cazz008");
+
         // 2. add Person to LDAP
         // 3. Update Person to FHIR
         // 4. Read Person
@@ -291,7 +278,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(19)
     public void testCRUDGroup() {
         // 1. add a Group to FHIR
         // 2. add Group to LDAP
@@ -301,7 +287,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(20)
     public void testPermissionToGroup() {
         // 1. Add Group Ex. TestPractitioner
         // 2. Add Permission Ex.  /Practitioner.crved
@@ -313,7 +298,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(21)
     public void testAddUserGroup() {
         // 1. Create a Group
         // 2. Create Person -Fhir- (And user to LDAP)
@@ -321,7 +305,6 @@ public class UserTest {
     }
 
     @Test
-    @Order(22)
     public void testRemoveUserGroup() {
         // 1. Create a Group
         // 2. Create Person -Fhir- (And user to LDAP)
@@ -329,12 +312,12 @@ public class UserTest {
     }
 
     @Test
-    @Order(23)
     public void testGetJWT() {
         // 1. Create Group
         // 2. ... (Base)
         // 3. Get Token from group (Scope: List of Group and Permissions, Context: *)
     }
+
 
 
 
