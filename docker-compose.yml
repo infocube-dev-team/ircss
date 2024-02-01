@@ -1,102 +1,36 @@
 version: '2'
 services:
-  openldap:
-    image: osixia/openldap:1.5.0
-    container_name: openldap
-    command: --copy-service
-    environment:
-      LDAP_LOG_LEVEL: "256"
-      LDAP_ORGANISATION: "irccs"
-      LDAP_DOMAIN: "irccs.it"
-      #LDAP_BASE_DN: ""
-      LDAP_ADMIN_PASSWORD: "irccs123"
-      LDAP_CONFIG_PASSWORD: "irccs123"
-      LDAP_READONLY_USER: "false"
-      #LDAP_READONLY_USER_USERNAME: "readonly"
-      #LDAP_READONLY_USER_PASSWORD: "readonly"
-      LDAP_RFC2307BIS_SCHEMA: "false"
-      LDAP_BACKEND: "mdb"
-      LDAP_TLS: "false"
-      #LDAP_TLS_CRT_FILENAME: "ldap.crt"
-      #LDAP_TLS_KEY_FILENAME: "ldap.key"
-      #LDAP_TLS_DH_PARAM_FILENAME: "dhparam.pem"
-      #LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
-      #LDAP_TLS_ENFORCE: "false"
-      #LDAP_TLS_CIPHER_SUITE: "SECURE256:-VERS-SSL3.0"
-      #LDAP_TLS_VERIFY_CLIENT: "demand"
-      LDAP_REPLICATION: "false"
-      #LDAP_REPLICATION_CONFIG_SYNCPROV: 'binddn="cn=admin,cn=config" bindmethod=simple credentials="$$LDAP_CONFIG_PASSWORD" searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical'
-      #LDAP_REPLICATION_DB_SYNCPROV: 'binddn="cn=admin,$$LDAP_BASE_DN" bindmethod=simple credentials="$$LDAP_ADMIN_PASSWORD" searchbase="$$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical'
-      #LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
-      KEEP_EXISTING_CONFIG: "false"
-      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
-      LDAP_SSL_HELPER_PREFIX: "ldap"
-    tty: true
-    stdin_open: true
-    volumes:
-      - ./users.ldif:/container/service/slapd/assets/config/bootstrap/ldif/users.ldif
-    ports:
-      - "389:389"
-      #- "636:636"
-    # For replication to work correctly, domainname and hostname must be
-    # set correctly so that "hostname"."domainname" equates to the
-    # fully-qualified domain name for the host.
-    domainname: "irccs.it"
-    hostname: "irccs"
-  phpldapadmin:
-    image: osixia/phpldapadmin:latest
-    container_name: phpldapadmin
-    environment:
-      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
-      PHPLDAPADMIN_HTTPS: "false"
-    ports:
-      - "9444:80"
-    depends_on:
-      - openldap
   postgres:
       image: postgres
-      container_name: KEYCLOAK-DB
+      hostname: postgres
+      container_name: postgres
       restart: always
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: keycloak
-        POSTGRES_USER: keycloak
-        POSTGRES_PASSWORD: keycloak
+        POSTGRES_USER: keycloak_owner
+        POSTGRES_PASSWORD: password
       ports:
         - "5432:5432"
+
+
   keycloak:
       image: quay.io/keycloak/keycloak
       container_name: KEYCLOAK
       restart: always
+      command: start-dev
       ports:
         - 9445:8080
       environment:
-        KC_DB_URL: jdbc:postgresql://postgres/keycloak
-        KC_DB_PORT: 5432
-        KC_DB_DATABASE: keycloak
-        KC_DB_USER: keycloak
-        KC_DB_PASSWORD: keycloak
         KEYCLOAK_ADMIN: keycloak
         KEYCLOAK_ADMIN_PASSWORD: keycloak
-        KC_HTTP_ENABLED: "false"
-        KC_HTTPS_ENABLED: "true"
-        KC_PROXY: edge
+        KC_DB: postgres
+        KC_DB_URL: jdbc:postgresql://postgres/postgres
+        KC_DB_USERNAME: keycloak_owner
+        KC_DB_PASSWORD: password
         KC_HOSTNAME_STRICT: "false"
-      entrypoint: ["/bin/sh", "-c", "/opt/keycloak/bin/kc.sh build --db postgres && /opt/keycloak/bin/kc.sh start --optimized"]
       depends_on:
         - postgres
 
-volumes:
-  postgres_data:
-      driver: local
-  keycloak:
-      driver: local
-
-networks:
-  openldap:
-  keycloak:
-    driver: bridge
 
 
 
@@ -107,53 +41,57 @@ networks:
 
 
 
-# version: '3'
 
+
+
+
+
+
+
+
+
+
+
+
+
+# version: '2'
 # services:
-#   ldap:
-#     container_name: ldap
-#     image: osixia/openldap
-#     ports:
-#       - "389:389"
-#       - "636:636"
-#     command: [--copy-service,  --loglevel, debug]
-#     volumes:
-#       - ./users.ldif:/container/service/slapd/assets/config/bootstrap/ldif/data.ldif
-#     environment:
-#       - LDAP_ADMIN_PASSWORD=admin
-#       - LDAP_BASE_DN=dc=infocube,dc=irccs,dc=it
-#       - LDAP_REPLICATION_HOSTS=ldap://ldap.infocube.irccs.it
-#       - LDAP_DOMAIN=infocube.irccs.it
-#     networks:
-#       - ldap
+#   postgres:
+#       image: postgres
+#       container_name: KEYCLOAK-DB
+#       restart: always
+#       volumes:
+#         - postgres_data:/var/lib/postgresql/data
+#       environment:
+#         POSTGRES_DB: keycloak
+#         POSTGRES_USER: keycloak
+#         POSTGRES_PASSWORD: keycloak
+#       ports:
+#         - "5432:5432"
 #   keycloak:
-#     container_name: keycloak
-#     image: quay.io/keycloak/keycloak
-#     ports:
-#       - "8080:8080"
-#     command: [start-dev]
-#     environment:
-#       - KEYCLOAK_ADMIN=admin
-#       - KEYCLOAK_ADMIN_PASSWORD=admin
-#     networks:
-#       - ldap
-#   phpldapadmin:
-#     container_name: phpldapadmin
-#     image: osixia/phpldapadmin
-#     ports:
-#       - "80:80"
-#     environment:
-#       - PHPLDAPADMIN_HTTPS="false"
-#       - PHPLDAPADMIN_LDAP_HOSTS=ldap
-#     links:
-#       - ldap
-#     depends_on:
-#       - ldap
-#     networks:
-#       - ldap
-#     #
-# networks:
-#   ldap:
+#       image: quay.io/keycloak/keycloak
+#       container_name: KEYCLOAK
+#       restart: always
+#       ports:
+#         - 9445:8080
+#       environment:
+#         KC_DB_URL: jdbc:postgresql://postgres/keycloak
+#         KC_DB_PORT: 5432
+#         KC_DB_DATABASE: keycloak
+#         KC_DB_USER: keycloak
+#         KC_DB_PASSWORD: keycloak
+#         KEYCLOAK_ADMIN: keycloak
+#         KEYCLOAK_ADMIN_PASSWORD: keycloak
+#         KC_HTTP_ENABLED: "true"
+#         KC_HTTPS_ENABLED: "false"
+#         KC_PROXY: edge
+#         KC_HOSTNAME_STRICT: "false"
+#       entrypoint: ["/bin/sh", "-c", "/opt/keycloak/bin/kc.sh build --db postgres && /opt/keycloak/bin/kc.sh start --optimized"]
+#       depends_on:
+#         - postgres
+
+# volumes:
+#   postgres_data:
+#       driver: local
 #   keycloak:
-#     # use the bridge driver, but enable IPv6
-#     driver: bridge
+#       driver: local

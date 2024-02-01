@@ -1,10 +1,13 @@
 package org.quarkus.controller;
 
+import org.hl7.fhir.r5.model.Practitioner;
 import org.quarkus.entity.User;
 import org.quarkus.service.UserService;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+
+import java.util.List;
 
 public class UserControllerImpl implements UserController{
 
