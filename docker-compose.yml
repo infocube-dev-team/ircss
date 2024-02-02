@@ -17,13 +17,13 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak
     container_name: KEYCLOAK
-    # restart: always
+    restart: always
     entrypoint:
       [
         "/bin/sh",
         "-c",
         "cd /opt/keycloak/conf && test -f server.keystore && echo \"server.keystore exists.\" || keytool -genkeypair -storepass password -storetype PKCS12 -keyalg RSA -keysize 2048 -dname \"CN=server\" -alias server -ext \"SAN:c=DNS:localhost,IP:127.0.0.1\" -keystore server.keystore
-        && /opt/keycloak/bin/kc.sh build --db postgres && /opt/keycloak/bin/kc.sh start",
+        && /opt/keycloak/bin/kc.sh build --db postgres && /opt/keycloak/bin/kc.sh start --import-realm",
       ]
     ports:
       - 9445:8080
@@ -51,6 +51,7 @@ services:
       KC_HEALTH_ENABLED: 'true'
     volumes:
       - keycloak:/opt/keycloak/conf
+      - ./pascale-realm.json:/opt/keycloak/data/import/pascale-realm.json
     depends_on:
       - postgres
 
@@ -59,3 +60,8 @@ volumes:
     driver: local
   keycloak:
     driver: local
+
+
+# volumes:
+#   - ./data/local_stack/init.keycloak.json:/opt/keycloak/data/import/main-realm.json:ro
+# entrypoint: "/opt/keycloak/bin/kc.sh start-dev --import-realm"
