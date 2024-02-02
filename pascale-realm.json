@@ -584,7 +584,7 @@
     "clientAuthenticatorType" : "client-secret",
     "secret" : "cwvB6qAn5iFl7pa9r04WxkordJyy3tjS",
     "redirectUris" : [ "/*" ],
-    "webOrigins" : [ "/*" ],
+    "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,
