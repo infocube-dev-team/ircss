@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: keycloak_owner
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   keycloak:
     image: quay.io/keycloak/keycloak
