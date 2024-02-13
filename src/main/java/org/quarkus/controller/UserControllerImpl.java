@@ -1,42 +1,31 @@
 package org.quarkus.controller;
 
-import org.hl7.fhir.r5.model.Practitioner;
-import org.quarkus.entity.User;
-import org.quarkus.service.UserService;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-
-import java.util.List;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.quarkus.entity.User;
+import org.quarkus.irccs.client.restclient.FhirClient;
+import org.quarkus.service.UserService;
 
 public class UserControllerImpl implements UserController{
 
     @Inject
     UserService userService;
 
-
-    public Response getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-    public Response createGroup(String x){
-        return userService.createGroup(x);
+    public Response getAllUsers(String email) {
+        return userService.getAllUsers(email);
     }
 
     public Response createUser(User user) {
-        return userService.createUser(user.getPractioner(),user.getPassword());
+        return userService.createUser(user);
     }
 
-    public Response getUserById(String id) {
-        return userService.getUserById(id);
+    public Response updateUser(User user) {
+        return userService.updateUser(user);
     }
 
-    public void updateUser(Long id, User user) {
-
-    }
-
-    public void deleteUser(Long id) {
-
+    public Response deleteUser(String email) {
+        return userService.deleteUser(email);
     }
 
 }

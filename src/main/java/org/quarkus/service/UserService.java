@@ -1,75 +1,59 @@
 package org.quarkus.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.hl7.fhir.r5.model.ContactPoint;
-import org.hl7.fhir.r5.model.Practitioner;
+import org.hl7.fhir.r5.model.*;
 import org.keycloak.admin.client.CreatedResponseUtil;
-import org.keycloak.admin.client.resource.GroupsResource;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.quarkus.configuration.KeycloakConfig;
-import org.quarkus.controller.UserController;
+import org.quarkus.entity.Group;
 import org.quarkus.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.quarkus.security.identity.SecurityIdentity;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
+import java.util.*;
 
 @ApplicationScoped
 public class UserService {
     private final static Logger LOG = LoggerFactory.getLogger(UserService.class);
     @Inject
-    KeycloakConfig keycloak;
-
+    Keycloak keycloak;
     @Inject
-    SecurityIdentity keycloakSecurityContext;
-
+    PractitionerController practitionerController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
 
-    private RealmResource getRealm(){
-        return keycloak.getKeycloakAdmin().realm(realm);
+    private RealmResource getRealm(){return keycloak.realm(realm);}
+
+    public Response getAllUsers(String email) {
+        if(email.isEmpty()) return Response.ok(getRealm().users().list()).build();
+        return Response.ok(getUserByEmail_keycloak(email)).build();
     }
 
-    public Response getAllUsers() {
-        return Response.ok(getRealm().users().list()).build();
-    }
+    public Response createUser(User user) {
+        // Creating Keycloak User Representation
 
-    public Response createGroup(String x){
-        GroupRepresentation g = new GroupRepresentation();
-        g.setName(x);
-        GroupsResource o = getRealm().groups();
-
-        return Response.ok(o.add(g)).build();
-    }
-
-    public Response createUser(Practitioner practitioner, String password) {
-        // Define user
         UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setUsername(user.getEmail());
+        userRepresentation.setEmail(user.getEmail());
+        userRepresentation.setEmailVerified(true);
         userRepresentation.setEnabled(true);
-        // practitioner.getTelecom().get(0).getValue() è l'indirizzo di posta elettronica
-        List<ContactPoint> list = practitioner
-                .getTelecom()
-                .stream()
-                .filter( c -> c.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL))
-                .toList();
-        String email = list.get(0).getValue();
-        Objects.requireNonNull(email);
-        userRepresentation.setUsername(email);
-        userRepresentation.setEmail(email);
-
-        LOG.info("user id: {}", practitioner.getId());
+        userRepresentation.setFirstName(user.getName());
+        userRepresentation.setLastName(user.getSurname());
+        userRepresentation.setAttributes(new HashMap<>(){{
+            put("organizationRequest", user.getOrganizationRequest());
+            put("phoneNumber", List.of(user.getPhoneNumber()));
+        }});
 
         UsersResource usersResource = getRealm()
                 .users();
@@ -77,31 +61,114 @@ public class UserService {
                 .create(userRepresentation);
         String userId = CreatedResponseUtil.getCreatedId(response);
 
-        LOG.info("userId: {}", userId);
-
         CredentialRepresentation credentialPassword = new CredentialRepresentation();
         credentialPassword.setTemporary(false);
         credentialPassword.setType(CredentialRepresentation.PASSWORD);
-        credentialPassword.setValue(password);
+        credentialPassword.setValue(user.getPassword());
 
         UserResource userResource = usersResource.get(userId);
         userResource.resetPassword(credentialPassword);
 
+        // Creating Fhir Practitioner Resource
+        Practitioner practitioner = new Practitioner();
+        practitioner.setName(List.of(new HumanName().setText(user.getName()).setFamily(user.getSurname()).setUse(HumanName.NameUse.OFFICIAL).setGiven(List.of(new StringType(user.getName() + " " + user.getSurname())))));
+        practitioner.setTelecom(List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.EMAIL).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getEmail()), new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getPhoneNumber())));
 
-        return Response.ok(userResource.toRepresentation()).build();
+        String practitionerCreated = practitionerController.create(practitionerController.encodeResourceToString(practitioner));
+        LOG.info("Practitioner created: {}", practitionerCreated);
+
+        return Response.ok().status(Response.Status.CREATED).build();
 
     }
 
-    public Response getUserById(String id) {
-        return Response.ok(getRealm().users().get(id)).build();
+     public UserRepresentation getUserByEmail_keycloak(String email) {
+        return getRealm().users().search(email).get(0);
     }
 
-    public void updateUser(Long id, User user) {
+    public Practitioner getUserByEmail_fhir(String email) {
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+        params.put("email", Collections.singletonList(email));
+        return (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+    }
+
+    public Response updateUser(User user) {
+
+        // TODO: Enforce same email policy
+
+        UsersResource usersResource = getRealm().users();
+
+        UserRepresentation userRepresentation = usersResource.search(user.getEmail()).get(0);
+        Objects.requireNonNull(userRepresentation);
+        String userId = userRepresentation.getId();
+
+        userRepresentation.setEmailVerified(true);
+        userRepresentation.setEnabled(true);
+        userRepresentation.setFirstName(user.getName());
+        userRepresentation.setLastName(user.getSurname());
+        userRepresentation.setAttributes(new HashMap<>(){{
+            put("organizationRequest", user.getOrganizationRequest());
+            put("phoneNumber", List.of(user.getPhoneNumber()));
+        }});
+
+
+        CredentialRepresentation credentialPassword = new CredentialRepresentation();
+        credentialPassword.setTemporary(false);
+        credentialPassword.setType(CredentialRepresentation.PASSWORD);
+        credentialPassword.setValue(user.getPassword());
+
+        UserResource userResource = usersResource.get(userId);
+        userResource.resetPassword(credentialPassword);
+        userResource.update(userRepresentation);
+
+        // Updating Fhir Practitioner Resource
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+        params.put("email", Collections.singletonList(user.getEmail()));
+
+        Practitioner practitioner = (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Objects.requireNonNull(practitioner);
+        practitioner.setName(List.of(new HumanName().setText(user.getName()).setFamily(user.getSurname()).setUse(HumanName.NameUse.OFFICIAL).setGiven(List.of(new StringType(user.getName() + " " + user.getSurname())))));
+        practitioner.setTelecom(List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.EMAIL).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getEmail()), new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getPhoneNumber())));
+
+        String practitionerUpdated = practitionerController.update(practitioner.getIdPart(), practitionerController.encodeResourceToString(practitioner));
+        LOG.info("Practitioner updated: {}", practitionerUpdated);
+
+        return Response.ok().status(Response.Status.ACCEPTED).build();
 
     }
 
-    public void deleteUser(Long id) {
+    public Response deleteUser(String email) {
 
+        // TODO: Unassign user from Groups
+
+        UsersResource usersResource = getRealm().users();
+
+        UserRepresentation userRepresentation = usersResource.search(email).get(0);
+        Objects.requireNonNull(userRepresentation);
+        String userId = userRepresentation.getId();
+        UserResource userResource = usersResource.get(userId);
+        userResource.remove();
+
+
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+        params.put("email", Collections.singletonList(email));
+
+        Practitioner practitioner = (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Objects.requireNonNull(practitioner);
+
+        practitionerController.delete(practitioner.getIdPart());
+
+        return Response.ok().status(Response.Status.OK).build();
+
+    }
+
+    public void joinGroup(String email, GroupRepresentation group){
+        getRealm().users().get(getUserByEmail_keycloak(email).getId()).joinGroup(group.getId());
+    }
+
+    public void leaveGroup(String email, GroupRepresentation group){
+        System.out.println(group.getName());
+        getRealm().users().get(getUserByEmail_keycloak(email).getId()).leaveGroup(group.getId());
     }
 
 }
+

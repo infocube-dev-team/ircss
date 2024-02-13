@@ -1,44 +1,26 @@
 package org.quarkus.controller;
 
-import org.quarkus.entity.User;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
+import jakarta.annotation.security.PermitAll;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import org.quarkus.entity.User;
+import org.quarkus.irccs.common.constants.FhirConst;
 
-@Path("/users")
-@ApplicationScoped
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+@Path("/public/users")
+@Consumes(FhirConst.FHIR_MEDIA_TYPE)
+@Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface UserController {
+
     @GET
-    Response getAllUsers();
+    Response getAllUsers(@QueryParam("email") @DefaultValue("") String email);
 
     @POST
-    @Path("/create")
     Response createUser(User user);
 
-    @POST
-    @Path("/group")
-    Response createGroup(String x);
-
-    @GET
-    @Path("/{id}")
-    Response getUserById(@PathParam("id") String id);
-
     @PUT
-    @Path("/{id}")
-    void updateUser(@PathParam("id") Long id, User user);
+    Response updateUser(User user);
 
     @DELETE
-    @Path("/{id}")
-    void deleteUser(@PathParam("id") Long id);
+    Response deleteUser(@QueryParam("email") String email);
 }

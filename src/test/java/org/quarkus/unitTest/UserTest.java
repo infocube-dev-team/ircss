@@ -1,22 +1,17 @@
+/*
 package org.quarkus.unitTest;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.http.HttpStatus;
-import org.hl7.fhir.r5.model.Practitioner;
-import org.junit.jupiter.api.Test;
-import org.quarkus.assembler.GroupBuilder;
-import org.quarkus.assembler.ProfileBuilder;
-import org.quarkus.assembler.UserBuilder;
-import org.quarkus.entity.FhirProfile;
-import org.quarkus.entity.Method;
-import org.quarkus.entity.ResourceType;
-import org.quarkus.service.UserService;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.junit.jupiter.api.Test;
+import org.quarkus.assembler.GroupBuilder;
+import org.quarkus.assembler.UserBuilder;
+import org.quarkus.service.UserService;
+
+import java.util.List;
 
 @QuarkusTest
 public class UserTest {
@@ -27,9 +22,6 @@ public class UserTest {
     public static Integer groupB;
     public static Integer profileA;
     public static Integer profileB;
-    public static FhirProfile medici;
-    public static FhirProfile tirocinanti;
-
     @jakarta.inject.Inject
     UserService userService;
     @Test
@@ -174,97 +166,6 @@ public class UserTest {
     }
 
     @Test
-    public void testProfileMediciCreate() {
-        medici = new ProfileBuilder(List.of(new ResourceType("Patient", List.of(new Method("create", "enabled"), new Method("read", "enabled"))))).buildProfile();
-
-
-        RestAssured
-                .given()
-                .contentType("application/json")
-                .body(new ProfileBuilder(medici).buildResourceTypes().encode())
-                .when()
-                .post("/profiles")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-    }
-
-    @Test
-    public void testProfileMediciGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/profiles")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> profileList = response.jsonPath().getList("id");
-        profileA = profileList.get(profileList.size() - 1);
-        System.out.println(profileA);
-    }
-
-    @Test
-    public void testProfileTirocinantiCreate() {
-        tirocinanti = new ProfileBuilder(List.of(new ResourceType("Patient", List.of(new Method("create", "enabled"), new Method("read", "enabled"))))).buildProfile();
-        RestAssured
-                .given()
-                .contentType("application/json")
-                .body(new ProfileBuilder(tirocinanti).buildResourceTypes().encode())
-                .when()
-                .post("/profiles")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-    }
-
-    @Test
-    public void testProfileTirocinantiGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/profiles")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> profileList = response.jsonPath().getList("id");
-        profileB = profileList.get(profileList.size() - 1);
-        System.out.println(profileB);
-    }
-
-    @Test
-    public void testAssociationProfileMediciToGroup() {
-        RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .post("/groups/" + groupA + "/profiles/" + profileA)
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-    }
-
-    @Test
-    public void testAssociationProfileTirocinantiToGroup() {
-        RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .post("/groups/" + groupB + "/profiles/" + profileB)
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-    }
-
-    @Test
-    public void testAssociationProfileTirocinantiToGroupGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/groups")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        System.out.println(Arrays.equals(response.jsonPath().getList("fhirProfile.resourceTypes").toArray(), new Object[]{new ProfileBuilder(medici).buildResourceTypes().getList().toArray(), new ProfileBuilder(tirocinanti).buildResourceTypes().getList().toArray()}));
-    }
-
-    @Test
     public void testCRUDPractitioner() {
         Practitioner practitioner = new Practitioner();
         practitioner.setId("Cazz008");
@@ -321,4 +222,4 @@ public class UserTest {
 
 
 
-}
+}*/

@@ -1,27 +1,23 @@
 package org.quarkus.entity;
 
 
+import java.util.List;
 import java.util.Objects;
 
+import jakarta.inject.Inject;
+import lombok.Setter;
 import org.hl7.fhir.r5.model.Practitioner;
 
 import lombok.Getter;
+import org.quarkus.irccs.client.restclient.FhirClient;
 
 
+@Getter @Setter
 public class User {
-    private final Practitioner practitioner;
-    @Getter
-    private final String password;
-
-    public Practitioner getPractioner() {
-        return practitioner;
-    }
-
-    public User(Practitioner practitioner, String password) {
-        Objects.requireNonNull(practitioner);
-        Objects.requireNonNull(password);
-        this.password = password;
-        this.practitioner = practitioner;
-
-    }
+    private String name;
+    private String surname;
+    private String email;
+    private String password;
+    private String phoneNumber;
+    private List<String> organizationRequest;
 }
