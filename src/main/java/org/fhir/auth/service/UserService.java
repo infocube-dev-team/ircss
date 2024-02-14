@@ -7,6 +7,8 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
+import org.apache.http.protocol.HTTP;
+import org.fhir.auth.AuthException;
 import org.fhir.auth.entity.User;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hl7.fhir.r5.model.*;
@@ -57,9 +59,14 @@ public class UserService {
 
         UsersResource usersResource = getRealm()
                 .users();
-        Response response = usersResource
-                .create(userRepresentation);
+            Response response = usersResource
+                    .create(userRepresentation);
+//        if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+//            throw new AuthException();
+//        }
+
         String userId = CreatedResponseUtil.getCreatedId(response);
+        LOG.info("User in keycloak has been created: {}", userId);
 
         CredentialRepresentation credentialPassword = new CredentialRepresentation();
         credentialPassword.setTemporary(false);

@@ -13,6 +13,17 @@ import io.restassured.response.Response;
 public class UserTest {
 
     @Test
+    public void testUserDelete() {
+        Response response = RestAssured
+                .given()
+                .contentType("application/fhir+json")
+                .when()
+                .delete("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response();
+    }
+        @Test
     public void testUserCreate() {
         User mick = new User();
         mick.setEmail("m.marrandino@infocube.it");
@@ -22,7 +33,7 @@ public class UserTest {
         mick.setPhoneNumber("123456789");
         Response response = RestAssured
                 .given()
-                .contentType("application/json")
+                .contentType("application/fhir+json")
                 .body(mick)
                 .when()
                 .post("/fhir/auth/users")
