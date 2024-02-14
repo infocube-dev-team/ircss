@@ -7,14 +7,14 @@ import org.quarkus.entity.PermissionWrapper;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 
-@Path("/admin/permissions")
+@Path("/private/permissions")
 @Consumes(FhirConst.FHIR_MEDIA_TYPE)
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface PermissionController {
-    /*@GET
-    Response getPermission(@QueryParam("name") String name);
+
+/*    Response getPermission(@QueryParam("name") String name);*/
     @POST
     Response createPermission(PermissionWrapper permissions);
-    @PUT
+/*    @PUT
     Response updatePermission(PermissionWrapper permissions);*/
 }

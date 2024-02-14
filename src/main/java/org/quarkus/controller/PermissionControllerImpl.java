@@ -9,18 +9,18 @@ import org.quarkus.service.UserService;
 
 public class PermissionControllerImpl implements PermissionController{
 
-   /* @Inject
+    @Inject
     PermissionService permissionService;
 
-    public Response getPermission(String name) {
+ /*   public Response getPermission(String name) {
         return permissionService.getPermission(name);
-    }
+    }*/
 
     public Response createPermission(PermissionWrapper permissions) {
         return permissionService.createPermission(permissions);
     }
 
-    public Response updatePermission(PermissionWrapper permissions) {
+   /* public Response updatePermission(PermissionWrapper permissions) {
         return permissionService.createPermission(permissions);
     }*/
 }
