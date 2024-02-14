@@ -1,4 +1,4 @@
-package org.quarkus.service;
+package org.fhir.auth.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -6,6 +6,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+
+import org.fhir.auth.entity.User;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hl7.fhir.r5.model.*;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -16,8 +18,6 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.quarkus.entity.Group;
-import org.quarkus.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

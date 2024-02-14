@@ -1,4 +1,4 @@
-package org.quarkus.entity;
+package org.fhir.auth.entity;
 
 
 import lombok.Getter;

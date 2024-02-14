@@ -1,4 +1,4 @@
-package org.quarkus.service;
+package org.fhir.auth.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -48,7 +48,7 @@ public class GroupService {
         return getGroupByName(name);
     }
 
-    public Response createGroup(org.quarkus.entity.Group group) {
+    public Response createGroup(org.fhir.auth.entity.Group group) {
         // Creating Keycloak Group Representation
 
         GroupRepresentation groupRepresentation = new GroupRepresentation();
@@ -87,7 +87,7 @@ public class GroupService {
         return getRealm().groups().groups(name, 0, 1, false).get(0);
     }
 
-    public Response updateGroup(org.quarkus.entity.Group group) {
+    public Response updateGroup(org.fhir.auth.entity.Group group) {
 
         GroupsResource groupsResource = getRealm().groups();
         GroupRepresentation foundGroup = groupsResource.groups(group.getName(), 0, 1).get(0);

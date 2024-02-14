@@ -1,4 +1,4 @@
-package org.quarkus.service;
+package org.fhir.auth.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -7,10 +7,9 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.*;
-import org.keycloak.representations.idm.authorization.GroupPolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
-import org.quarkus.entity.Permission;
-import org.quarkus.entity.PermissionWrapper;
+import org.fhir.auth.entity.Permission;
+import org.fhir.auth.entity.PermissionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

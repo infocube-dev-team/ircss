@@ -1,11 +1,10 @@
-package org.quarkus.controller;
+package org.fhir.auth.controller;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import org.quarkus.entity.PermissionWrapper;
-import org.quarkus.entity.User;
-import org.quarkus.service.PermissionService;
-import org.quarkus.service.UserService;
+
+import org.fhir.auth.service.PermissionService;
+import org.fhir.auth.entity.PermissionWrapper;
 
 public class PermissionControllerImpl implements PermissionController{
 

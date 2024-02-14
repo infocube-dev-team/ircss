@@ -1,37 +1,31 @@
-/*
-package org.quarkus.unitTest;
+
+package org.fhir.auth;
+
+import org.apache.http.HttpStatus;
+import org.fhir.auth.entity.User;
+import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.apache.http.HttpStatus;
-import org.hl7.fhir.r5.model.Practitioner;
-import org.junit.jupiter.api.Test;
-import org.quarkus.assembler.GroupBuilder;
-import org.quarkus.assembler.UserBuilder;
-import org.quarkus.service.UserService;
-
-import java.util.List;
 
 @QuarkusTest
 public class UserTest {
 
-    public static Integer userA;
-    public static Integer userB;
-    public static Integer groupA;
-    public static Integer groupB;
-    public static Integer profileA;
-    public static Integer profileB;
-    @jakarta.inject.Inject
-    UserService userService;
     @Test
-    public void testUserACreate() {
+    public void testUserCreate() {
+        User mick = new User();
+        mick.setEmail("m.marrandino@infocube.it");
+        mick.setName("Michele");
+        mick.setSurname("Marrandino");
+        mick.setPassword("Kloss2001!!");
+        mick.setPhoneNumber("123456789");
         Response response = RestAssured
                 .given()
                 .contentType("application/json")
-                .body(new UserBuilder("Mario", "Rossi").build().encode())
+                .body(mick)
                 .when()
-                .post("/users")
+                .post("/fhir/auth/users")
                 .then()
                 .statusCode(HttpStatus.SC_NO_CONTENT)
                 .extract().response();
@@ -39,6 +33,7 @@ public class UserTest {
         System.out.println(response.prettyPrint());
     }
 
+    /*
     @Test
     public void testUserAGet() {
         Response response = RestAssured.given()
@@ -219,7 +214,7 @@ public class UserTest {
         // 3. Get Token from group (Scope: List of Group and Permissions, Context: *)
     }
 
+*/
 
 
-
-}*/
+}

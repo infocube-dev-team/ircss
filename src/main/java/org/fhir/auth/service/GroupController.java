@@ -1,4 +1,4 @@
-package org.quarkus.service;
+package org.fhir.auth.service;
 
 import jakarta.enterprise.context.RequestScoped;
 import org.hl7.fhir.r5.model.Group;

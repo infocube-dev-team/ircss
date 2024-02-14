@@ -1,9 +1,9 @@
-package org.quarkus.controller;
+package org.fhir.auth.controller;
 
-import jakarta.annotation.security.PermitAll;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.quarkus.entity.User;
+
+import org.fhir.auth.entity.User;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 

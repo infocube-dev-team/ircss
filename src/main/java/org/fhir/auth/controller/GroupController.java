@@ -1,9 +1,8 @@
-package org.quarkus.controller;
+package org.fhir.auth.controller;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.quarkus.entity.Group;
-import org.quarkus.entity.User;
+import org.fhir.auth.entity.Group;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 

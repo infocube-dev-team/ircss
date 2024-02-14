@@ -1,13 +1,10 @@
-package org.quarkus.controller;
+package org.fhir.auth.controller;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import org.hl7.fhir.r5.model.Practitioner;
-import org.quarkus.entity.Group;
-import org.quarkus.entity.User;
-import org.quarkus.irccs.client.restclient.FhirClient;
-import org.quarkus.service.GroupService;
-import org.quarkus.service.UserService;
+
+import org.fhir.auth.entity.Group;
+import org.fhir.auth.service.GroupService;
 
 public class GroupControllerImpl implements GroupController {
 

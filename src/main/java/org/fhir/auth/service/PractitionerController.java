@@ -1,4 +1,4 @@
-package org.quarkus.service;
+package org.fhir.auth.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
