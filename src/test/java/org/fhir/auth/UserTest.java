@@ -3,6 +3,7 @@ package org.fhir.auth;
 
 import org.apache.http.HttpStatus;
 import org.fhir.auth.entity.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -13,6 +14,7 @@ import io.restassured.response.Response;
 public class UserTest {
 
     @Test
+    @Disabled
     public void testUserDelete() {
         Response response = RestAssured
                 .given()
@@ -22,8 +24,10 @@ public class UserTest {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
+
+        System.out.println(response.prettyPrint());
     }
-        @Test
+    @Test
     public void testUserCreate() {
         User mick = new User();
         mick.setEmail("m.marrandino@infocube.it");

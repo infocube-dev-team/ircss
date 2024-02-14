@@ -1,4 +1,6 @@
 package org.fhir.auth;
 
-public class AuthException extends Exception {
+import org.hl7.fhir.exceptions.FHIRException;
+
+public class AuthException extends FHIRException {
 }
