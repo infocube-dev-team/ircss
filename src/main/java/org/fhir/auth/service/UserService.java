@@ -7,8 +7,6 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
-import org.apache.http.protocol.HTTP;
-import org.fhir.auth.AuthException;
 import org.fhir.auth.entity.User;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hl7.fhir.r5.model.*;
@@ -31,7 +29,7 @@ public class UserService {
     @Inject
     Keycloak keycloak;
     @Inject
-    PractitionerController practitionerController;
+    PractitionerFhirController practitionerFhirController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
 
@@ -81,7 +79,7 @@ public class UserService {
         practitioner.setName(List.of(new HumanName().setText(user.getName()).setFamily(user.getSurname()).setUse(HumanName.NameUse.OFFICIAL).setGiven(List.of(new StringType(user.getName() + " " + user.getSurname())))));
         practitioner.setTelecom(List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.EMAIL).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getEmail()), new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getPhoneNumber())));
 
-        String practitionerCreated = practitionerController.create(practitionerController.encodeResourceToString(practitioner));
+        String practitionerCreated = practitionerFhirController.create(practitionerFhirController.encodeResourceToString(practitioner));
         LOG.info("Practitioner created: {}", practitionerCreated);
 
         return Response.ok().status(Response.Status.CREATED).build();
@@ -95,7 +93,7 @@ public class UserService {
     public Practitioner getUserByEmail_fhir(String email) {
         MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
         params.put("email", Collections.singletonList(email));
-        return (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+        return (Practitioner) practitionerFhirController.parseResource(practitionerFhirController.search(params), Bundle.class).getEntry().get(0).getResource();
     }
 
     public Response updateUser(User user) {
@@ -131,12 +129,12 @@ public class UserService {
         MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
         params.put("email", Collections.singletonList(user.getEmail()));
 
-        Practitioner practitioner = (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Practitioner practitioner = (Practitioner) practitionerFhirController.parseResource(practitionerFhirController.search(params), Bundle.class).getEntry().get(0).getResource();
         Objects.requireNonNull(practitioner);
         practitioner.setName(List.of(new HumanName().setText(user.getName()).setFamily(user.getSurname()).setUse(HumanName.NameUse.OFFICIAL).setGiven(List.of(new StringType(user.getName() + " " + user.getSurname())))));
         practitioner.setTelecom(List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.EMAIL).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getEmail()), new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getPhoneNumber())));
 
-        String practitionerUpdated = practitionerController.update(practitioner.getIdPart(), practitionerController.encodeResourceToString(practitioner));
+        String practitionerUpdated = practitionerFhirController.update(practitioner.getIdPart(), practitionerFhirController.encodeResourceToString(practitioner));
         LOG.info("Practitioner updated: {}", practitionerUpdated);
 
         return Response.ok().status(Response.Status.ACCEPTED).build();
@@ -159,10 +157,10 @@ public class UserService {
         MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
         params.put("email", Collections.singletonList(email));
 
-        Practitioner practitioner = (Practitioner) practitionerController.parseResource(practitionerController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Practitioner practitioner = (Practitioner) practitionerFhirController.parseResource(practitionerFhirController.search(params), Bundle.class).getEntry().get(0).getResource();
         Objects.requireNonNull(practitioner);
 
-        practitionerController.delete(practitioner.getIdPart());
+        practitionerFhirController.delete(practitioner.getIdPart());
 
         return Response.ok().status(Response.Status.OK).build();
 

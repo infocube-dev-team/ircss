@@ -1,10 +1,14 @@
 
 package org.fhir.auth;
 
+import java.util.List;
+
 import org.apache.http.HttpStatus;
 import org.fhir.auth.entity.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.keycloak.representations.idm.UserRepresentation;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -12,10 +16,79 @@ import io.restassured.response.Response;
 
 @QuarkusTest
 public class UserTest {
-
     @Test
-    @Disabled
-    public void testUserDelete() {
+    public void testUserCRUD() {
+        User mick = new User();
+        mick.setEmail("m.marrandino@infocube.it");
+        mick.setName("Michele");
+        mick.setSurname("Marrandino");
+        mick.setPassword("Kloss2001!!");
+        mick.setPhoneNumber("123456789");
+        Response responseCreate = RestAssured
+                .given()
+                .contentType("application/fhir+json")
+                .body(mick)
+                .when()
+                .post("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED)
+                .extract().response();
+
+        System.out.println("--------POST----------");
+        System.out.println(responseCreate.prettyPrint());
+        Response responseGet = RestAssured
+                .given()
+                .contentType("application/fhir+json")
+                .when()
+                .get("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response();
+
+        System.out.println("--------GET----------");
+        System.out.println(responseGet.prettyPrint());
+        UserRepresentation mikeur = responseGet.as(UserRepresentation.class);
+
+        Assertions.assertNotNull(mikeur);
+        Assertions.assertEquals("m.marrandino@infocube.it",mikeur.getEmail());
+        Assertions.assertEquals("123456789",mikeur.getAttributes().get("phoneNumber").get(0));
+
+        System.out.println("--------ID----------");
+        System.out.println(mikeur.getId());
+        System.out.println("------------------");
+
+        mick.setPhoneNumber("999000");
+        Response responsePut = RestAssured
+                .given()
+                .contentType("application/fhir+json")
+                .body(mick)
+                .when()
+                .put("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .then()
+                .statusCode(HttpStatus.SC_ACCEPTED)
+                .extract().response();
+
+        System.out.println("------PUT------------");
+        System.out.println(responsePut.prettyPrint());
+
+        responseGet = RestAssured
+                .given()
+                .contentType("application/fhir+json")
+                .when()
+                .get("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response();
+
+        UserRepresentation mikeur2 = responseGet.as(UserRepresentation.class);
+        Assertions.assertNotNull(mikeur2);
+        Assertions.assertEquals("m.marrandino@infocube.it",mikeur2.getEmail());
+        Assertions.assertEquals("999000",mikeur2.getAttributes().get("phoneNumber").get(0));
+        Assertions.assertEquals(mikeur.getId(),mikeur2.getId());
+
+        System.out.println("--------GET----------");
+        System.out.println(responseGet.prettyPrint());
+
         Response response = RestAssured
                 .given()
                 .contentType("application/fhir+json")
@@ -25,167 +98,8 @@ public class UserTest {
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
 
+        System.out.println("--------DELETE----------");
         System.out.println(response.prettyPrint());
-    }
-    @Test
-    public void testUserCreate() {
-        User mick = new User();
-        mick.setEmail("m.marrandino@infocube.it");
-        mick.setName("Michele");
-        mick.setSurname("Marrandino");
-        mick.setPassword("Kloss2001!!");
-        mick.setPhoneNumber("123456789");
-        Response response = RestAssured
-                .given()
-                .contentType("application/fhir+json")
-                .body(mick)
-                .when()
-                .post("/fhir/auth/users")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT)
-                .extract().response();
-
-        System.out.println(response.prettyPrint());
-    }
-
-    /*
-    @Test
-    public void testUserAGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/users")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> userIdList = response.jsonPath().getList("id");
-        userA = userIdList.get(userIdList.size() - 1);
-        System.out.println(userA);
-    }
-
-    @Test
-    public void testUserAPut() {
-        RestAssured.given()
-                .contentType("application/json")
-                .body(new UserBuilder("Mario", "Bianchi").build().encode())
-                .when()
-                .put("/users/" + userA)
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT)
-                .extract().response();
-    }
-
-    @Test
-    public void testUserAEditedGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/users/" + userA)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        assert(response.asString().equals(new UserBuilder("Mario", "Bianchi").withId(userA).build().encode()));
-    }
-
-    @Test
-    public void testUserBCreate() {
-        Response response = RestAssured
-                .given()
-                .contentType("application/json")
-                .body(new UserBuilder("Giovanni", "Bianchi").build().encode())
-                .when()
-                .post("/users")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT)
-                .extract().response();
-
-        System.out.println(response.prettyPrint());
-    }
-
-    @Test
-    public void testUserBGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/users")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> userIdList = response.jsonPath().getList("id");
-        userB = userIdList.get(userIdList.size() - 1);
-        System.out.println(userB);
-    }
-
-    @Test
-    public void testGroupMediciCreate() {
-        Response response = RestAssured
-                .given()
-                .contentType("application/json")
-                .body(new GroupBuilder("Medici", List.of(UserTest.userA, UserTest.userB)).build().encode())
-                .when()
-                .post("/groups")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT)
-                .extract().response();
-    }
-
-    @Test
-    public void testGroupMediciGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/groups")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> groupIdList = response.jsonPath().getList("id");
-        groupA = groupIdList.get(groupIdList.size() - 1);
-        System.out.println(groupA);
-    }
-
-    @Test
-    public void testGroupTirocinantiCreate() {
-         RestAssured
-                .given()
-                .contentType("application/json")
-                .body(new GroupBuilder("Medici", List.of(UserTest.userA)).build().encode())
-                .when()
-                .post("/groups")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT)
-                .extract().response();
-    }
-
-    @Test
-    public void testGroupTirocinantiGet() {
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/groups")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        List<Integer> groupIdList = response.jsonPath().getList("id");
-        groupB = groupIdList.get(groupIdList.size() - 1);
-        System.out.println(groupB);
-    }
-
-    @Test
-    public void testCRUDPractitioner() {
-        Practitioner practitioner = new Practitioner();
-        practitioner.setId("Cazz008");
-        userService.createUser(practitioner, "pass008!!##");
-        userService.getUserById("Cazz008");
-
-        // 2. add Person to LDAP
-        // 3. Update Person to FHIR
-        // 4. Read Person
-        // 5. Delete Person to FHIR & LDAP
     }
 
     @Test
@@ -228,8 +142,5 @@ public class UserTest {
         // 2. ... (Base)
         // 3. Get Token from group (Scope: List of Group and Permissions, Context: *)
     }
-
-*/
-
 
 }

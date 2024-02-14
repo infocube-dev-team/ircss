@@ -30,10 +30,10 @@ public class GroupService {
     @Inject
     Keycloak keycloak;
     @Inject
-    GroupController groupController;
+    GroupFhirController groupController;
 
     @Inject
-    PractitionerController practitionerController;
+    PractitionerFhirController practitionerFhirController;
 
     @Inject
     UserService userService;
