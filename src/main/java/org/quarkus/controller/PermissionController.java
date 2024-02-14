@@ -7,7 +7,7 @@ import org.quarkus.entity.PermissionWrapper;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 
-@Path("/private/permissions")
+@Path("/fhir/auth/permissions")
 @Consumes(FhirConst.FHIR_MEDIA_TYPE)
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface PermissionController {

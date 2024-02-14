@@ -7,7 +7,7 @@ import org.quarkus.entity.User;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 
-@Path("/public/users")
+@Path("/fhir/auth/users")
 @Consumes(FhirConst.FHIR_MEDIA_TYPE)
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface UserController {

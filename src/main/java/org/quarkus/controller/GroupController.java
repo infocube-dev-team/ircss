@@ -7,7 +7,7 @@ import org.quarkus.entity.User;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 
-@Path("/admin/groups")
+@Path("/fhir/auth/groups")
 @Consumes(FhirConst.FHIR_MEDIA_TYPE)
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface GroupController {
