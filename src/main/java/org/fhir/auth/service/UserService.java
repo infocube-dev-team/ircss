@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+//FIXME  Create FHIR Practitioner
+//FIXME the KeyCloak User with attribute fhir:Practitioner.uri
+
 @ApplicationScoped
 public class UserService {
     private final static Logger LOG = LoggerFactory.getLogger(UserService.class);
