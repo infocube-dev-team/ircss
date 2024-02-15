@@ -1,14 +1,10 @@
-package org.fhir.auth.entity;
+package org.fhir.irccs.entity;
 
-
-import java.util.List;
-import java.util.Objects;
-
-import jakarta.inject.Inject;
-import lombok.Setter;
-import org.hl7.fhir.r5.model.Practitioner;
 
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 
 @Getter @Setter

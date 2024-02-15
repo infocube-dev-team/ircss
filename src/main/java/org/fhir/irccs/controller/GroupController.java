@@ -1,14 +1,14 @@
-package org.fhir.auth.controller;
+package org.fhir.irccs.controller;
 
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.fhir.auth.entity.Group;
+import org.fhir.irccs.entity.Group;
+import org.quarkus.irccs.common.constants.FhirConst;
 
 
 @Path("/fhir/auth/groups")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Consumes(FhirConst.FHIR_MEDIA_TYPE)
+@Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface GroupController {
 
     @GET
