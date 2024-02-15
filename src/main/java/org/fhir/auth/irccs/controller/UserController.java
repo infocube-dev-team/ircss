@@ -1,15 +1,14 @@
-package org.fhir.auth.controller;
+package org.fhir.auth.irccs.controller;
 
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.fhir.auth.entity.User;
-import org.quarkus.irccs.common.constants.FhirConst;
+import org.fhir.auth.irccs.entity.User;
 
 
 @Path("/fhir/auth/users")
-@Consumes(FhirConst.FHIR_MEDIA_TYPE)
-@Produces(FhirConst.FHIR_MEDIA_TYPE)
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public interface UserController {
 
     @GET

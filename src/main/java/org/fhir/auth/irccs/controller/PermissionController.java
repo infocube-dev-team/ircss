@@ -1,15 +1,17 @@
-package org.fhir.auth.controller;
+package org.fhir.auth.irccs.controller;
 
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.fhir.auth.entity.PermissionWrapper;
-import org.quarkus.irccs.common.constants.FhirConst;
+import org.fhir.auth.irccs.entity.PermissionWrapper;
 
 
 @Path("/fhir/auth/permissions")
-@Consumes(FhirConst.FHIR_MEDIA_TYPE)
-@Produces(FhirConst.FHIR_MEDIA_TYPE)
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public interface PermissionController {
 
 /*    Response getPermission(@QueryParam("name") String name);*/

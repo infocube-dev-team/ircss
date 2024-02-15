@@ -1,9 +1,9 @@
-package org.fhir.auth;
-
-import java.util.List;
+package org.fhir.auth.irccs;
 
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.utils.client.EFhirClientException;
+
+import java.util.List;
 
 public class AuthException extends EFhirClientException {
     public AuthException(String message) {

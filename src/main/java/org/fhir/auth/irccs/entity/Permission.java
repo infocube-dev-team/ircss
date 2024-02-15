@@ -1,8 +1,5 @@
-package org.fhir.irccs.entity;
+package org.fhir.auth.irccs.entity;
 
-
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;

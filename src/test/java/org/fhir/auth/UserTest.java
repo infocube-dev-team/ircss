@@ -1,18 +1,14 @@
 
 package org.fhir.auth;
 
-import java.util.List;
-
-import org.apache.http.HttpStatus;
-import org.fhir.auth.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.keycloak.representations.idm.UserRepresentation;
-
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
+import org.fhir.auth.irccs.entity.User;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.keycloak.representations.idm.UserRepresentation;
 
 @QuarkusTest
 public class UserTest {

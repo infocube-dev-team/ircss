@@ -1,4 +1,4 @@
-package org.fhir.irccs.service;
+package org.fhir.auth.irccs.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.fhir.auth.irccs.entity.User;
 import org.hl7.fhir.r5.model.*;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -16,11 +17,13 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.fhir.irccs.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class UserService {
@@ -28,7 +31,7 @@ public class UserService {
     @Inject
     Keycloak keycloak;
     @Inject
-    PractitionerController practitionerController;
+    PractitionerFhirController practitionerController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
 

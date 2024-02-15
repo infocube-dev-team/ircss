@@ -1,19 +1,22 @@
-package org.fhir.auth.service;
+package org.fhir.auth.irccs.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.fhir.auth.irccs.entity.Permission;
+import org.fhir.auth.irccs.entity.PermissionWrapper;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.*;
+import org.keycloak.admin.client.resource.AuthorizationResource;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
-import org.fhir.auth.entity.Permission;
-import org.fhir.auth.entity.PermissionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 @ApplicationScoped
 public class PermissionService {

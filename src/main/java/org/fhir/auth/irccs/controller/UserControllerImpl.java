@@ -1,10 +1,9 @@
-package org.fhir.auth.controller;
+package org.fhir.auth.irccs.controller;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-
-import org.fhir.auth.entity.User;
-import org.fhir.auth.service.UserService;
+import org.fhir.auth.irccs.entity.User;
+import org.fhir.auth.irccs.service.UserService;
 
 public class UserControllerImpl implements UserController{
 

@@ -1,4 +1,4 @@
-package org.fhir.auth.entity;
+package org.fhir.auth.irccs.entity;
 
 
 import lombok.Getter;
