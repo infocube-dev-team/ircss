@@ -10,6 +10,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.fhir.auth.irccs.exceptions.OperationException;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
@@ -53,7 +54,10 @@ public class GroupService {
         groupRepresentation.setName(group.getName());
 
         GroupsResource groupsResource = getRealm().groups();
-        groupsResource.add(groupRepresentation);
+        Response KCgroupCreated = groupsResource.add(groupRepresentation);
+
+        String keycloakGroupId = CreatedResponseUtil.getCreatedId(KCgroupCreated);
+
 
         GroupRepresentation foundGroup = groupsResource.groups(group.getName(), 0, 1).get(0);
         Objects.requireNonNull(foundGroup);
@@ -73,10 +77,14 @@ public class GroupService {
         Group fhirGroup = new Group();
         fhirGroup.setName(group.getName());
         fhirGroup.setMember(practitionerReferences);
+        fhirGroup.setIdentifier(List.of(new Identifier().setUse(Identifier.IdentifierUse.SECONDARY).setValue(keycloakGroupId)));
 
-
-        IIdType groupCreated = groupController.create(fhirGroup);
-        LOG.info("Group created: {}", groupCreated);
+        try {
+            IIdType groupCreated = groupController.create(fhirGroup);
+            LOG.info("Group created: {}", groupCreated);
+        } catch (Exception e){
+            groupsResource.group(keycloakGroupId).remove();
+        }
 
         return Response.ok().status(Response.Status.CREATED).build();
 
@@ -92,6 +100,7 @@ public class GroupService {
 
     public Response updateGroup(org.fhir.auth.irccs.entity.Group group) {
 
+        // FIXME: Enforce unique GroupName
         GroupsResource groupsResource = getRealm().groups();
         GroupRepresentation foundGroup = groupsResource.groups(group.getName(), 0, 1).get(0);
         Objects.requireNonNull(foundGroup);

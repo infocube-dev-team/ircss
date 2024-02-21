@@ -40,25 +40,24 @@ public class UserService {
     private RealmResource getRealm(){return keycloak.realm(realm);}
 
     public Response getAllUsers(String email) {
-        if(email.isEmpty()) return Response.ok(getRealm().users().list()).build();
-        return Response.ok(getUserByEmail_keycloak(email)).build();
+        if(email.isEmpty())
+            return Response.ok(getRealm()
+                    .users()
+                    .list()
+                    .stream()
+                    .map(User::fromUserRepresentation)
+                    .toList())
+                    .build();
+
+        return Response.ok(User.fromUserRepresentation(getUserByEmail_keycloak(email))).build();
     }
 
     public Response createUser(User user) {
         // Creating Keycloak User Representation
 
+
         LOG.info("Creating Keycloak User: {}", user.getEmail());
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setUsername(user.getEmail());
-        userRepresentation.setEmail(user.getEmail());
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setEnabled(false);
-        userRepresentation.setFirstName(user.getName());
-        userRepresentation.setLastName(user.getSurname());
-        userRepresentation.setAttributes(new HashMap<>(){{
-            put("organizationRequest", user.getOrganizationRequest());
-            put("phoneNumber", List.of(user.getPhoneNumber()));
-        }});
+        UserRepresentation userRepresentation = User.toUserRepresentation(user);
 
         String userId;
         UsersResource usersResource;
@@ -67,8 +66,8 @@ public class UserService {
                     .users();
             Response response = usersResource
                     .create(userRepresentation);
-            userId = CreatedResponseUtil.getCreatedId(response);
-            Objects.requireNonNull(userId);
+            user.setId(CreatedResponseUtil.getCreatedId(response));
+            Objects.requireNonNull(user.getId());
         } catch (Exception e){
             e.printStackTrace();
             LOG.error("ERROR: Couldn't create user {}", userRepresentation.getEmail());
@@ -85,12 +84,12 @@ public class UserService {
         credentialPassword.setValue(user.getPassword());
 
         try {
-            UserResource userResource = usersResource.get(userId);
+            UserResource userResource = usersResource.get(user.getId());
             Objects.requireNonNull(userResource);
             userResource.resetPassword(credentialPassword);
         } catch (Exception e){
             e.printStackTrace();
-            Response response = usersResource.delete(userId);
+            Response response = usersResource.delete(user.getId());
             response.close();
             LOG.error("ERROR: Couldn't set user's password {}.\nDeleting User...", userRepresentation.getEmail());
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
@@ -102,12 +101,14 @@ public class UserService {
     public Response enableUser(String email) {
         LOG.info("Enabling user {}...", email);
 
-        UserRepresentation user;
+        User user;
+        UserRepresentation userRepresentation;
         try {
-            user = getUserByEmail_keycloak(email);
-            Objects.requireNonNull(user);
-            user.setEnabled(true);
-            getRealm().users().get(user.getId()).update(user);
+            userRepresentation = getUserByEmail_keycloak(email);
+            Objects.requireNonNull(userRepresentation);
+            userRepresentation.setEnabled(true);
+            getRealm().users().get(userRepresentation.getId()).update(userRepresentation);
+            user = User.fromUserRepresentation(userRepresentation);
         } catch (Exception e){
             LOG.error("ERROR: Couldn't get nor enable Keycloak User: {}", email);
             e.printStackTrace();
@@ -116,21 +117,19 @@ public class UserService {
 
 
 
+
         // Creating Fhir Practitioner Resource
         IIdType practitionerId;
-        Practitioner practitioner = new Practitioner();
-        practitioner.setName(List.of(new HumanName().setText(user.getFirstName()).setFamily(user.getLastName()).setUse(HumanName.NameUse.OFFICIAL).setGiven(List.of(new StringType(user.getFirstName() + " " + user.getLastName())))));
-        practitioner.setTelecom(List.of(new ContactPoint().setSystem(ContactPoint.ContactPointSystem.EMAIL).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getEmail()), new ContactPoint().setSystem(ContactPoint.ContactPointSystem.PHONE).setUse(ContactPoint.ContactPointUse.WORK).setValue(user.getAttributes().get("phoneNumber").get(0))));
-        practitioner.setIdentifier(List.of(new Identifier().setUse(Identifier.IdentifierUse.SECONDARY).setValue(user.getId())));
+        Practitioner practitioner = User.toPractitioner(user);
+
         try{
-            LOG.info("Creating Fhir Practitioner {}...", user.getEmail() + " " + user.getLastName());
+            LOG.info("Creating Fhir Practitioner {}...", user.getEmail());
             practitionerId = practitionerController.create(practitioner);
             Objects.requireNonNull(practitionerId);
         } catch (Exception e){
-            user.setEnabled(false);
-            getRealm().users().get(user.getId()).update(user);
-            LOG.error("ERROR: Couldn't create Fhir Practitioner: {}.\nDisabled Keyclock User Again.", user.getFirstName() + " " + user.getLastName());
-            e.printStackTrace();
+            userRepresentation.setEnabled(false);
+            getRealm().users().get(user.getId()).update(userRepresentation);
+            LOG.error("ERROR: Couldn't create Fhir Practitioner: {}.\nDisabled Keyclock User Again.", user.getEmail(), e);
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
 
@@ -168,12 +167,11 @@ public class UserService {
         String userId;
 
         try {
-            userRepresentation = usersResource.search(user.getEmail()).get(0);
+            userRepresentation = getUserByEmail_keycloak(user.getEmail());
             userId = userRepresentation.getId();
             Objects.requireNonNull(userId);
         } catch (Exception e){
-            LOG.error("ERROR: Couldn't find Keycloak user: {}.", user.getEmail());
-            e.printStackTrace();
+            LOG.error("ERROR: Couldn't find Keycloak user: {}.", user.getEmail(), e);
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
 
@@ -244,16 +242,14 @@ public class UserService {
                 practitioner = getUserByEmail_fhir(email);
                 Objects.requireNonNull(practitioner);
             } catch (Exception e) {
-                LOG.error("ERROR: Couldn't retrieve FHIR Practitioner: {}.", email);
-                e.printStackTrace();
+                LOG.error("ERROR: Couldn't retrieve FHIR Practitioner: {}.", email, e);
                 return Response.status(Response.Status.EXPECTATION_FAILED).build();
             }
 
             try {
                 practitionerController.delete(practitioner.getIdPart());
             } catch (Exception e) {
-                LOG.error("ERROR: Couldn't remove FHIR Practitioner: {}.", email);
-                e.printStackTrace();
+                LOG.error("ERROR: Couldn't remove FHIR Practitioner: {}.", email, e);
                 return Response.status(Response.Status.EXPECTATION_FAILED).build();
             }
         }

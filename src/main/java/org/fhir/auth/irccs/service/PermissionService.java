@@ -38,6 +38,7 @@ public class PermissionService {
         return keycloak.realm(realmName);
     }
 
+    // Move it to a Fhir centered-class static
     private Response createResource(String groupName, String resourceName, String type, AuthorizationResource authzResource) {
         ResourceRepresentation resource = new ResourceRepresentation();
         String calculatedName = String.format("%s - %s: %s Resource", type.toUpperCase(), groupName.toUpperCase(), resourceName);
@@ -118,6 +119,8 @@ public class PermissionService {
             authzResource.policies().group().create(groupPolicyRepresentation).close();
         }
     }
+
+    // List of supported resources
 
 }
 
