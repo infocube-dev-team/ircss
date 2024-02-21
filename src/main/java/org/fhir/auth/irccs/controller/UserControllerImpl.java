@@ -18,6 +18,10 @@ public class UserControllerImpl implements UserController{
         return userService.createUser(user);
     }
 
+    public Response enableUser(String email) {
+        return userService.enableUser(email);
+    }
+
     public Response updateUser(User user) {
         return userService.updateUser(user);
     }

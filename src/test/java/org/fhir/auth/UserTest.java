@@ -3,140 +3,298 @@ package org.fhir.auth;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import jakarta.inject.Inject;
 import org.apache.http.HttpStatus;
 import org.fhir.auth.irccs.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.fhir.auth.irccs.service.UserService;
+import org.hl7.fhir.r5.model.ContactPoint;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.junit.jupiter.api.*;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.quarkus.irccs.client.restclient.FhirClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @QuarkusTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserTest {
+    @Inject
+    FhirClient<Practitioner> practitionerFhirClient;
+
     @Test
-    public void testUserCRUD() {
-        User mick = new User();
-        mick.setEmail("m.marrandino@infocube.it");
-        mick.setName("Michele");
-        mick.setSurname("Marrandino");
-        mick.setPassword("Kloss2001!!");
-        mick.setPhoneNumber("123456789");
-        Response responseCreate = RestAssured
+    @Order(1)
+    public void UserSignsup() {
+        // Testing what happens when a new Keycloak User signs up.
+        User user = new User();
+        user.setEmail("jhondoe1@gmail.com");
+        user.setPhoneNumber("+393388888888");
+        user.setName("Jhon");
+        user.setSurname("Doe");
+        user.setPassword("JhonDoe123");
+
+        UserRepresentation res = RestAssured
                 .given()
-                .contentType("application/fhir+json")
-                .body(mick)
+                .contentType("application/json")
+                .body(user)
                 .when()
                 .post("/fhir/auth/users")
                 .then()
-                .statusCode(HttpStatus.SC_CREATED)
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getAttributes().get("phoneNumber").get(0), user.getPhoneNumber());
+        Assertions.assertEquals(res.getFirstName(), user.getName());
+        Assertions.assertEquals(res.getLastName(), user.getSurname());
+        Assertions.assertEquals(res.isEnabled(), false);
+
+        System.out.println("User successfully created! " + res.getEmail());
+    }
+
+    @Test
+    @Order(2)
+    public void unenabledUserLogsin() {
+        // Testing what happens when a new Keycloak User logs in (Not yet enabled).
+        User user = new User();
+        user.setEmail("jhondoe2@gmail.com");
+        user.setPhoneNumber("+393388888888");
+        user.setName("Jhon");
+        user.setSurname("Doe");
+        user.setPassword("JhonDoe123");
+
+        UserRepresentation res = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getAttributes().get("phoneNumber").get(0), user.getPhoneNumber());
+        Assertions.assertEquals(res.getFirstName(), user.getName());
+        Assertions.assertEquals(res.getLastName(), user.getSurname());
+        Assertions.assertEquals(res.isEnabled(), false);
+
+        System.out.println("User successfully created! " + res.getEmail());
+
+        Map<String, String> params = new HashMap<>(){{
+            put("username", user.getEmail());
+            put("password", user.getPassword());
+            put("grant_type", "password");
+            put("client_id", "irccs");
+            put("client_secret", "cwvB6qAn5iFl7pa9r04WxkordJyy3tjS");
+        }};
+
+        // Un-enabled User tries to login, expected: BAD REQUEST
+        RestAssured
+                .given()
+                .contentType(ContentType.URLENC)
+                .formParams(params)
+                .when()
+                .post("http://localhost:9445/realms/pascale/protocol/openid-connect/token")
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
                 .extract().response();
 
-        System.out.println("--------POST----------");
-        System.out.println(responseCreate.prettyPrint());
-        Response responseGet = RestAssured
+        System.out.println("User couldn't rightfully log in! " + user.getEmail());
+    }
+
+    @Test
+    @Order(3)
+    public void UserGetsEnabled() {
+        // Testing what happens when a User gets enabled.
+        User user = new User();
+        user.setEmail("jhondoe3@gmail.com");
+        user.setPhoneNumber("+393388888888");
+        user.setName("Jhon");
+        user.setSurname("Doe");
+        user.setPassword("JhonDoe123");
+
+        UserRepresentation resCreate = RestAssured
                 .given()
-                .contentType("application/fhir+json")
+                .contentType("application/json")
+                .body(user)
                 .when()
-                .get("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .post("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
+
+        Assertions.assertEquals(resCreate.getEmail(), user.getEmail());
+        Assertions.assertEquals(resCreate.getAttributes().get("phoneNumber").get(0), user.getPhoneNumber());
+        Assertions.assertEquals(resCreate.getFirstName(), user.getName());
+        Assertions.assertEquals(resCreate.getLastName(), user.getSurname());
+        Assertions.assertEquals(false, resCreate.isEnabled());
+
+        System.out.println("User successfully created! " + resCreate.getEmail());
+
+        // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
+        Response resEnable = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
 
-        System.out.println("--------GET----------");
-        System.out.println(responseGet.prettyPrint());
-        UserRepresentation mikeur = responseGet.as(UserRepresentation.class);
+        Practitioner practitioner = practitionerFhirClient.parseResource(Practitioner.class, resEnable.getBody().prettyPrint());
 
-        Assertions.assertNotNull(mikeur);
-        Assertions.assertEquals("m.marrandino@infocube.it",mikeur.getEmail());
-        Assertions.assertEquals("123456789",mikeur.getAttributes().get("phoneNumber").get(0));
-
-        System.out.println("--------ID----------");
-        System.out.println(mikeur.getId());
-        System.out.println("------------------");
-
-        mick.setPhoneNumber("999000");
-        Response responsePut = RestAssured
+        // Practitioner is created, testing expectations.
+        UserRepresentation resRead = RestAssured
                 .given()
-                .contentType("application/fhir+json")
-                .body(mick)
+                .contentType("application/json")
                 .when()
-                .put("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .get("/fhir/auth/users?email=" + user.getEmail())
                 .then()
-                .statusCode(HttpStatus.SC_ACCEPTED)
-                .extract().response();
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
 
-        System.out.println("------PUT------------");
-        System.out.println(responsePut.prettyPrint());
 
-        responseGet = RestAssured
+        Assertions.assertEquals(resRead.getId(), practitioner.getIdentifier().get(0).getValue());
+        Assertions.assertEquals(true, resRead.isEnabled());
+        Assertions.assertEquals(resRead.getEmail(), practitioner.getTelecom().stream().filter(contact -> contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)).toList().get(0).getValue());
+        Assertions.assertEquals(resRead.getAttributes().get("phoneNumber").get(0), practitioner.getTelecom().stream().filter(contact -> contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)).toList().get(0).getValue());
+        Assertions.assertEquals(resRead.getFirstName(), practitioner.getName().get(0).getText());
+        Assertions.assertEquals(resRead.getLastName(), practitioner.getName().get(0).getFamily());
+
+        System.out.println("Specular Practitioner successfully created! " + practitioner.getId());
+    }
+
+    @Test
+    @Order(4)
+    public void EnabledUserLogsin() {
+        // Testing what happens when a new Keycloak User logs in (enabled).
+        User user = new User();
+        user.setEmail("jhondoe4@gmail.com");
+        user.setPhoneNumber("+393388888888");
+        user.setName("Jhon");
+        user.setSurname("Doe");
+        user.setPassword("JhonDoe123");
+
+        UserRepresentation resCreate = RestAssured
                 .given()
-                .contentType("application/fhir+json")
+                .contentType("application/json")
+                .body(user)
                 .when()
-                .get("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .post("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
+
+        Assertions.assertEquals(resCreate.getEmail(), user.getEmail());
+        Assertions.assertEquals(resCreate.getAttributes().get("phoneNumber").get(0), user.getPhoneNumber());
+        Assertions.assertEquals(resCreate.getFirstName(), user.getName());
+        Assertions.assertEquals(resCreate.getLastName(), user.getSurname());
+        Assertions.assertEquals(false, resCreate.isEnabled());
+
+        System.out.println("User successfully created! " + resCreate.getEmail());
+
+        // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
+        Response resEnable = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
 
-        UserRepresentation mikeur2 = responseGet.as(UserRepresentation.class);
-        Assertions.assertNotNull(mikeur2);
-        Assertions.assertEquals("m.marrandino@infocube.it",mikeur2.getEmail());
-        Assertions.assertEquals("999000",mikeur2.getAttributes().get("phoneNumber").get(0));
-        Assertions.assertEquals(mikeur.getId(),mikeur2.getId());
+        Practitioner practitioner = practitionerFhirClient.parseResource(Practitioner.class, resEnable.getBody().prettyPrint());
 
-        System.out.println("--------GET----------");
-        System.out.println(responseGet.prettyPrint());
+        // Practitioner is created, testing expectations.
 
-        Response response = RestAssured
+        UserRepresentation resRead = RestAssured
                 .given()
-                .contentType("application/fhir+json")
+                .contentType("application/json")
+                .body(user)
                 .when()
-                .delete("/fhir/auth/users?email=m.marrandino@infocube.it")
+                .get("/fhir/auth/users?email=" + user.getEmail())
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(UserRepresentation.class);
+
+
+        Assertions.assertEquals(resRead.getId(), practitioner.getIdentifier().get(0).getValue());
+        Assertions.assertEquals(true, resRead.isEnabled());
+        Assertions.assertEquals(resRead.getEmail(), practitioner.getTelecom().stream().filter(contact -> contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)).toList().get(0).getValue());
+        Assertions.assertEquals(resRead.getAttributes().get("phoneNumber").get(0), practitioner.getTelecom().stream().filter(contact -> contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)).toList().get(0).getValue());
+        Assertions.assertEquals(resRead.getFirstName(), practitioner.getName().get(0).getText());
+        Assertions.assertEquals(resRead.getLastName(), practitioner.getName().get(0).getFamily());
+
+        System.out.println("Specular Practitioner successfully created! " + practitioner.getId());
+
+        Map<String, String> params = new HashMap<>(){{
+            put("username", user.getEmail());
+            put("password", user.getPassword());
+            put("grant_type", "password");
+            put("client_id", "irccs");
+            put("client_secret", "cwvB6qAn5iFl7pa9r04WxkordJyy3tjS");
+        }};
+
+        // enabled User tries to login, expected: OK
+        RestAssured
+                .given()
+                .contentType(ContentType.URLENC)
+                .formParams(params)
+                .when()
+                .post("http://localhost:9445/realms/pascale/protocol/openid-connect/token")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
 
-        System.out.println("--------DELETE----------");
-        System.out.println(response.prettyPrint());
+        System.out.println("User logged in! " + user.getEmail());
     }
 
     @Test
-    public void testCRUDGroup() {
-        // 1. add a Group to FHIR
-        // 2. add Group to LDAP
-        // 3. Update Group to FHIR
-        // 4. Read Group
-        // 5. Delete Group to FHIR & LDAP
-    }
+    @Order(5)
+    public void UsersGetAndDelete() {
+        List<UserRepresentation> users = RestAssured
+                .given()
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<List<UserRepresentation>>(){});
 
-    @Test
-    public void testPermissionToGroup() {
-        // 1. Add Group Ex. TestPractitioner
-        // 2. Add Permission Ex.  /Practitioner.crved
-        // 3. Add Permission Ex.  /ResearchStudy.r
-        // 4. Add Permission 1 to Group 1.
-        // 5. Add Permission 2 to Group 1.
-            // 1. Get Group 1 (and Linked Permissions)
-            // 2. Get Group 2 (and Linked Permissions)
-    }
+        for(UserRepresentation user : users){
+            if(!user.getEmail().equals("pascale@admin.it")){
+                RestAssured
+                        .given()
+                        .contentType("application/json")
+                        .when()
+                        .delete("/fhir/auth/users?email=" + user.getEmail())
+                        .then()
+                        .statusCode(HttpStatus.SC_OK);
+            }
+        }
 
-    @Test
-    public void testAddUserGroup() {
-        // 1. Create a Group
-        // 2. Create Person -Fhir- (And user to LDAP)
-        // 3. Add person to group (LDAP only)
-    }
+        users = RestAssured
+                .given()
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<List<UserRepresentation>>(){});
 
-    @Test
-    public void testRemoveUserGroup() {
-        // 1. Create a Group
-        // 2. Create Person -Fhir- (And user to LDAP)
-        // 3. Add person to group (LDAP only)
-    }
+        Assertions.assertEquals(1, users.size());
 
-    @Test
-    public void testGetJWT() {
-        // 1. Create Group
-        // 2. ... (Base)
-        // 3. Get Token from group (Scope: List of Group and Permissions, Context: *)
+        System.out.println("Keycloak users & FHIR Practitioners successfully deleted!");
     }
 
 }

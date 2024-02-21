@@ -16,7 +16,9 @@ public interface UserController {
 
     @POST
     Response createUser(User user);
-
+    @Path("/enable")
+    @POST
+    Response enableUser(@QueryParam("email") @DefaultValue("") String email);
     @PUT
     Response updateUser(User user);
 

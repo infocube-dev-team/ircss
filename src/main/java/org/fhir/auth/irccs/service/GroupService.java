@@ -7,15 +7,16 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Group;
-import org.hl7.fhir.r5.model.Reference;
+import org.fhir.auth.irccs.exceptions.OperationException;
+import org.hl7.fhir.instance.model.api.IIdType;
+import org.hl7.fhir.r5.model.*;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class GroupService {
     @Inject
     Keycloak keycloak;
     @Inject
-    GroupFhirController groupController;
+    FhirClient<Group> groupController;
 
     @Inject
     UserService userService;
@@ -61,7 +62,12 @@ public class GroupService {
         List<Group.GroupMemberComponent> practitionerReferences = new ArrayList<>();
         for(String email : group.getMembers()){
             userService.joinGroup(email, foundGroup);
-            practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference(userService.getUserByEmail_fhir(email).getId())));
+            try {
+                practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference(userService.getUserByEmail_fhir(email).getId())));
+            } catch (Exception e){
+                e.printStackTrace();
+                throw new OperationException("Couldn't find FHIR practitioner", OperationOutcome.IssueSeverity.ERROR);
+            }
         }
 
         Group fhirGroup = new Group();
@@ -69,7 +75,7 @@ public class GroupService {
         fhirGroup.setMember(practitionerReferences);
 
 
-        String groupCreated = groupController.create(groupController.encodeResourceToString(fhirGroup));
+        IIdType groupCreated = groupController.create(fhirGroup);
         LOG.info("Group created: {}", groupCreated);
 
         return Response.ok().status(Response.Status.CREATED).build();
@@ -106,15 +112,13 @@ public class GroupService {
 
 
         // Updating Fhir Practitioner Resource
-        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
-        params.put("name", Collections.singletonList(group.getName()));
 
-        Group fhirGroup = (Group) groupController.parseResource(groupController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Group fhirGroup = (Group) groupController.search("name=" + group.getName()).getEntry().get(0).getResource();
         Objects.requireNonNull(fhirGroup);
         fhirGroup.setName(group.getName());
         fhirGroup.setMember(practitionerReferences);
 
-        String groupUpdated = groupController.update(fhirGroup.getIdPart(), groupController.encodeResourceToString(fhirGroup));
+        Group groupUpdated = groupController.update(fhirGroup.getIdPart(), fhirGroup);
         LOG.info("Group updated: {}", groupUpdated);
 
         return Response.ok().status(Response.Status.ACCEPTED).build();
@@ -129,11 +133,7 @@ public class GroupService {
         GroupResource groupResource = groupsResource.group(foundGroup.getId());
         groupResource.remove();
 
-
-        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
-        params.put("name", Collections.singletonList(name));
-
-        Group group = (Group) groupController.parseResource(groupController.search(params), Bundle.class).getEntry().get(0).getResource();
+        Group group = (Group) groupController.search("name=" + name).getEntry().get(0).getResource();
         Objects.requireNonNull(group);
 
         groupController.delete(group.getIdPart());
