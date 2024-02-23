@@ -48,9 +48,11 @@ public class PermissionService {
         ResourcePermissionRepresentation resourcePermission = new ResourcePermissionRepresentation();
         String policyName = String.format("%s Policy - %s", type.toUpperCase(), groupName.toUpperCase());
         String groupId;
+        String adminGroupId;
 
         try {
            groupId = getRealm().groups().groups(groupName,  0,  1, false).get(0).getId();
+           adminGroupId = getRealm().groups().groups("admin",  0,  1, false).get(0).getId();
         } catch (Exception e){
             LOG.error("ERROR: Couldn't find group {}", groupName, e);
             throw new Exception("ERROR: Couldn't find group " + groupName);
@@ -89,7 +91,7 @@ public class PermissionService {
                 throw new IllegalArgumentException("Invalid resource type: " + type);
         }
 
-        ensureGroupPolicyExists(policyName, groupId, authzResource);
+        ensureGroupPolicyExists(policyName, groupId, adminGroupId, authzResource);
 
         resourcePermission.setName(calculatedName + " Permission");
         resourcePermission.addPolicy(policyName);
@@ -100,14 +102,6 @@ public class PermissionService {
 
         resourceCreation.close();
         resourcePermissionCreation.close();
-
-        ResourcePermissionRepresentation adminResourcePermission = new ResourcePermissionRepresentation();
-        adminResourcePermission.setResourceType(resourceName);
-        adminResourcePermission.addPolicy("Admin Policy");
-        adminResourcePermission.setName("Admin " + resourceName.toUpperCase() + " Permission");
-        Response adminResourcePermissionCreation = authzResource.permissions().resource().create(adminResourcePermission);
-        adminResourcePermissionCreation.close();
-
 
         return resourcePermissionCreation;
     }
@@ -128,13 +122,13 @@ public class PermissionService {
         return Response.ok().build();
     }
 
-    private void ensureGroupPolicyExists(String policyName, String groupId, AuthorizationResource authzResource) {
+    private void ensureGroupPolicyExists(String policyName, String groupId, String adminGroupId, AuthorizationResource authzResource) {
         try {
             authzResource.policies().group().findByName(policyName).getId();
         } catch (Exception e) {
             GroupPolicyRepresentation groupPolicyRepresentation = new GroupPolicyRepresentation();
             groupPolicyRepresentation.setName(policyName);
-            groupPolicyRepresentation.addGroup(groupId);
+            groupPolicyRepresentation.addGroup(groupId, adminGroupId);
             authzResource.policies().group().create(groupPolicyRepresentation).close();
         }
     }
