@@ -1,10 +1,7 @@
 package org.fhir.auth.irccs.controller;
 
 import io.quarkus.security.Authenticated;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.fhir.auth.irccs.entity.PermissionWrapper;
@@ -16,9 +13,9 @@ import org.fhir.auth.irccs.entity.PermissionWrapper;
 @Authenticated
 public interface PermissionController {
 
-/*    Response getPermission(@QueryParam("name") String name);*/
+    @GET
+    Response getPermission(@QueryParam("name") String name);
     @POST
     Response createPermission(PermissionWrapper permissions);
-/*    @PUT
-    Response updatePermission(PermissionWrapper permissions);*/
+
 }

@@ -39,7 +39,7 @@ public class PermissionService {
     }
 
     // Move it to a Fhir centered-class static
-    private Response createResource(String groupName, String resourceName, String type, AuthorizationResource authzResource) {
+    private Response createResource(String groupName, String resourceName, String type, AuthorizationResource authzResource) throws Exception {
         ResourceRepresentation resource = new ResourceRepresentation();
         String calculatedName = String.format("%s - %s: %s Resource", type.toUpperCase(), groupName.toUpperCase(), resourceName);
         resource.setName(calculatedName);
@@ -47,7 +47,14 @@ public class PermissionService {
 
         ResourcePermissionRepresentation resourcePermission = new ResourcePermissionRepresentation();
         String policyName = String.format("%s Policy - %s", type.toUpperCase(), groupName.toUpperCase());
-        String groupId = getRealm().groups().groups(groupName,  0,  1, false).get(0).getId();
+        String groupId;
+
+        try {
+           groupId = getRealm().groups().groups(groupName,  0,  1, false).get(0).getId();
+        } catch (Exception e){
+            LOG.error("ERROR: Couldn't find group {}", groupName, e);
+            throw new Exception("ERROR: Couldn't find group " + groupName);
+        }
 
         switch (type.toLowerCase()) {
             case "create":
@@ -86,6 +93,8 @@ public class PermissionService {
 
         resourcePermission.setName(calculatedName + " Permission");
         resourcePermission.addPolicy(policyName);
+        resourcePermission.addPolicy("Admin Policy");
+        resourcePermission.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
 
         Response resourceCreation = authzResource.resources().create(resource);
         resourcePermission.addResource(authzResource.resources().findByName(calculatedName).get(0).getId());
@@ -102,7 +111,11 @@ public class PermissionService {
 
         for (Permission p : permission.getPermissions()) {
             for (String scopeType : p.getPermissions()) {
-                createResource(permission.getGroupName(), p.getResource(), scopeType, authzResource).close();
+                try {
+                    createResource(permission.getGroupName(), p.getResource(), scopeType, authzResource).close();
+                } catch (Exception e){
+                    return Response.status(Response.Status.EXPECTATION_FAILED).build();
+                }
             }
         }
 
@@ -119,8 +132,6 @@ public class PermissionService {
             authzResource.policies().group().create(groupPolicyRepresentation).close();
         }
     }
-
-    // List of supported resources
 
 }
 

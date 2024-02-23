@@ -71,4 +71,14 @@ public class User {
         return user;
     }
 
+    public static User fromPractitioner(Practitioner practitioner){
+        User user = new User();
+        user.setId(practitioner.getIdentifier().get(0).getValue());
+        user.setName(practitioner.getName().get(0).getText());
+        user.setSurname(practitioner.getName().get(0).getFamily());
+        user.setEmail(practitioner.getTelecom().get(0).getValue());
+        user.setPhoneNumber(practitioner.getTelecom().get(1).getValue());
+        return user;
+    }
+
 }
