@@ -93,8 +93,6 @@ public class PermissionService {
 
         resourcePermission.setName(calculatedName + " Permission");
         resourcePermission.addPolicy(policyName);
-        resourcePermission.addPolicy("Admin Policy");
-        resourcePermission.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
 
         Response resourceCreation = authzResource.resources().create(resource);
         resourcePermission.addResource(authzResource.resources().findByName(calculatedName).get(0).getId());
@@ -102,6 +100,14 @@ public class PermissionService {
 
         resourceCreation.close();
         resourcePermissionCreation.close();
+
+        ResourcePermissionRepresentation adminResourcePermission = new ResourcePermissionRepresentation();
+        adminResourcePermission.setResourceType(resourceName);
+        adminResourcePermission.addPolicy("Admin Policy");
+        adminResourcePermission.setName("Admin " + resourceName.toUpperCase() + " Permission");
+        Response adminResourcePermissionCreation = authzResource.permissions().resource().create(adminResourcePermission);
+        adminResourcePermissionCreation.close();
+
 
         return resourcePermissionCreation;
     }
