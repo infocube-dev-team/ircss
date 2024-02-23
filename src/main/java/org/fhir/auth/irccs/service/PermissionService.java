@@ -61,7 +61,7 @@ public class PermissionService {
         switch (type.toLowerCase()) {
             case "create":
                 resource.addScope("POST");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName + "/*")));
+                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName)));
                 break;
             case "read":
                 resource.addScope("GET");
