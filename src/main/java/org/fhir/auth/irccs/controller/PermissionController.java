@@ -14,7 +14,7 @@ import org.fhir.auth.irccs.entity.PermissionWrapper;
 public interface PermissionController {
 
     @GET
-    Response getPermission(@QueryParam("name") String name);
+    Response getPermission(@QueryParam("groupId") String groupId);
     @POST
     Response createPermission(PermissionWrapper permissions);
 

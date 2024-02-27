@@ -15,7 +15,7 @@ public class UserControllerImpl implements UserController{
     }
 
     public Response createUser(User user) {
-        return userService.createUser(user);
+        return userService.createKeycloakUser(user);
     }
 
     public Response enableUser(String email) {

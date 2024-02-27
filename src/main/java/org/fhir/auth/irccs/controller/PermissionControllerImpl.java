@@ -10,8 +10,8 @@ public class PermissionControllerImpl implements PermissionController{
     @Inject
     PermissionService permissionService;
 
-    public Response getPermission(String name) {
-        return null;
+    public Response getPermission(String groupId) {
+        return permissionService.getPermission(groupId);
     }
 
     public Response createPermission(PermissionWrapper permissions) {

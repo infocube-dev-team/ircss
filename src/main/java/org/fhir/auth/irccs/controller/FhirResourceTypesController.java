@@ -1,12 +1,11 @@
 package org.fhir.auth.irccs.controller;
 
 import io.quarkus.security.Authenticated;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import org.fhir.auth.irccs.entity.Group;
-import org.fhir.auth.irccs.service.FhirResourceTypesService;
 
 import java.util.List;
 

@@ -7,9 +7,14 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.fhir.auth.irccs.RollbackSystem.Command;
+import org.fhir.auth.irccs.RollbackSystem.RollbackManager;
+import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.exceptions.OperationException;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.client.impl.ClientResponseImpl;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
@@ -21,10 +26,8 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ApplicationScoped
 public class GroupService {
@@ -47,7 +50,74 @@ public class GroupService {
         return getGroupByName(name);
     }
 
-    public Response createGroup(org.fhir.auth.irccs.entity.Group group) {
+    public Response createGroup(org.fhir.auth.irccs.entity.Group group) throws OperationException{
+        RollbackManager rollbackManager = new RollbackManager();
+
+        AtomicReference<org.fhir.auth.irccs.entity.Group> keycloakGroupRef = new AtomicReference<>();
+
+        rollbackManager.addCommand(new Command(
+                () -> {
+                    Response keycloakGroup = createKeycloakGroup(group);
+                    keycloakGroupRef.set(keycloakGroup.readEntity(org.fhir.auth.irccs.entity.Group.class)); // Set the result in the AtomicReference
+                    keycloakGroup.close();
+                },
+                () -> {}
+        ));
+
+        rollbackManager.addCommand(new Command(
+                () -> createFhirGroup(keycloakGroupRef.get()).close(),
+                () -> {}
+        ));
+
+        try {
+            rollbackManager.executeCommands();
+        } catch (Exception e){
+            throw new OperationException(e.getMessage(), OperationOutcome.IssueSeverity.ERROR);
+        }
+
+        return Response.ok(group).build();
+    }
+
+    public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
+        try {
+            GroupRepresentation groupRepresentation = new GroupRepresentation();
+            GroupsResource groupsResource = getRealm().groups();
+            groupRepresentation.setName(group.getName());
+            groupRepresentation.setAttributes(new HashMap<>(){{
+                put("organizations", group.getOrganizations());
+            }});
+            Response groupCreatedRes =  groupsResource.add(groupRepresentation);
+            GroupRepresentation groupCreated = groupsResource.group(CreatedResponseUtil.getCreatedId(groupCreatedRes)).toRepresentation();
+            for (String email : group.getMembers()) {
+                userService.joinGroup(email, groupCreated);
+            }
+            group.setId(groupCreated.getId());
+            return Response.ok(group).build();
+        } catch (Exception e) {
+            LOG.error("Error creating Keycloak group: " + group.getName(), e);
+            throw e;
+        }
+    }
+
+    public Response createFhirGroup(org.fhir.auth.irccs.entity.Group group) {
+        try {
+            Group fhirGroup = new Group();
+            List<Group.GroupMemberComponent> practitionerReferences = new ArrayList<>();
+            for (String email : group.getMembers()) {
+                practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference(userService.getUserByEmail_fhir(email).getId())));
+            }
+            fhirGroup.setName(group.getName());
+            fhirGroup.setMember(practitionerReferences);
+            fhirGroup.setIdentifier(List.of(new Identifier().setUse(Identifier.IdentifierUse.SECONDARY).setValue(group.getId())));
+            groupController.create(fhirGroup);
+            return Response.ok(group).build();
+        } catch (Exception e) {
+            LOG.error("Error creating Fhir group: " + group.getName(), e);
+            throw e;
+        }
+    }
+
+    /*public Response createGroup(org.fhir.auth.irccs.entity.Group group) {
         // Creating Keycloak Group Representation
 
         GroupRepresentation groupRepresentation = new GroupRepresentation();
@@ -88,7 +158,7 @@ public class GroupService {
 
         return Response.ok().status(Response.Status.CREATED).build();
 
-    }
+    }*/
 
     private Response getGroupByName(String name) {
         return Response.ok(getRealm().groups().groups(name, 0, 1, false)).build();

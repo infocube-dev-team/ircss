@@ -14,6 +14,7 @@ public interface UserController {
     @GET
     Response getAllUsers(@QueryParam("email") @DefaultValue("") String email);
 
+    @Path("/signup")
     @POST
     Response createUser(User user);
     @Path("/enable")

@@ -1,6 +1,9 @@
 package org.fhir.auth.irccs.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -17,10 +20,9 @@ import org.keycloak.representations.idm.authorization.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class PermissionService {
@@ -36,6 +38,24 @@ public class PermissionService {
 
     private RealmResource getRealm() {
         return keycloak.realm(realmName);
+    }
+
+    public Response getPermission(String groupId){
+
+        List<PolicyRepresentation> policies = getRealm().clients().get(getRealm().clients().findByClientId(clientId).get(0).getId())
+                .authorization().policies().policies().stream()
+                .filter(x -> {
+                    List<Map<String, String>> groupsList = null;
+                    try {
+                        groupsList = new ObjectMapper().readValue(x.getConfig().get("groups"), new TypeReference<List<Map<String, String>>>() {
+                        });
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return groupsList.stream().anyMatch(group -> groupId.equals(group.get("id")));
+                }).toList();
+
+        return Response.ok(getRealm().groups().group(groupId).roles()).build();
     }
 
     // Move it to a Fhir centered-class static

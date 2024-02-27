@@ -18,6 +18,7 @@ public class User {
     private String surname;
     private String email;
     private String password;
+    private Boolean enabled;
     private String phoneNumber;
     private List<String> organizationRequest;
 
@@ -26,7 +27,7 @@ public class User {
         userRepresentation.setUsername(user.getEmail());
         userRepresentation.setEmail(user.getEmail());
         userRepresentation.setEmailVerified(true);
-        userRepresentation.setEnabled(false);
+        userRepresentation.setEnabled(user.getEnabled());
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getSurname());
         userRepresentation.setId(user.getId());
@@ -58,6 +59,7 @@ public class User {
         practitioner.setIdentifier(List.of(new Identifier()
                 .setUse(Identifier.IdentifierUse.SECONDARY)
                 .setValue(user.getId())));
+        practitioner.setActive(user.getEnabled());
         return practitioner;
     }
 
@@ -67,7 +69,9 @@ public class User {
         user.setName(userRepresentation.getFirstName());
         user.setSurname(userRepresentation.getLastName());
         user.setPhoneNumber(userRepresentation.getAttributes().get("phoneNumber").get(0));
+        user.setOrganizationRequest(userRepresentation.getAttributes().get("organizationRequest"));
         user.setEmail(userRepresentation.getEmail());
+        user.setEnabled(userRepresentation.isEnabled());
         return user;
     }
 
