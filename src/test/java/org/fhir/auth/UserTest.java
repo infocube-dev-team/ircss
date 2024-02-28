@@ -18,6 +18,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.quarkus.irccs.client.restclient.FhirClient;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.keycloak.client.KeycloakTestClient;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -30,9 +31,16 @@ public class UserTest {
     @Inject
     FhirClient<Practitioner> practitionerFhirClient;
 
+    KeycloakTestClient keycloakClient = new KeycloakTestClient();
+
+    static {
+        RestAssured.useRelaxedHTTPSValidation();
+    }
     @Test
     @Order(1)
     public void UserSignsup() {
+        String devenabled = ConfigProvider.getConfig().getConfigValue("quarkus.devservices.enabled").getValue();
+        System.err.println(devenabled);
         String url =
             ConfigProvider.getConfig()
                     .getConfigValue("quarkus.keycloak.policy-enforcer.paths.0.path")
