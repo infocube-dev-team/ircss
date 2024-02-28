@@ -1,5 +1,6 @@
 package org.fhir.auth.irccs.controller;
 
+import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -9,6 +10,7 @@ import org.fhir.auth.irccs.entity.User;
 @Path("/fhir/auth/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public interface UserController {
 
     @GET
