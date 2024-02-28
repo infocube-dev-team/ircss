@@ -148,4 +148,18 @@ public class User {
     public void setOrganizationRequest(List<String> organizationRequest) {
         this.organizationRequest = organizationRequest;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", organizationRequest=" + organizationRequest +
+                '}';
+    }
 }

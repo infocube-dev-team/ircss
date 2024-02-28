@@ -162,6 +162,8 @@ public class UserTest {
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response().as(User.class);
 
+        System.out.println(resEnable);
+
         Thread.sleep(3000);
 
         Response createdPractitionerRes = RestAssured
@@ -220,6 +222,7 @@ public class UserTest {
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response().as(User.class);
 
+        System.out.println(resEnable);
         Thread.sleep(3000);
 
         Response createdPractitionerRes = RestAssured
@@ -271,7 +274,8 @@ public class UserTest {
                 .get("/fhir/auth/users")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(new TypeRef<List<User>>(){});
+                .extract().response().as(new TypeRef<>() {
+                });
 
         for(User user : users){
             if(!user.getEmail().equals("pascale@admin.it")){
@@ -292,7 +296,8 @@ public class UserTest {
                 .get("/fhir/auth/users")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(new TypeRef<List<User>>(){});
+                .extract().response().as(new TypeRef<>() {
+                });
 
         Assertions.assertEquals(1, users.size());
 
