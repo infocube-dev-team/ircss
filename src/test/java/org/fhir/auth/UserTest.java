@@ -1,25 +1,28 @@
 
 package org.fhir.auth;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.HttpStatus;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.fhir.auth.irccs.entity.User;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.quarkus.irccs.client.restclient.FhirClient;
+
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
-import org.apache.http.HttpStatus;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.fhir.auth.irccs.entity.User;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Practitioner;
-import org.junit.jupiter.api.*;
-import org.keycloak.Config;
-import org.keycloak.representations.idm.UserRepresentation;
-import org.quarkus.irccs.client.restclient.FhirClient;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
