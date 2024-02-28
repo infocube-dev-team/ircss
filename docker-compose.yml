@@ -6,34 +6,8 @@ services:
     image: "hapiproject/hapi:latest"
     container_name: APIFHIRSERVER
     ports:
-      - "8080:8080"
+      - "8980:8080"
     volumes:
-      - ./configs:/data/hapi
+      - ./fhir-configs:/data/hapi
     environment:
       SPRING_CONFIG_LOCATION: 'file:///data/hapi/irccs-application.yaml'
-
-  keycloak:
-    image: quay.io/keycloak/keycloak
-    container_name: KEYCLOAK
-    restart: always
-    entrypoint:
-      [
-      "/bin/sh",
-      "-c",
-      "/opt/keycloak/bin/kc.sh start-dev --import-realm",
-      ]
-    ports:
-      - "9445:8080"
-    environment:
-      KEYCLOAK_ADMIN: keycloak
-      KEYCLOAK_ADMIN_PASSWORD: keycloak
-      KC_HOSTNAME_STRICT: 'false'
-      KC_FEATURES_TOKEN_EXCHANGE: 'enabled'
-      KC_LOG_LEVEL: info
-      KC_METRICS_ENABLED: 'true'
-      KC_PROXY: edge
-      KC_HEALTH_ENABLED: 'true'
-    volumes:
-      - ./keycloak:/opt/keycloak/conf
-      - ./realm-export/pascale-realm.json:/opt/keycloak/data/import/pascale-realm.json
-      - ./realm-export:/export #opt/keycloak/bin/kc.sh export --realm pascale --users realm_file --dir /export

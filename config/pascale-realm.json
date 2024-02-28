@@ -592,7 +592,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "cwvB6qAn5iFl7pa9r04WxkordJyy3tjS",
-    "redirectUris" : [ "/*" ],
+    "redirectUris" : [ "/fhir/*" ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,

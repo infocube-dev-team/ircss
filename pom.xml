@@ -129,7 +129,7 @@
         <directory>src/main/resources</directory>
       </resource>
       <resource>
-        <directory>realm-export</directory>
+        <directory>config</directory>
       </resource>
     </resources>
     <plugins>
