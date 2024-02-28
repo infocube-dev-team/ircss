@@ -1,17 +1,17 @@
 package org.fhir.auth.irccs.entity;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r5.model.*;
-import org.keycloak.representations.idm.UserRepresentation;
-
 import java.util.HashMap;
 import java.util.List;
 
+import org.hl7.fhir.r5.model.ContactPoint;
+import org.hl7.fhir.r5.model.HumanName;
+import org.hl7.fhir.r5.model.Identifier;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.hl7.fhir.r5.model.StringType;
+import org.keycloak.representations.idm.UserRepresentation;
 
-@Getter @Setter
+
 public class User {
     private String id;
     private String name;
@@ -85,4 +85,67 @@ public class User {
         return user;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public List<String> getOrganizationRequest() {
+        return organizationRequest;
+    }
+
+    public void setOrganizationRequest(List<String> organizationRequest) {
+        this.organizationRequest = organizationRequest;
+    }
 }

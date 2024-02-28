@@ -8,10 +8,12 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import org.apache.http.HttpStatus;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.fhir.auth.irccs.entity.User;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.*;
+import org.keycloak.Config;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.quarkus.irccs.client.restclient.FhirClient;
 
@@ -28,6 +30,18 @@ public class UserTest {
     @Test
     @Order(1)
     public void UserSignsup() {
+        String url =
+            ConfigProvider.getConfig()
+                    .getConfigValue("quarkus.keycloak.policy-enforcer.paths.0.path")
+                    .getValue();
+
+        System.err.println(url);
+        String enforce =
+                ConfigProvider.getConfig()
+                        .getConfigValue("quarkus.keycloak.policy-enforcer.paths.0.enforcement-mode")
+                        .getValue();
+        System.err.println(enforce);
+
         // Testing what happens when a new Keycloak User signs up.
         User user = new User();
         user.setEmail("jhondoe1@gmail.com");
