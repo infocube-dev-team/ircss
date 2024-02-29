@@ -200,7 +200,7 @@
         "composite" : true,
         "composites" : {
           "client" : {
-            "realm-management" : [ "query-groups", "view-events", "create-client", "view-users", "manage-realm", "view-identity-providers", "query-realms", "manage-clients", "manage-authorization", "query-clients", "query-users", "impersonation", "manage-users", "manage-events", "view-clients", "view-realm", "view-authorization", "manage-identity-providers" ]
+            "realm-management" : [ "query-groups", "view-events", "view-users", "create-client", "manage-realm", "view-identity-providers", "query-realms", "manage-clients", "query-clients", "manage-authorization", "query-users", "impersonation", "manage-users", "manage-events", "view-clients", "view-realm", "view-authorization", "manage-identity-providers" ]
           }
         },
         "clientRole" : true,
@@ -350,6 +350,22 @@
     }
   },
   "groups" : [ {
+    "id" : "2d631434-3575-4431-a2aa-cc258fb63e0b",
+    "name" : "Medici",
+    "path" : "/Medici",
+    "subGroups" : [ ],
+    "attributes" : { },
+    "realmRoles" : [ ],
+    "clientRoles" : { }
+  }, {
+    "id" : "2b9d5075-9941-4337-ad93-208bfe65b6c4",
+    "name" : "Tirocinanti",
+    "path" : "/Tirocinanti",
+    "subGroups" : [ ],
+    "attributes" : { },
+    "realmRoles" : [ ],
+    "clientRoles" : { }
+  }, {
     "id" : "ac1041bb-731f-452f-92c5-e549752af05b",
     "name" : "admin",
     "path" : "/admin",
@@ -404,6 +420,38 @@
   "webAuthnPolicyPasswordlessAcceptableAaguids" : [ ],
   "webAuthnPolicyPasswordlessExtraOrigins" : [ ],
   "users" : [ {
+    "id" : "5eb0ab0a-0a68-4703-9249-08ae90d9b98b",
+    "createdTimestamp" : 1709220948898,
+    "username" : "medico@yopmail.com",
+    "enabled" : false,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Roberto",
+    "lastName" : "Bolle",
+    "email" : "medico@yopmail.com",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-pascale" ],
+    "notBefore" : 0,
+    "groups" : [ "/Medici" ]
+  }, {
+    "id" : "0564ffa9-9658-443f-ad53-ba6e146bcc8e",
+    "createdTimestamp" : 1709221001407,
+    "username" : "medicotirocinante@yopmail.com",
+    "enabled" : false,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Nicole",
+    "lastName" : "Sabatini",
+    "email" : "medicotirocinante@yopmail.com",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-pascale" ],
+    "notBefore" : 0,
+    "groups" : [ "/Medici", "/Tirocinanti" ]
+  }, {
     "id" : "4f814033-5e6b-4094-9c13-88582b03353a",
     "createdTimestamp" : 1706869746445,
     "username" : "pascale@admin.it",
@@ -443,6 +491,22 @@
     },
     "notBefore" : 0,
     "groups" : [ ]
+  }, {
+    "id" : "7f4c8dd1-e3fe-4209-b664-da23a2d9759d",
+    "createdTimestamp" : 1709220919642,
+    "username" : "tirocinante@yopmail.com",
+    "enabled" : false,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Massimiliano",
+    "lastName" : "Allegri",
+    "email" : "tirocinante@yopmail.com",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-pascale" ],
+    "notBefore" : 0,
+    "groups" : [ "/Tirocinanti" ]
   } ],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
@@ -718,7 +782,41 @@
         "displayName" : "Admin Resource",
         "attributes" : { },
         "_id" : "fe22362e-4d3f-4622-8baa-f0585214c14e",
-        "uris" : [ "/*" ],
+        "uris" : [ "/fhir/*" ],
+        "scopes" : [ {
+          "name" : "DELETE"
+        }, {
+          "name" : "GET"
+        }, {
+          "name" : "POST"
+        }, {
+          "name" : "PUT"
+        } ],
+        "icon_uri" : ""
+      }, {
+        "name" : "Medici Resource",
+        "ownerManagedAccess" : false,
+        "displayName" : "Medici Resource",
+        "attributes" : { },
+        "_id" : "4ee3c8a0-aa04-4c09-a8db-2dfaf1d48154",
+        "uris" : [ "/fhir/ResearchStudy", "/fhir/ResearchStudy/*" ],
+        "scopes" : [ {
+          "name" : "DELETE"
+        }, {
+          "name" : "GET"
+        }, {
+          "name" : "POST"
+        }, {
+          "name" : "PUT"
+        } ],
+        "icon_uri" : ""
+      }, {
+        "name" : "Tirocinanti Resource",
+        "ownerManagedAccess" : false,
+        "displayName" : "Tirocinanti Resource",
+        "attributes" : { },
+        "_id" : "4375ae61-b4c5-4622-b17d-373420835847",
+        "uris" : [ "/fhir/Patient/*", "/fhir/Patient" ],
         "scopes" : [ {
           "name" : "DELETE"
         }, {
@@ -741,6 +839,28 @@
           "roles" : "[{\"id\":\"irccs/admin\",\"required\":false}]"
         }
       }, {
+        "id" : "917d369b-e0c1-4056-a5cf-90d2ab8d686c",
+        "name" : "Medici Policy",
+        "description" : "",
+        "type" : "group",
+        "logic" : "POSITIVE",
+        "decisionStrategy" : "UNANIMOUS",
+        "config" : {
+          "groups" : "[{\"path\":\"/admin\",\"extendChildren\":false},{\"path\":\"/Medici\",\"extendChildren\":false}]",
+          "groupsClaim" : ""
+        }
+      }, {
+        "id" : "72e2f7ae-a52a-4359-8b23-74c5591ab1bd",
+        "name" : "Tirocinanti Policy",
+        "description" : "",
+        "type" : "group",
+        "logic" : "POSITIVE",
+        "decisionStrategy" : "UNANIMOUS",
+        "config" : {
+          "groups" : "[{\"path\":\"/admin\",\"extendChildren\":false},{\"path\":\"/Tirocinanti\",\"extendChildren\":false}]",
+          "groupsClaim" : ""
+        }
+      }, {
         "id" : "aa02e855-ab2d-4f89-bb9d-dcc1335f0879",
         "name" : "Admin Permission",
         "description" : "",
@@ -750,6 +870,28 @@
         "config" : {
           "resources" : "[\"Admin Resource\"]",
           "applyPolicies" : "[\"Admin Policy\"]"
+        }
+      }, {
+        "id" : "e5824b28-cc2e-417b-ac69-bd8071f12fa3",
+        "name" : "Medici Permission",
+        "description" : "",
+        "type" : "resource",
+        "logic" : "POSITIVE",
+        "decisionStrategy" : "UNANIMOUS",
+        "config" : {
+          "resources" : "[\"Medici Resource\"]",
+          "applyPolicies" : "[\"Medici Policy\"]"
+        }
+      }, {
+        "id" : "522b125c-8494-4793-8aa5-ced88c106f31",
+        "name" : "Tirocinanti Permission",
+        "description" : "",
+        "type" : "resource",
+        "logic" : "POSITIVE",
+        "decisionStrategy" : "UNANIMOUS",
+        "config" : {
+          "resources" : "[\"Tirocinanti Resource\"]",
+          "applyPolicies" : "[\"Tirocinanti Policy\"]"
         }
       } ],
       "scopes" : [ {
@@ -1391,7 +1533,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "saml-role-list-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
       }
     }, {
       "id" : "9ecfc219-aab7-4fc3-8cb2-a3786d9192f8",
@@ -1400,7 +1542,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper" ]
       }
     }, {
       "id" : "221dcd54-3967-4f49-9708-5371c1a50912",
