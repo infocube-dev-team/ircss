@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   hapi:
-    image: "hapiproject/hapi:latest"
+    image: "hapiproject/hapi:v6.10.1"
     container_name: APIFHIRSERVER
     ports:
       - "8980:8080"

@@ -9,7 +9,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.home>${user.home}/.m2/settings.xml</maven.home>
-    <i3.common.version>2.0.1-SNAPSHOT</i3.common.version>
+    <i3.common.version>2.0.4-SNAPSHOT</i3.common.version>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
     <quarkus.platform.version>3.7.4</quarkus.platform.version>
