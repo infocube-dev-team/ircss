@@ -99,6 +99,11 @@
       <artifactId>quarkus-test-keycloak-server</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.lorislab.quarkus</groupId>
+      <artifactId>quarkus-testcontainers-test</artifactId>
+      <version>0.3.0</version>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
