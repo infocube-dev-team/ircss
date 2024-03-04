@@ -1,9 +1,7 @@
 
 package org.fhir.auth;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.keycloak.client.KeycloakTestClient;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -18,23 +16,16 @@ import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.*;
 import org.keycloak.representations.AccessTokenResponse;
 import org.quarkus.irccs.client.restclient.FhirClient;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fhir.auth.HapiTestResourceLifecycleManager.getHapiPort;
-
-@Testcontainers
 @QuarkusTest
-@QuarkusTestResource(HapiTestResourceLifecycleManager.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserTest {
     @Inject
     FhirClient<Practitioner> practitionerFhirClient;
-
-    static KeycloakTestClient keycloakClient = new KeycloakTestClient();
 
     static {
         RestAssured.defaultParser = Parser.JSON;
@@ -167,7 +158,7 @@ public class UserTest {
                 .given()
                 .contentType("application/json")
                 .when()
-                .get("http://localhost:"+ getHapiPort() + "/fhir/Practitioner?email=" + resCreate.getEmail())
+                .get(getFhirUrl() + "/Practitioner?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
@@ -227,7 +218,7 @@ public class UserTest {
                 .given()
                 .contentType("application/json")
                 .when()
-                .get("http://localhost:" + getHapiPort() + "/fhir/Practitioner?email=" + resCreate.getEmail())
+                .get(getFhirUrl() + "/Practitioner?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract().response();
@@ -323,7 +314,8 @@ public class UserTest {
                 .formParams(params)
                 .when()
                 .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
+                .then()
+                .extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }
 
@@ -336,17 +328,19 @@ public class UserTest {
             put("client_secret", getClientSecret());
         }};
 
-        return RestAssured
+       return RestAssured
                 .given()
                 .contentType(ContentType.URLENC)
                 .formParams(params)
                 .when()
                 .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
+                .then()
+                .extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }
 
     private static String getKeycloakUrl(){
+        System.out.println(ConfigProvider.getConfig().getConfigValue("keycloak-url").getValue());
         return ConfigProvider.getConfig().getConfigValue("keycloak-url").getValue();
     }
 
@@ -368,6 +362,10 @@ public class UserTest {
 
     private static String getKeycloakRealm(){
         return ConfigProvider.getConfig().getConfigValue("keycloak-realm").getValue();
+    }
+    private static String getFhirUrl(){
+        System.out.println(ConfigProvider.getConfig().getConfigValue("org.quarkus.irccs.fhir-server").getValue());
+        return ConfigProvider.getConfig().getConfigValue("org.quarkus.irccs.fhir-server").getValue();
     }
 
 
