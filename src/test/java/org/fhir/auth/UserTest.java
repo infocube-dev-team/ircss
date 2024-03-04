@@ -10,13 +10,16 @@ import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.fhir.auth.irccs.entity.Group;
 import org.fhir.auth.irccs.entity.User;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.*;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.quarkus.irccs.client.restclient.FhirClient;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -356,25 +359,42 @@ public class UserTest {
         System.out.println("User " + res.getEmail() + " successfully found!");
     }
 
-    //@Test
+    @Test
     @Order(8)
-    public static String getAllAdmins(String username, String password) {
-        Map<String, String> params = new HashMap<>(){{
-            put("username", username);
-            put("password", password);
-            put("grant_type", "password");
-            put("client_id", getClientId());
-            put("client_secret", getClientSecret());
-        }};
+    public void getAllAdmins() {
 
-        return RestAssured
+        List<Group> groups = RestAssured
                 .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
+                .auth()
+                .oauth2(getAdminAccessToken())
+                .contentType("application/json")
                 .when()
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
-                .as(AccessTokenResponse.class).getToken();
+                .get("/fhir/auth/groups?name=admin")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        List<User> users = new ArrayList<User>();
+
+        if(groups.size() == 1){
+            for( String groupMember : groups.get(0).getMembers() ){
+                users.add(RestAssured
+                        .given()
+                        .auth()
+                        .oauth2(getAdminAccessToken())
+                        .contentType("application/json")
+                        .when()
+                        .get("/fhir/auth/users?email=" + groupMember)
+                        .then()
+                        .statusCode(HttpStatus.SC_OK)
+                        .extract().response().as(new TypeRef<>() {
+                        }));
+            }
+        }
+
+        System.out.println(users.size() + " admins found!");
+
     }
 
     public static String getAdminAccessToken() {

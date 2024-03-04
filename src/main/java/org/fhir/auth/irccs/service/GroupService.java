@@ -46,7 +46,7 @@ public class GroupService {
     private RealmResource getRealm(){return keycloak.realm(realm);}
 
     public Response getAllGroups(String name) {
-        if(name.isEmpty()) return Response.ok(getRealm().groups().groups(null, null, null, false)).build();
+        if(name.isEmpty()) return Response.ok(getRealm().groups().groups(null, null, null, true)).build();
         return getGroupByName(name);
     }
 
@@ -161,7 +161,7 @@ public class GroupService {
     }*/
 
     private Response getGroupByName(String name) {
-        return Response.ok(getRealm().groups().groups(name, 0, 1, false)).build();
+        return Response.ok(getRealm().groups().groups(name, 0, 1, true)).build();
     }
 
     public GroupRepresentation getGroupByName_representation(String name) {
