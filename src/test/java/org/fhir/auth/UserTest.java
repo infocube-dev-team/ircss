@@ -299,7 +299,66 @@ public class UserTest {
         System.out.println("Keycloak users & FHIR Practitioners successfully deleted!");
     }
 
-    public static String getAccessToken(String username, String password) {
+    @Test
+    @Order(6)
+    public void UserSignUp() {
+        // Testing what happens when a new Keycloak User signs up.
+        User user = new User();
+        user.setEmail("francescototti@gmail.com");
+        user.setPhoneNumber("+391010101010");
+        user.setName("Francesco");
+        user.setSurname("Totti");
+        user.setPassword("FrancescoTotti10");
+
+        User res = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users/signup")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(User.class);
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getPhoneNumber(), user.getPhoneNumber());
+        Assertions.assertEquals(res.getName(), user.getName());
+        Assertions.assertEquals(res.getSurname(), user.getSurname());
+        Assertions.assertEquals(res.getEnabled(), false);
+
+        System.out.println("User successfully created! " + res.getEmail());
+    }
+
+    @Test
+    @Order(7)
+    public void UserCheck() {
+        User user = new User();
+        user.setEmail("francescototti@gmail.com");
+        user.setPhoneNumber("+391010101010");
+        user.setName("Francesco");
+        user.setSurname("Totti");
+        user.setPassword("FrancescoTotti10");
+
+        User res = RestAssured
+                .given()
+                .auth()
+                .oauth2(getAdminAccessToken())
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users?email=francescototti@gmail.com")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+
+        System.out.println("User " + res.getEmail() + " successfully found!");
+    }
+
+    //@Test
+    @Order(8)
+    public static String getAllAdmins(String username, String password) {
         Map<String, String> params = new HashMap<>(){{
             put("username", username);
             put("password", password);
@@ -314,8 +373,7 @@ public class UserTest {
                 .formParams(params)
                 .when()
                 .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then()
-                .extract().response()
+                .then().extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }
 
@@ -328,19 +386,17 @@ public class UserTest {
             put("client_secret", getClientSecret());
         }};
 
-       return RestAssured
+        return RestAssured
                 .given()
                 .contentType(ContentType.URLENC)
                 .formParams(params)
                 .when()
                 .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then()
-                .extract().response()
+                .then().extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }
 
     private static String getKeycloakUrl(){
-        System.out.println(ConfigProvider.getConfig().getConfigValue("keycloak-url").getValue());
         return ConfigProvider.getConfig().getConfigValue("keycloak-url").getValue();
     }
 
@@ -368,5 +424,23 @@ public class UserTest {
         return ConfigProvider.getConfig().getConfigValue("org.quarkus.irccs.fhir-server").getValue();
     }
 
+    public static String getAccessToken(String username, String password) {
+        Map<String, String> params = new HashMap<>(){{
+            put("username", username);
+            put("password", password);
+            put("grant_type", "password");
+            put("client_id", getClientId());
+            put("client_secret", getClientSecret());
+        }};
+
+        return RestAssured
+                .given()
+                .contentType(ContentType.URLENC)
+                .formParams(params)
+                .when()
+                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
+                .then().extract().response()
+                .as(AccessTokenResponse.class).getToken();
+    }
 
 }
