@@ -43,10 +43,18 @@ public class GroupService {
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
 
-    private RealmResource getRealm(){return keycloak.realm(realm);}
+    public RealmResource getRealm(){return keycloak.realm(realm);}
 
     public Response getAllGroups(String name) {
-        if(name.isEmpty()) return Response.ok(getRealm().groups().groups(null, null, null, true)).build();
+        if(name.isEmpty()) {
+            return Response.ok(getRealm()
+                            .groups()
+                            .groups(name, 0, 1, true)
+                            .stream()
+                            .map(org.fhir.auth.irccs.entity.Group::fromGroupRepresentation)
+                            .toList())
+                    .build();
+        }
         return getGroupByName(name);
     }
 
@@ -161,7 +169,7 @@ public class GroupService {
     }*/
 
     private Response getGroupByName(String name) {
-        return Response.ok(getRealm().groups().groups(name, 0, 1, true)).build();
+        return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getRealm().groups().groups(name, 0, 1, true).get(0))).build();
     }
 
     public GroupRepresentation getGroupByName_representation(String name) {

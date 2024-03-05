@@ -16,7 +16,6 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.*;
 import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.quarkus.irccs.client.restclient.FhirClient;
 
 import java.util.ArrayList;
@@ -363,7 +362,7 @@ public class UserTest {
     @Order(8)
     public void getAllAdmins() {
 
-        List<Group> groups = RestAssured
+        Group groups = RestAssured
                 .given()
                 .auth()
                 .oauth2(getAdminAccessToken())
@@ -377,8 +376,7 @@ public class UserTest {
 
         List<User> users = new ArrayList<User>();
 
-        if(groups.size() == 1){
-            for( String groupMember : groups.get(0).getMembers() ){
+            for( String groupMember : groups.getMembers() ){
                 users.add(RestAssured
                         .given()
                         .auth()
@@ -391,7 +389,6 @@ public class UserTest {
                         .extract().response().as(new TypeRef<>() {
                         }));
             }
-        }
 
         System.out.println(users.size() + " admins found!");
 
