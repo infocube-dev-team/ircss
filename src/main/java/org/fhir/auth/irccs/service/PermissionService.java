@@ -12,9 +12,8 @@ import org.fhir.auth.irccs.entity.Permission;
 import org.fhir.auth.irccs.entity.PermissionWrapper;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.AuthorizationResource;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RolesResource;
+import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.*;
 import org.slf4j.Logger;
@@ -22,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -42,7 +43,61 @@ public class PermissionService {
 
     public Response getPermission(String groupId){
 
-        List<PolicyRepresentation> policies = getRealm().clients().get(getRealm().clients().findByClientId(clientId).get(0).getId())
+        return Response.ok(
+                "{\n" +
+                        "    \"groupId\": \"df150a40-430c-4afa-98bc-6f970b2bcb95\",\n" +
+                        "    \"groupName\": \"admin\",\n" +
+                        "    \"permissions\": [\n" +
+                        "        {\n" +
+                        "            \"resource\": \"Practitioner\",\n" +
+                        "            \"read\": true,\n" +
+                        "            \"create\": true,\n" +
+                        "            \"update\": false,\n" +
+                        "            \"history\": false,\n" +
+                        "            \"delete\": false,\n" +
+                        "            \"search\": false\n" +
+                        "        },\n" +
+                        "          {\n" +
+                        "            \"resource\": \"Observation\",\n" +
+                        "            \"read\": false,\n" +
+                        "            \"create\": true,\n" +
+                        "            \"update\": false,\n" +
+                        "            \"history\": true,\n" +
+                        "            \"delete\": false,\n" +
+                        "            \"search\": false\n" +
+                        "        },\n" +
+                        "          {\n" +
+                        "            \"resource\": \"ResearchStudy\",\n" +
+                        "            \"read\": false,\n" +
+                        "            \"create\": true,\n" +
+                        "            \"update\": false,\n" +
+                        "            \"history\": false,\n" +
+                        "            \"delete\": true,\n" +
+                        "            \"search\": false\n" +
+                        "        },\n" +
+                        "          {\n" +
+                        "            \"resource\": \"PractitionerRole\",\n" +
+                        "            \"read\": true,\n" +
+                        "            \"create\": true,\n" +
+                        "            \"update\": false,\n" +
+                        "            \"history\": false,\n" +
+                        "            \"delete\": false,\n" +
+                        "            \"search\": true\n" +
+                        "        },\n" +
+                        "          {\n" +
+                        "            \"resource\": \"CarePlan\",\n" +
+                        "            \"read\": true,\n" +
+                        "            \"create\": true,\n" +
+                        "            \"update\": false,\n" +
+                        "            \"history\": false,\n" +
+                        "            \"delete\": false,\n" +
+                        "            \"search\": true\n" +
+                        "        }\n" +
+                        "    ]\n" +
+                        "}"
+        ).build();
+
+        /*List<PolicyRepresentation> policies = getRealm().clients().get(getRealm().clients().findByClientId(clientId).get(0).getId())
                 .authorization().policies().policies().stream()
                 .filter(x -> {
                     List<Map<String, String>> groupsList = null;
@@ -55,7 +110,7 @@ public class PermissionService {
                     return groupsList.stream().anyMatch(group -> groupId.equals(group.get("id")));
                 }).toList();
 
-        return Response.ok(getRealm().groups().group(groupId).roles()).build();
+        return Response.ok(getRealm().groups().group(groupId).roles()).build();*/
     }
 
     // Move it to a Fhir centered-class static

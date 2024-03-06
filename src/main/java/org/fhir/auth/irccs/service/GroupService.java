@@ -26,6 +26,9 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -51,7 +54,7 @@ public class GroupService {
                             .groups()
                             .groups(name, 0, 1, true)
                             .stream()
-                            .map(org.fhir.auth.irccs.entity.Group::fromGroupRepresentation)
+                            .map(x -> org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(x, getRealm()))
                             .toList())
                     .build();
         }
@@ -112,7 +115,7 @@ public class GroupService {
             Group fhirGroup = new Group();
             List<Group.GroupMemberComponent> practitionerReferences = new ArrayList<>();
             for (String email : group.getMembers()) {
-                practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference(userService.getUserByEmail_fhir(email).getId())));
+                practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference("Practitioner/"+userService.getUserByEmail_fhir(email).getIdPart())));
             }
             fhirGroup.setName(group.getName());
             fhirGroup.setMember(practitionerReferences);
@@ -169,7 +172,7 @@ public class GroupService {
     }*/
 
     private Response getGroupByName(String name) {
-        return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getRealm().groups().groups(name, 0, 1, true).get(0))).build();
+        return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getGroupByName_representation(name), getRealm())).build();
     }
 
     public GroupRepresentation getGroupByName_representation(String name) {
@@ -200,7 +203,7 @@ public class GroupService {
 
         // Updating Fhir Practitioner Resource
 
-        Group fhirGroup = (Group) groupController.search("name=" + group.getName()).getEntry().get(0).getResource();
+        Group fhirGroup = (Group) groupController.search("name=" + URLEncoder.encode(group.getName(), StandardCharsets.UTF_8)).getEntry().get(0).getResource();
         Objects.requireNonNull(fhirGroup);
         fhirGroup.setName(group.getName());
         fhirGroup.setMember(practitionerReferences);
