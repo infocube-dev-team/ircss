@@ -114,7 +114,7 @@ public class UserTest {
     @Test
     @Order(3)
     public void UserGetsEnabled() throws InterruptedException {
-        // Testing what happens when a User gets enabled.
+        // Testing what happens when a User gets enabled.F
         User user = new User();
         user.setEmail("jhondoe3@gmail.com");
         user.setPhoneNumber("+393388888888");
@@ -360,7 +360,7 @@ public class UserTest {
 
     @Test
     @Order(8)
-    public void getAllAdmins() {
+    public void checkApiWithAdmin() {
 
         Group groups = RestAssured
                 .given()
@@ -391,6 +391,109 @@ public class UserTest {
             }
 
         System.out.println(users.size() + " admins found!");
+
+        User admin = users.get(0);
+
+        // Testing what happens when a new Keycloak User signs up.
+        User user = new User();
+        user.setEmail("email@gmail.com");
+        user.setPhoneNumber("+391010101010");
+        user.setName("Email");
+        user.setSurname("Random");
+        user.setPassword("EmailRandom1");
+
+        User res = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users/signup")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(User.class);
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getPhoneNumber(), user.getPhoneNumber());
+        Assertions.assertEquals(res.getName(), user.getName());
+        Assertions.assertEquals(res.getSurname(), user.getSurname());
+        Assertions.assertEquals(res.getEnabled(), false);
+
+        System.out.println("User successfully created! " + res.getEmail());
+
+        // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
+        User resEnable = RestAssured
+                .given()
+                .auth()
+                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .contentType("application/json")
+                .when()
+                .post("/fhir/auth/users/enable?email=" + res.getEmail())
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(User.class);
+
+        System.out.println(resEnable);
+
+        res.setSurname("Changed");
+
+        User resChanged = RestAssured
+                .given()
+                .auth()
+                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .contentType("application/json")
+                .body(res)
+                .when()
+                .put("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(User.class);
+
+        Assertions.assertEquals(resChanged.getSurname(), "Changed");
+
+        System.out.println("Surname of " + resChanged.getEmail() + " successfully changed to \"" + resChanged.getSurname() + "\"");
+
+        users = RestAssured
+                .given()
+                .auth()
+                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        Assertions.assertEquals(2, users.size());
+
+        System.out.println("Users size: " + users.size() + "!");
+
+        RestAssured
+                .given()
+                .auth()
+                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .contentType("application/json")
+                .when()
+                .delete("/fhir/auth/users?email=" + res.getEmail())
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        users = RestAssured
+                .given()
+                .auth()
+                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        Assertions.assertEquals(1, users.size());
+
+        System.out.println("Users size: " + users.size() + "!");
+        System.out.println("User successfully deleted!");
 
     }
 

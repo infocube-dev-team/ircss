@@ -211,7 +211,7 @@ public class GroupService {
         Group groupUpdated = groupController.update(fhirGroup.getIdPart(), fhirGroup);
         LOG.info("Group updated: {}", groupUpdated);
 
-        return Response.ok().status(Response.Status.ACCEPTED).build();
+        return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(foundGroup, getRealm())).status(Response.Status.ACCEPTED).build();
 
     }
 
