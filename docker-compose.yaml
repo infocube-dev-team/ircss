@@ -1,0 +1,52 @@
+version: '3.1'
+
+services:
+  fhir:
+    container_name: fhir
+    image: "hapiproject/hapi:v6.10.1"
+    ports:
+      - "8080:8080"
+    networks:
+      - irccs-docker_default
+    volumes:
+      - ./configs:/data/hapi
+      - ./application.yaml:/home/application.yaml
+    environment:
+      SPRING_CONFIG_LOCATION: '/home/application.yaml'
+      hapi.fhir.allow_external_references: "true"
+    depends_on:
+      - db
+      #- elasticsearch
+
+  #elasticsearch:
+  #  image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+  #  container_name: elasticsearch
+  #  ports:
+  #    - "9200:9200"
+  #  environment:
+  #    ELASTIC_PASSWORD: "123456"
+  #    discovery.type: single-node
+  #    xpack.security.enabled: true
+  #    path.data: /usr/share/elasticsearch/data
+  #    bootstrap.memory_lock: true
+  #    ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+  db:
+    image: postgres:16-bullseye
+    restart: always
+    container_name: fhir_db
+    volumes:
+      - ./hapi.postgress.data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: hapi
+    ports:
+      - "5432:5432"
+    networks:
+      - irccs-docker_default
+  
+networks:
+  irccs-docker_default:
+    external: true
+    name: irccs-docker_default
