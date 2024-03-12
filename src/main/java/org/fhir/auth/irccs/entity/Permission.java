@@ -15,36 +15,36 @@ public class Permission {
     }
 
     public void setCreate(Boolean create) {
-        if(create){
+        if(!create){
             this.permissions.add("create");
         }
     }
 
     public void setRead(Boolean read) {
-        if(read){
+        if(!read){
             this.permissions.add("read");
         }
     }
     public void setUpdate(Boolean update) {
-        if(update){
+        if(!update){
             this.permissions.add("update");
         }
     }
 
     public void setSearch(Boolean search) {
-        if(search){
+        if(!search){
             this.permissions.add("search");
         }
     }
 
     public void setHistory(Boolean history) {
-        if(history){
+        if(!history){
             this.permissions.add("history");
         }
     }
 
     public void setDelete(Boolean delete) {
-        if(delete){
+        if(!delete){
             this.permissions.add("delete");
         }
     }
