@@ -136,30 +136,30 @@ public class PermissionService {
         switch (type.toLowerCase()) {
             case "create":
                 resource.addScope("POST");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName)));
+                resource.setUris(new HashSet<>(Collections.singleton("/fhir/" + resourceName)));
                 break;
             case "read":
                 resource.addScope("GET");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName + "/*")));
+                resource.setUris(new HashSet<>(Collections.singleton("/fhir/" + resourceName + "/*")));
                 break;
             case "update":
                 resource.addScope("PUT");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName + "/*")));
+                resource.setUris(new HashSet<>(Collections.singleton("/fhir/" + resourceName + "/*")));
                 break;
             case "delete":
                 resource.addScope("DELETE");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName + "/*")));
+                resource.setUris(new HashSet<>(Collections.singleton("/fhir/" + resourceName + "/*")));
                 break;
             case "search":
                 resource.addScope("GET");
-                resource.setUris(new HashSet<>(Collections.singleton("/" + resourceName + "/_search")));
+                resource.setUris(new HashSet<>(Collections.singleton("/fhir/" + resourceName + "/_search")));
                 break;
             case "history":
                 resource.addScope("GET");
                 resource.setUris(new HashSet<>(List.of(
-                        "/" + resourceName + "/_history",
-                        "/" + resourceName + "/{id}/_history",
-                        "/" + resourceName + "/{id}/_history/{version_id}"
+                        "/fhir/" + resourceName + "/_history",
+                        "/fhir/" + resourceName + "/{id}/_history",
+                        "/fhir/" + resourceName + "/{id}/_history/{version_id}"
                 )));
                 break;
             default:
