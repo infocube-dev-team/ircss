@@ -16,11 +16,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @ApplicationScoped
 public class KeycloakService {
+    private final static Logger LOG = LoggerFactory.getLogger(KeycloakService.class);
 
     @ConfigProperty(name = "keycloak-realm")
     String realm;
@@ -37,12 +40,14 @@ public class KeycloakService {
 
     public Response exchangeToken(String payload) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            LOG.info("Asking for access token to: " + authServer + "/protocol/openid-connect/token");
             HttpPost request = new HttpPost(authServer + "/protocol/openid-connect/token");
             payload = String.format(URIDecoder.decodeURIComponent(payload) + "&client_id=%s&client_secret=%s", clientId, clientSecret);
             StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_FORM_URLENCODED);
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
             HttpEntity responseEntity = response.getEntity();
+            LOG.info("Response is: " + responseEntity);
             return Response.status(response.getStatusLine().getStatusCode()).entity(null != responseEntity ? EntityUtils.toString(responseEntity) : null).build();
         } catch (IOException e) {
             e.printStackTrace();
