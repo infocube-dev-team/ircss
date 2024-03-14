@@ -19,6 +19,15 @@ public interface UserController {
     @Path("/signup")
     @POST
     Response createUser(User user);
+
+    @Path("/token")
+    @Consumes("application/x-www-form-urlencoded")
+    @POST
+    Response tokenExchange(String payload);
+    @Path("/logout")
+    @Consumes("application/x-www-form-urlencoded")
+    @POST
+    Response logout(String payload);
     @Path("/enable")
     @POST
     Response enableUser(@QueryParam("email") @DefaultValue("") String email);
@@ -28,3 +37,4 @@ public interface UserController {
     @DELETE
     Response deleteUser(@QueryParam("email") String email);
 }
+
