@@ -558,7 +558,7 @@ public class UserTest {
                 .contentType(ContentType.URLENC)
                 .formParams(params)
                 .when()
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
+                .post("/fhir/auth/users/token")
                 .then().extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }
