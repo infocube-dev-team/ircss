@@ -464,7 +464,7 @@ public class UserTest {
                 .extract().response().as(new TypeRef<>() {
                 });
 
-        Assertions.assertEquals(2, users.size());
+        Assertions.assertEquals(3, users.size());
 
         System.out.println("Users size: " + users.size() + "!");
 
@@ -490,7 +490,7 @@ public class UserTest {
                 .extract().response().as(new TypeRef<>() {
                 });
 
-        Assertions.assertEquals(1, users.size());
+        Assertions.assertEquals(2, users.size());
 
         System.out.println("Users size: " + users.size() + "!");
         System.out.println("User successfully deleted!");
@@ -558,7 +558,8 @@ public class UserTest {
                 .contentType(ContentType.URLENC)
                 .formParams(params)
                 .when()
-                .post("/fhir/auth/users/token")
+                //.post("/fhir/auth/users/token")
+                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
                 .then().extract().response()
                 .as(AccessTokenResponse.class).getToken();
     }

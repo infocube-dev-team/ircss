@@ -87,7 +87,6 @@ public class GroupTest {
         groupBody.setName("Users");
         groupBody.setMembers(members);
         groupBody.setOrganizations(organizations);
-
         Group resGroups = RestAssured
                 .given()
                 .auth()
@@ -104,7 +103,7 @@ public class GroupTest {
         Assertions.assertEquals(resGroups.getOrganizations(), groupBody.getOrganizations());
         Assertions.assertEquals(resGroups.getMembers(), groupBody.getMembers());
 
-        System.out.println(resGroups.getName() + " group with id:+" + resGroups.getId() + " successfully created!");
+        System.out.println(resGroups.getName() + " group with id:" + resGroups.getId() + " successfully created!");
 
         organizations.add("prova");
         resGroups.setOrganizations(organizations);
@@ -230,6 +229,7 @@ public class GroupTest {
                 .contentType(ContentType.URLENC)
                 .formParams(params)
                 .when()
+                //.post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
                 .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
                 .then().extract().response()
                 .as(AccessTokenResponse.class).getToken();
