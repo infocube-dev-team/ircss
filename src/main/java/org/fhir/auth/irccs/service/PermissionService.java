@@ -10,6 +10,7 @@ import org.fhir.auth.irccs.entity.PermissionWrapper;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.admin.client.token.TokenManager;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,7 @@ public class PermissionService {
             LOG.error("ERROR: Couldn't find group {}", groupName, e);
             throw new Exception("ERROR: Couldn't find group " + groupName);
         }
-        ensureGroupPolicyExists(policyName, groupId, adminGroupId, authzResource);
+        ensureGroupPolicyExists(policyName, groupId, adminGroupId, authzResource, resourceName, type);
         String calculatedName = String.format("%s Resource", resourceName);
         ensureResourcesExists(calculatedName, authzResource, resourceName);
 
@@ -159,16 +160,19 @@ public class PermissionService {
         return Response.ok().build();
     }
 
-    private Response ensureGroupPolicyExists(String policyName, String groupId, String adminGroupId, AuthorizationResource authzResource) {
+    private Response ensureGroupPolicyExists(String policyName, String groupId, String adminGroupId, AuthorizationResource authzResource, String resourceName, String type) {
         Response policy = null;
 
         try {
             policy = Response.ok(authzResource.policies().group().findById(authzResource.policies().group().findByName(policyName).getId())).build();
         } catch (Exception e) {
+            RoleRepresentation role = new RoleRepresentation(String.format("%s:%s", resourceName.toLowerCase(), type), String.format("Allows group to %s a %s.", type, resourceName), false);
+            getRealm().roles().create(role);
             GroupPolicyRepresentation groupPolicyRepresentation = new GroupPolicyRepresentation();
             groupPolicyRepresentation.setName(policyName);
             groupPolicyRepresentation.addGroup(groupId);
             groupPolicyRepresentation.setDescription(groupId);
+            getRealm().groups().group(groupId).roles().realmLevel().add(getRealm().roles().list().stream().filter(rolem -> rolem.getName().equals(String.format("%s:%s", resourceName.toLowerCase(), type))).toList());
             policy = authzResource.policies().group().create(groupPolicyRepresentation);
             policy.close();
         }

@@ -144,18 +144,21 @@ public class UserService {
 
             LOG.info("Keycloak User created: " + user.getEmail() + ". Setting password...");
 
-            // Prepare the credential for the user's password
-            CredentialRepresentation credentialPassword = new CredentialRepresentation();
-            credentialPassword.setTemporary(false);
-            credentialPassword.setType(CredentialRepresentation.PASSWORD);
-            credentialPassword.setValue(user.getPassword());
-            UserResource userResource = usersResource.get(user.getId());
-            Objects.requireNonNull(userResource, "UserResource cannot be null for password reset.");
+            if(null != user.getPassword()){
+                // Prepare the credential for the user's password
+                CredentialRepresentation credentialPassword = new CredentialRepresentation();
+                credentialPassword.setTemporary(false);
+                credentialPassword.setType(CredentialRepresentation.PASSWORD);
+                credentialPassword.setValue(user.getPassword());
+                UserResource userResource = usersResource.get(user.getId());
+                Objects.requireNonNull(userResource, "UserResource cannot be null for password reset.");
 
-            // Reset the user's password
-            userResource.resetPassword(credentialPassword);
+                // Reset the user's password
+                userResource.resetPassword(credentialPassword);
 
-            LOG.info("Password set for Keycloak User: " + user.getEmail());
+                LOG.info("Password set for Keycloak User: " + user.getEmail());
+            }
+
 
             return Response.ok(user).build();
         } catch (Exception e) {
@@ -206,29 +209,13 @@ public class UserService {
     }
 
     public Response updateKeycloakUser(User user) {
-        UsersResource usersResource = getRealm().users();
-        UserRepresentation userRepresentation;
-        String userId;
+        UserResource userResource = getRealm().users().get(user.getId());
 
         // Attempt to find the user by email
         try {
-            userRepresentation = getUserByEmail_keycloak(user.getEmail());
-            userId = userRepresentation.getId();
-            // Check if the user ID is not null
-            Objects.requireNonNull(userId, "User ID is null.");
-            UserRepresentation userRepresentationUpdated = User.toUserRepresentation(user);
-            userRepresentationUpdated.setId(userId);
-            LOG.info("User found with ID: {}", userId);
-
-            CredentialRepresentation credentialPassword = new CredentialRepresentation();
-            credentialPassword.setTemporary(false);
-            credentialPassword.setType(CredentialRepresentation.PASSWORD);
-            credentialPassword.setValue(user.getPassword());
-            UserResource userResource = usersResource.get(userId);
-            userResource.resetPassword(credentialPassword);
-            userResource.update(userRepresentationUpdated);
+            userResource.update(User.toUserRepresentation(user));
             LOG.info("User updated successfully.");
-            return Response.ok(getUserByEmail_keycloak(user.getEmail())).build();
+            return Response.ok(user).build();
         } catch (Exception e) {
             LOG.error("Error retrieving KEYCLOAK user: " + user.getEmail(), e);
             throw e;

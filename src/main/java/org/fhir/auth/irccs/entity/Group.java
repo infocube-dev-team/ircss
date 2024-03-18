@@ -1,12 +1,16 @@
 package org.fhir.auth.irccs.entity;
 
 
+import jakarta.inject.Inject;
 import org.fhir.auth.irccs.service.GroupService;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +18,8 @@ import java.util.stream.Collectors;
 
 public class Group {
 
+    @Inject
+    Keycloak keycloak;
     private String id;
     private String name;
     private List<String> members;
@@ -65,6 +71,34 @@ public class Group {
             group.setOrganizations(attributes.get("organizations"));
         }
         return group;
+    }
+
+    public static GroupRepresentation toGroupRepresentation(Group group, RealmResource realm){
+        GroupRepresentation groupRepresentation = new GroupRepresentation();
+
+        if(null != group.getId()){
+            groupRepresentation.setId(group.getId());
+        }
+        if(null != group.getName()){
+            groupRepresentation.setName(group.getName());
+        }
+        if(null != group.getId()){
+            List<UserRepresentation> users = realm.groups().group(group.getId()).members();
+            users.forEach(member -> realm.users().get(member.getId()).leaveGroup(group.getId()) );
+        }
+        if(group.getMembers().size() > 0){
+
+            group.getMembers().forEach(member -> realm.users().get(member).joinGroup(group.getId()) );
+        }
+        if(group.getOrganizations().size() > 0){
+            groupRepresentation.setAttributes(new HashMap<>(){{
+                put("organizations", group.getOrganizations());
+            }});
+        } else {
+            groupRepresentation.setAttributes(new HashMap<>());
+        }
+
+        return groupRepresentation;
     }
 
 }

@@ -91,21 +91,20 @@ public class GroupService {
 
     public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
         try {
-            GroupRepresentation groupRepresentation = new GroupRepresentation();
-            GroupsResource groupsResource = getRealm().groups();
-            groupRepresentation.setName(group.getName());
-            groupRepresentation.setAttributes(new HashMap<>(){{
-                put("organizations", group.getOrganizations());
-            }});
-            Response groupCreatedRes =  groupsResource.add(groupRepresentation);
-            GroupRepresentation groupCreated = groupsResource.group(CreatedResponseUtil.getCreatedId(groupCreatedRes)).toRepresentation();
-            for (String email : group.getMembers()) {
-                userService.joinGroup(email, groupCreated);
-            }
-            group.setId(groupCreated.getId());
+            group.setId(CreatedResponseUtil.getCreatedId(getRealm().groups().add(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()))));
             return Response.ok(group).build();
         } catch (Exception e) {
             LOG.error("Error creating Keycloak group: " + group.getName(), e);
+            throw e;
+        }
+    }
+
+    public Response updateKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
+        try {
+            getRealm().groups().group(group.getId()).update(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()));
+            return Response.ok(group).build();
+        } catch (Exception e) {
+            LOG.error("Error updating Keycloak group: " + group.getName(), e);
             throw e;
         }
     }

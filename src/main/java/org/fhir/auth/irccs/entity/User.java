@@ -30,10 +30,13 @@ public class User {
         userRepresentation.setEnabled(user.getEnabled());
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getSurname());
-        userRepresentation.setId(user.getId());
         userRepresentation.setAttributes(new HashMap<>(){{
-            put("organizationRequest", user.getOrganizationRequest());
-            put("phoneNumber", List.of(user.getPhoneNumber()));
+            if(null != user.getOrganizationRequest()){
+                put("organizationRequest", user.getOrganizationRequest());
+            }
+            if(null != user.getPhoneNumber()){
+                put("phoneNumber", List.of(user.getPhoneNumber()));
+            }
         }});
 
         return userRepresentation;
