@@ -21,6 +21,9 @@ public class UserControllerImpl implements UserController{
     public Response createUser(User user) {
         return userService.createKeycloakUser(user);
     }
+    public Response signUp(User user) {
+        return userService.createKeycloakUser(user);
+    }
 
     public Response tokenExchange(String payload) {
         return keycloakService.exchangeToken(payload);

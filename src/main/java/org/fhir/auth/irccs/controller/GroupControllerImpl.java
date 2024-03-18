@@ -15,11 +15,11 @@ public class GroupControllerImpl implements GroupController {
     }
 
     public Response createGroup(Group group) {
-        return groupService.createGroup(group);
+        return groupService.createKeycloakGroup(group);
     }
 
     public Response updateGroup(Group group) {
-        return groupService.updateGroup(group);
+        return groupService.updateKeycloakGroup(group);
     }
 
     public Response deleteGroup(String name) {

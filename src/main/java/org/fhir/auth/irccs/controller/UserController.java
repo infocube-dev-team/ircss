@@ -13,10 +13,11 @@ import org.fhir.auth.irccs.entity.User;
 @Authenticated
 public interface UserController {
 
-    @GET
-    Response getAllUsers(@QueryParam("email") @DefaultValue("") String email);
-
     @Path("/signup")
+    @POST
+    Response signUp(User user);
+
+    @Path("/create")
     @POST
     Response createUser(User user);
 

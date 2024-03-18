@@ -10,12 +10,11 @@ import org.fhir.auth.irccs.entity.PermissionWrapper;
 @Path("/fhir/auth/permissions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Authenticated
 public interface PermissionController {
 
     @GET
-    Response getPermission(@QueryParam("groupId") String groupId);
+    Response getPermission(@QueryParam("name") String groupName);
     @POST
-    Response createPermission(PermissionWrapper permissions);
+    Response addRoles(PermissionWrapper permissions);
 
 }

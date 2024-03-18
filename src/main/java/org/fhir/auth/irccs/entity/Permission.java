@@ -2,75 +2,82 @@ package org.fhir.auth.irccs.entity;
 
 
 import java.util.ArrayList;
-import java.util.List;
-
 
 
 public class Permission {
-    private String resource;
-    public List<String> permissions = new ArrayList<>();
-    public List<String> disabled = new ArrayList<>();
+    public String resource;
+    public boolean read;
+    public boolean create;
+    public boolean update;
+    public boolean history;
+    public boolean delete;
+    public boolean search;
 
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public void setCreate(Boolean create) {
-        if(create){
-            this.permissions.add("create");
-        } else {
-            this.disabled.add("create");
-        }
-    }
-
-    public void setRead(Boolean read) {
-        if(read){
-            this.permissions.add("read");
-        } else {
-            this.disabled.add("read");
-        }
-    }
-    public void setUpdate(Boolean update) {
-        if(update){
-            this.permissions.add("update");
-        } else {
-            this.disabled.add("update");
-        }
-    }
-
-    public void setSearch(Boolean search) {
-        if(search){
-            this.permissions.add("search");
-        } else {
-            this.disabled.add("search");
-        }
-    }
-
-    public void setHistory(Boolean history) {
-        if(history){
-            this.permissions.add("history");
-        } else {
-            this.disabled.add("history");
-        }
-    }
-
-    public void setDelete(Boolean delete) {
-        if(delete){
-            this.permissions.add("delete");
-        } else {
-            this.disabled.add("delete");
-        }
-    }
-
-    public List<String> getPermissions() {
-        return permissions;
-    }
 
     public String getResource() {
         return resource;
     }
 
-    public List<String> getDisabled() {
-        return disabled;
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public boolean isCreate() {
+        return create;
+    }
+
+    public void setCreate(boolean create) {
+        this.create = create;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    public void setUpdate(boolean update) {
+        this.update = update;
+    }
+
+    public boolean isHistory() {
+        return history;
+    }
+
+    public void setHistory(boolean history) {
+        this.history = history;
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
+    }
+
+    public boolean isSearch() {
+        return search;
+    }
+
+    public void setSearch(boolean search) {
+        this.search = search;
+    }
+
+    public ArrayList<String> calcTruePermissions() {
+        ArrayList<String> truePermissions = new ArrayList<>();
+        if (read) truePermissions.add("read");
+        if (create) truePermissions.add("create");
+        if (update) truePermissions.add("update");
+        if (history) truePermissions.add("history");
+        if (delete) truePermissions.add("delete");
+        if (search) truePermissions.add("search");
+        return truePermissions;
     }
 }
