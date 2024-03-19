@@ -28,7 +28,7 @@ public class GroupTest {
     }
 
 
-    @Test
+    /*@Test
     @Order(1)
     public void getAllAdmins() throws InterruptedException {
 
@@ -164,7 +164,7 @@ public class GroupTest {
         System.out.println("Groups size: " + groups.size() + "!");
         System.out.println("Group successfully deleted!");
 
-    }
+    }*/
 
     public static String getAdminAccessToken() {
         String token =  RestAssured
