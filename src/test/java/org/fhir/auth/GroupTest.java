@@ -12,6 +12,7 @@ import org.fhir.auth.irccs.entity.Group;
 import org.fhir.auth.irccs.entity.User;
 import org.junit.jupiter.api.*;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class GroupTest {
         User admin = users.get(0);
 
         System.out.println(admin);
-        User resEnable = RestAssured
+        UserRepresentation resEnable = RestAssured
                 .given()
                 .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
@@ -70,7 +71,7 @@ public class GroupTest {
                 .post("/fhir/auth/users/enable?email=" + admin.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(User.class);
+                .extract().response().as(UserRepresentation.class);
 
         System.out.println(resEnable);
 
