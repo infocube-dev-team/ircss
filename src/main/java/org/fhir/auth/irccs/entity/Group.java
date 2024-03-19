@@ -3,6 +3,7 @@ package org.fhir.auth.irccs.entity;
 
 import jakarta.inject.Inject;
 import org.fhir.auth.irccs.service.GroupService;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -74,21 +75,23 @@ public class Group {
     }
 
     public static GroupRepresentation toGroupRepresentation(Group group, RealmResource realm){
-        GroupRepresentation groupRepresentation = new GroupRepresentation();
 
-        if(null != group.getId()){
-            groupRepresentation.setId(group.getId());
-        }
+        GroupRepresentation groupRepresentation = new GroupRepresentation();
+        String createdId = group.getId();
+
         if(null != group.getName()){
             groupRepresentation.setName(group.getName());
         }
-        if(null != group.getId()){
+        if(null != createdId){
+            groupRepresentation.setId(group.getId());
             List<UserRepresentation> users = realm.groups().group(group.getId()).members();
             users.forEach(member -> realm.users().get(member.getId()).leaveGroup(group.getId()) );
+        } else {
+            createdId = CreatedResponseUtil.getCreatedId(realm.groups().add(groupRepresentation));
         }
         if(group.getMembers().size() > 0){
-
-            group.getMembers().forEach(member -> realm.users().get(member).joinGroup(group.getId()) );
+            String finalCreatedId = createdId;
+            group.getMembers().forEach(member -> realm.users().get(member).joinGroup(finalCreatedId) );
         }
         if(group.getOrganizations().size() > 0){
             groupRepresentation.setAttributes(new HashMap<>(){{
