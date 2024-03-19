@@ -143,8 +143,7 @@ public class UserTest {
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
         User resEnable = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
@@ -204,8 +203,7 @@ public class UserTest {
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
         User resEnable = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
@@ -260,8 +258,7 @@ public class UserTest {
     public void UsersGetAndDelete() {
         List<User> users = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/users")
@@ -274,8 +271,7 @@ public class UserTest {
             if(!user.getEmail().equals("pascale@admin.it")){
                 RestAssured
                         .given()
-                        .auth()
-                        .oauth2(getAdminAccessToken())
+                        .header("Authorization", getAdminAccessToken())
                         .contentType("application/json")
                         .when()
                         .delete("/fhir/auth/users?email=" + user.getEmail())
@@ -286,8 +282,7 @@ public class UserTest {
 
         users = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/users")
@@ -343,8 +338,7 @@ public class UserTest {
 
         User res = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/users?email=francescototti@gmail.com")
@@ -364,8 +358,7 @@ public class UserTest {
 
         Group groups = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/groups?name=admin")
@@ -379,8 +372,7 @@ public class UserTest {
             for( String groupMember : groups.getMembers() ){
                 users.add(RestAssured
                         .given()
-                        .auth()
-                        .oauth2(getAdminAccessToken())
+                        .header("Authorization", getAdminAccessToken())
                         .contentType("application/json")
                         .when()
                         .get("/fhir/auth/users?email=" + groupMember)
@@ -423,8 +415,7 @@ public class UserTest {
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
         User resEnable = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .post("/fhir/auth/users/enable?email=" + res.getEmail())
@@ -438,8 +429,7 @@ public class UserTest {
 
         User resChanged = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
                 .body(res)
                 .when()
@@ -454,8 +444,7 @@ public class UserTest {
 
         users = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/users")
@@ -470,8 +459,7 @@ public class UserTest {
 
         RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .delete("/fhir/auth/users?email=" + res.getEmail())
@@ -480,8 +468,7 @@ public class UserTest {
 
         users = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/users")

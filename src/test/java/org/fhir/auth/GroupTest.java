@@ -33,8 +33,7 @@ public class GroupTest {
 
         Group group = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAdminAccessToken())
+                .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/groups?name=admin")
@@ -48,8 +47,7 @@ public class GroupTest {
             for( String groupMember : group.getMembers() ){
                 users.add(RestAssured
                         .given()
-                        .auth()
-                        .oauth2(getAdminAccessToken())
+                        .header("Authorization", getAdminAccessToken())
                         .contentType("application/json")
                         .when()
                         .get("/fhir/auth/users?email=" + groupMember)
@@ -65,8 +63,7 @@ public class GroupTest {
 
         User resEnable = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .post("/fhir/auth/users/enable?email=" + admin.getEmail())
@@ -89,8 +86,7 @@ public class GroupTest {
         groupBody.setOrganizations(organizations);
         Group resGroups = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .body(groupBody)
                 .when()
@@ -110,8 +106,7 @@ public class GroupTest {
 
         Group resGroupChanged = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .body(resGroups)
                 .when()
@@ -128,8 +123,7 @@ public class GroupTest {
 
         List<Group> groups = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/groups")
@@ -145,8 +139,7 @@ public class GroupTest {
 
         RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .delete("/fhir/auth/groups?name=" + resGroupChanged.getName())
@@ -155,8 +148,7 @@ public class GroupTest {
 
         groups = RestAssured
                 .given()
-                .auth()
-                .oauth2(getAccessToken(admin.getEmail(),getAdminPassword()))
+                .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
                 .contentType("application/json")
                 .when()
                 .get("/fhir/auth/groups")
@@ -173,22 +165,20 @@ public class GroupTest {
     }
 
     public static String getAdminAccessToken() {
-        Map<String, String> params = new HashMap<>(){{
-            put("username", getAdminUsername());
-            put("password", getAdminPassword());
-            put("grant_type", "password");
-            put("client_id", getClientId());
-            put("client_secret", getClientSecret());
-        }};
-
-        return RestAssured
+        String token =  RestAssured
                 .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
+                .auth()
+                .preemptive()
+                .basic(getClientId(), getClientSecret())
+                .formParam("grant_type", "password")
+                .formParam("username", getAdminUsername())
+                .formParam("password", getAdminPassword())
                 .when()
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
-                .as(AccessTokenResponse.class).getToken();
+                .post("/fhir/auth/users")
+                .then()
+                .extract()
+                .asString();
+        return "Bearer " + token;
     }
 
     private static String getKeycloakUrl(){
@@ -216,23 +206,23 @@ public class GroupTest {
     }
 
     public static String getAccessToken(String username, String password) {
-        Map<String, String> params = new HashMap<>(){{
-            put("username", username);
-            put("password", password);
-            put("grant_type", "password");
-            put("client_id", getClientId());
-            put("client_secret", getClientSecret());
-        }};
 
-        return RestAssured
+        String token = RestAssured
                 .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
+                .auth()
+                .preemptive()
+                .basic(getClientId(), getClientSecret())
+                .formParam("grant_type", "password")
+                .formParam("username", username)
+                .formParam("password", password)
                 .when()
-                //.post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
-                .as(AccessTokenResponse.class).getToken();
+                .post("/fhir/auth/users")
+                .then()
+                .extract()
+                .asString();
+
+        return "Bearer " + token;
+
     }
 
 }
