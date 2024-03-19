@@ -91,8 +91,7 @@ public class Group {
         }
         if(group.getMembers().size() > 0){
             String finalCreatedId = createdId;
-            List<String> users = group.getMembers().stream().map(user -> realm.users().get(user).toRepresentation().getId()).toList();
-            users.forEach(member -> realm.users().get(member).joinGroup(finalCreatedId) );
+            group.getMembers().forEach(member -> realm.users().get(member).joinGroup(finalCreatedId) );
         }
         if(group.getOrganizations().size() > 0){
             groupRepresentation.setAttributes(new HashMap<>(){{
