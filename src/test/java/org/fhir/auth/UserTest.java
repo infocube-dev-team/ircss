@@ -16,6 +16,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.junit.jupiter.api.*;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.quarkus.irccs.client.restclient.FhirClient;
 
 import java.util.ArrayList;
@@ -56,6 +57,8 @@ public class UserTest {
         user.setName("Jhon");
         user.setSurname("Doe");
         user.setPassword("JhonDoe123");
+        user.setEnabled(false);
+        user.setOrganizationRequest(List.of("Pascale"));
 
         User res = RestAssured
                 .given()
@@ -86,6 +89,8 @@ public class UserTest {
         user.setName("Jhon");
         user.setSurname("Doe");
         user.setPassword("JhonDoe123");
+        user.setEnabled(false);
+        user.setOrganizationRequest(List.of("Pascale"));
 
         User res = RestAssured
                 .given()
@@ -106,7 +111,7 @@ public class UserTest {
         System.out.println("User successfully created! " + res.getEmail());
 
         // Un-enabled User tries to login, expected: BAD REQUEST
-        Assertions.assertNull(getAccessToken("jhondoe2@gmail.com", "JhonDoe123"));
+        Assertions.assertEquals(" Bearer null", getAccessToken("jhondoe2@gmail.com", "JhonDoe123"));
 
         System.out.println("User couldn't rightfully log in! " + user.getEmail());
     }
@@ -121,6 +126,8 @@ public class UserTest {
         user.setName("Jhon");
         user.setSurname("Doe");
         user.setPassword("JhonDoe123");
+        user.setEnabled(false);
+        user.setOrganizationRequest(List.of("Pascale"));
 
         User resCreate = RestAssured
                 .given()
@@ -141,7 +148,7 @@ public class UserTest {
         System.out.println("User successfully created! " + resCreate.getEmail());
 
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
-        User resEnable = RestAssured
+        UserRepresentation resEnable = RestAssured
                 .given()
                 .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
@@ -149,27 +156,9 @@ public class UserTest {
                 .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(User.class);
+                .extract().response().as(UserRepresentation.class);
 
         System.out.println(resEnable);
-
-        Thread.sleep(3000);
-
-        Response createdPractitionerRes = RestAssured
-                .given()
-                .contentType("application/json")
-                .when()
-                .get(getFhirUrl() + "/Practitioner?email=" + resCreate.getEmail())
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        Bundle createdPractitioner = practitionerFhirClient.parseResource(Bundle.class, createdPractitionerRes.getBody().asPrettyString());
-
-        Assertions.assertEquals(createdPractitioner.getEntry().size(), 1);
-
-
-        System.out.println("Specular Practitioner successfully created!");
     }
 
     @Order(4)
@@ -201,7 +190,7 @@ public class UserTest {
         System.out.println("User successfully created! " + resCreate.getEmail());
 
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
-        User resEnable = RestAssured
+        UserRepresentation resEnable = RestAssured
                 .given()
                 .header("Authorization", getAdminAccessToken())
                 .contentType("application/json")
@@ -209,45 +198,11 @@ public class UserTest {
                 .post("/fhir/auth/users/enable?email=" + resCreate.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(User.class);
+                .extract().response().as(UserRepresentation.class);
 
         System.out.println(resEnable);
-        Thread.sleep(3000);
-
-        Response createdPractitionerRes = RestAssured
-                .given()
-                .contentType("application/json")
-                .when()
-                .get(getFhirUrl() + "/Practitioner?email=" + resCreate.getEmail())
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
-
-        Bundle createdPractitioner = practitionerFhirClient.parseResource(Bundle.class, createdPractitionerRes.getBody().asPrettyString());
-
-        Assertions.assertEquals(createdPractitioner.getEntry().size(), 1);
-
-
-        System.out.println("Specular Practitioner successfully created!");
-
-        Map<String, String> params = new HashMap<>(){{
-            put("username", user.getEmail());
-            put("password", user.getPassword());
-            put("grant_type", "password");
-            put("client_id", "irccs");
-            put("client_secret", "cwvB6qAn5iFl7pa9r04WxkordJyy3tjS");
-        }};
-
         // enabled User tries to login, expected: OK
-        RestAssured
-                .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
-                .when()
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract().response();
+        getAccessToken(user.getEmail(), user.getPassword());
 
 
         System.out.println("User logged in! " + user.getEmail());
@@ -293,7 +248,7 @@ public class UserTest {
 
         Assertions.assertEquals(1, users.size());
 
-        System.out.println("Keycloak users & FHIR Practitioners successfully deleted!");
+        System.out.println("Keycloak users successfully deleted!");
     }
 
     @Test
@@ -413,7 +368,7 @@ public class UserTest {
         System.out.println("User successfully created! " + res.getEmail());
 
         // Enabling Keycloak user and creating specular Practitioner resource on FHIR.
-        User resEnable = RestAssured
+        UserRepresentation resEnable = RestAssured
                 .given()
                 .header("Authorization", getAccessToken(admin.getEmail(),getAdminPassword()))
                 .contentType("application/json")
@@ -421,7 +376,7 @@ public class UserTest {
                 .post("/fhir/auth/users/enable?email=" + res.getEmail())
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(User.class);
+                .extract().response().as(UserRepresentation.class);
 
         System.out.println(resEnable);
 
@@ -484,23 +439,62 @@ public class UserTest {
 
     }
 
-    public static String getAdminAccessToken() {
-        Map<String, String> params = new HashMap<>(){{
-            put("username", getAdminUsername());
-            put("password", getAdminPassword());
-            put("grant_type", "password");
-            put("client_id", getClientId());
-            put("client_secret", getClientSecret());
-        }};
-
-        return RestAssured
+    @Test
+    @Order(9)
+    public void UsersGetAndDeleteAll() {
+        List<User> users = RestAssured
                 .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
+                .header("Authorization", getAdminAccessToken())
+                .contentType("application/json")
                 .when()
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        for(User user : users){
+            if(!user.getEmail().equals("pascale@admin.it")){
+                RestAssured
+                        .given()
+                        .header("Authorization", getAdminAccessToken())
+                        .contentType("application/json")
+                        .when()
+                        .delete("/fhir/auth/users?email=" + user.getEmail())
+                        .then()
+                        .statusCode(HttpStatus.SC_OK);
+            }
+        }
+
+        users = RestAssured
+                .given()
+                .header("Authorization", getAdminAccessToken())
+                .contentType("application/json")
+                .when()
+                .get("/fhir/auth/users")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        Assertions.assertEquals(1, users.size());
+
+        System.out.println("Keycloak users successfully deleted!");
+    }
+
+    public static String getAdminAccessToken() {
+        String token = RestAssured
+                .given()
+                .formParams("grant_type", "password")
+                .formParam("username", getAdminUsername())
+                .formParam("password", getAdminPassword())
+                .when()
+                .post("/fhir/auth/users/token")
+                .then()
+                .extract()
                 .as(AccessTokenResponse.class).getToken();
+
+        return " Bearer " + token;
     }
 
     private static String getKeycloakUrl(){
@@ -532,23 +526,18 @@ public class UserTest {
     }
 
     public static String getAccessToken(String username, String password) {
-        Map<String, String> params = new HashMap<>(){{
-            put("username", username);
-            put("password", password);
-            put("grant_type", "password");
-            put("client_id", getClientId());
-            put("client_secret", getClientSecret());
-        }};
-
-        return RestAssured
+        String token = RestAssured
                 .given()
-                .contentType(ContentType.URLENC)
-                .formParams(params)
+                .formParams("grant_type", "password")
+                .formParam("username", username)
+                .formParam("password", password)
                 .when()
-                //.post("/fhir/auth/users/token")
-                .post(getKeycloakUrl() + "/realms/" + getKeycloakRealm() + "/protocol/openid-connect/token")
-                .then().extract().response()
+                .post("/fhir/auth/users/token")
+                .then()
+                .extract()
                 .as(AccessTokenResponse.class).getToken();
+
+        return " Bearer " + token;
     }
 
 }

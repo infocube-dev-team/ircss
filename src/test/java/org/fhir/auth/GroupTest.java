@@ -61,6 +61,7 @@ public class GroupTest {
 
         User admin = users.get(0);
 
+        System.out.println(admin);
         User resEnable = RestAssured
                 .given()
                 .header("Authorization", getAccessToken(admin.getEmail(), getAdminPassword()))
@@ -167,18 +168,15 @@ public class GroupTest {
     public static String getAdminAccessToken() {
         String token =  RestAssured
                 .given()
-                .auth()
-                .preemptive()
-                .basic(getClientId(), getClientSecret())
-                .formParam("grant_type", "password")
+                .formParams("grant_type", "password")
                 .formParam("username", getAdminUsername())
                 .formParam("password", getAdminPassword())
                 .when()
-                .post("/fhir/auth/users")
+                .post("/fhir/auth/users/token")
                 .then()
                 .extract()
-                .asString();
-        return "Bearer " + token;
+                .as(AccessTokenResponse.class).getToken();
+        return " Bearer " + token;
     }
 
     private static String getKeycloakUrl(){
@@ -209,19 +207,16 @@ public class GroupTest {
 
         String token = RestAssured
                 .given()
-                .auth()
-                .preemptive()
-                .basic(getClientId(), getClientSecret())
-                .formParam("grant_type", "password")
+                .formParams("grant_type", "password")
                 .formParam("username", username)
                 .formParam("password", password)
                 .when()
-                .post("/fhir/auth/users")
+                .post("/fhir/auth/users/token")
                 .then()
                 .extract()
-                .asString();
+                .as(AccessTokenResponse.class).getToken();
 
-        return "Bearer " + token;
+        return " Bearer " + token;
 
     }
 

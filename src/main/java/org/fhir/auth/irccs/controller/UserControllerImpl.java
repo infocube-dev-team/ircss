@@ -34,15 +34,15 @@ public class UserControllerImpl implements UserController{
     }
 
     public Response enableUser(String email) {
-        return userService.enableUser(email);
+        return userService.enableKeycloakUser(email);
     }
 
     public Response updateUser(User user) {
-        return userService.updateUser(user);
+        return userService.updateKeycloakUser(user);
     }
 
     public Response deleteUser(String email) {
-        return userService.deleteUser(email);
+        return userService.deleteKeycloakUser(email);
     }
 
 }

@@ -237,7 +237,7 @@ public class UserService {
         }
     }
 
-    public void deleteKeycloakUser(String email) {
+    public Response deleteKeycloakUser(String email) {
         try {
             UsersResource usersResource = getRealm().users();
             UserRepresentation userRepresentation = getUserByEmail_keycloak(email);
@@ -245,6 +245,7 @@ public class UserService {
             String userId = userRepresentation.getId();
             UserResource userResource = usersResource.get(userId);
             userResource.remove();
+            return Response.ok().build();
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't remove Keycloak User: {}.", email, e);
             throw e;
