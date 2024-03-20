@@ -482,6 +482,27 @@ public class UserTest {
         System.out.println("Keycloak users successfully deleted!");
     }
 
+    @Test
+    @Order(10)
+    public void sendLinkResetPassword() {
+
+        User res = RestAssured
+                .given()
+                .contentType("application/json")
+                .when()
+                .body("{\"username\":\"francescototti@gmail.com\"}")
+                .post("/fhir/auth/users/forgotPassword")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(new TypeRef<>() {
+                });
+
+        Assertions.assertNotNull(res);
+        System.out.println("User successfully reset psw by email!:"+res.toString());
+
+    }
+
+
     public static String getAdminAccessToken() {
         String token = RestAssured
                 .given()

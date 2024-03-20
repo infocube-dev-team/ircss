@@ -6,6 +6,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.fhir.auth.irccs.entity.User;
 
+import java.util.HashMap;
+
 
 @Path("/fhir/auth/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -39,5 +41,15 @@ public interface UserController {
 
     @DELETE
     Response deleteUser(@QueryParam("email") String email);
+
+    @Path("/forgotPassword")
+    @Consumes("application/json")
+    @POST
+    Response forgotPassword(HashMap<String,String> payload);
+
+    @Path("/updatePassword")
+    @Consumes("application/json")
+    @PUT
+    Response updatePassword(HashMap<String,String>  payload);
 }
 
