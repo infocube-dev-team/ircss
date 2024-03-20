@@ -39,12 +39,8 @@ public class PermissionService {
     public Response addRoles(PermissionWrapper permission) {
         GroupResource group = null;
         List<String> roles = permission.getPermissions().stream().flatMap(role -> IntStream.range(0, role.calcTruePermissions().size()).mapToObj(i -> role.getResource().toLowerCase() + ":" + role.calcTruePermissions().get(i))).toList();
-        if(null != permission.getGroupId()){
-            group = getRealm().groups().group(permission.getGroupId());
-        } else if(null != permission.getGroupName()){
-            String groupId = getRealm().groups().groups(permission.getGroupName(),  0,  1, false).get(0).getId();
-            group = getRealm().groups().group(groupId);
-        }
+        String groupId = getRealm().groups().groups(permission.getGroupName(),  0,  1, false).get(0).getId();
+        group = getRealm().groups().group(groupId);
 
         List<RoleRepresentation> mappedRoles = roles.stream().map(role -> getRealm().roles().get(role).toRepresentation()).toList();
        try {
