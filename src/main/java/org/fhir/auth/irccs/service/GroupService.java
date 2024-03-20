@@ -91,10 +91,6 @@ public class GroupService {
 
     public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
         try {
-            if(group.getMembers().size() > 0){
-                List<String> userIds = group.getMembers().stream().map(user -> userService.getUserByEmail_keycloak(user).getId()).toList();
-                group.setMembers(userIds);
-            }
             group.setId(CreatedResponseUtil.getCreatedId(getRealm().groups().add(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()))));
             return Response.ok(group).build();
         } catch (Exception e) {
