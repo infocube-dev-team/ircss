@@ -24,6 +24,8 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 @ApplicationScoped
@@ -291,6 +293,84 @@ public class UserService {
             e.printStackTrace();
             throw new OperationException("Couldn't find FHIR practitioner", OperationOutcome.IssueSeverity.ERROR);
         }
+    }
+
+
+
+    public Response forgotPassword(HashMap<String,String> payload) {
+        //verifico se è abilitato, se è abilitato chiamo api di reset psw by email
+        //PUT /admin/realms/{realm}/users/{id}/reset-password-email  risponde 200
+        //in query param posso mettere il redirect_url se serve
+        LOG.info("Forgot PSW user {}...", payload);
+
+        // Ottieni la risorsa degli utenti
+        UsersResource usersResource = getRealm().users();
+
+        // Trova l'utente di cui si vuole recuperare la password
+        String username = payload.get("username");
+
+        System.out.println("payload:"+payload.toString());
+        System.out.println("L'utente:"+username);
+        List<UserRepresentation> users = usersResource.search(username);
+
+        if (users.isEmpty()) {
+            System.out.println("L'utente non è stato trovato.");
+            return Response.ok().build();
+        }
+
+
+        System.out.println("L'utente è stato trovato. userid:"+users.get(0).getId());
+        try {
+            // Ottieni l'ID dell'utente
+            String userId = users.get(0).getId();
+
+            // Esegui l'azione di reset della password
+            //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+            usersResource.get(userId).sendVerifyEmail();
+
+        } catch (Exception e) {
+            LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+
+    }
+
+    public Response updatePassword(HashMap<String,String> payload) {
+        //questo meoto d viene chiamato solo dall'interno della pagina personale di profilo
+        //PUT /admin/realms/{realm}/users/{id}/reset-password   risponde 204
+        LOG.info("Update PSW user {}...", payload);
+        // Ottieni la risorsa degli utenti
+        UsersResource usersResource = getRealm().users();
+
+        // Trova l'utente di cui si vuole recuperare la password
+        String username = payload.get("username");
+        List<UserRepresentation> users = usersResource.search(username);
+
+        if (users.isEmpty()) {
+            System.out.println("L'utente non è stato trovato.");
+            return Response.ok().build();
+        }
+
+
+        try {
+            // Ottieni l'ID dell'utente
+            String userId = users.get(0).getId();
+
+            // Esegui l'azione di reset della password
+            //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+            CredentialRepresentation cRep = new CredentialRepresentation();
+            cRep.setType(CredentialRepresentation.PASSWORD);
+            cRep.setValue(payload.get("new_password"));
+            cRep.setTemporary(false);
+            usersResource.get(userId).resetPassword(cRep);
+
+        } catch (Exception e) {
+            LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+
     }
 
 }

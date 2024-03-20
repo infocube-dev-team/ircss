@@ -6,6 +6,8 @@ import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.service.KeycloakService;
 import org.fhir.auth.irccs.service.UserService;
 
+import java.util.HashMap;
+
 public class UserControllerImpl implements UserController{
 
     @Inject
@@ -44,5 +46,11 @@ public class UserControllerImpl implements UserController{
     public Response deleteUser(String email) {
         return userService.deleteKeycloakUser(email);
     }
+
+    public Response forgotPassword(HashMap<String,String> payload) {
+        return userService.forgotPassword(payload);    }
+
+    public Response updatePassword(HashMap<String,String> payload) {
+        return userService.updatePassword(payload);    }
 
 }
