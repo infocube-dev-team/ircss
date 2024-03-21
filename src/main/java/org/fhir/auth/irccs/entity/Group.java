@@ -100,6 +100,7 @@ public class Group {
         } else {
             groupRepresentation.setAttributes(new HashMap<>());
         }
+        groupRepresentation.setId(createdId);
 
         return groupRepresentation;
     }

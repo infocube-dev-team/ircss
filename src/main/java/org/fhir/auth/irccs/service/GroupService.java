@@ -91,7 +91,7 @@ public class GroupService {
 
     public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
         try {
-            group.setId(CreatedResponseUtil.getCreatedId(getRealm().groups().add(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()))));
+            group.setId(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()).getId());
             return Response.ok(group).build();
         } catch (Exception e) {
             LOG.error("Error creating Keycloak group: " + group.getName(), e);
