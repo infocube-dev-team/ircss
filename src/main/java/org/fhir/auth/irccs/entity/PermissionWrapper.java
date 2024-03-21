@@ -37,7 +37,8 @@ public class PermissionWrapper {
         roles.forEach(role -> {
             String[] splitRole = role.split(":");
             Permission mapPermission = new Permission();
-            if(splitRole.length == 2){
+            boolean resourceProcessed = permission.stream().anyMatch(perm -> perm.getResource().equals(splitRole[0]));
+            if(splitRole.length == 2 && !resourceProcessed){
                 mapPermission.setResource(splitRole[0]);
                 mapPermission.setRead(roles.contains(splitRole[0]+":read"));
                 mapPermission.setCreate(roles.contains(splitRole[0]+":create"));
