@@ -314,7 +314,7 @@ public class UserService {
 
         if (users.isEmpty()) {
             System.out.println("L'utente non è stato trovato.");
-            return Response.ok().build();
+            return Response.status(RestResponse.Status.NOT_FOUND).build();
         }
 
 
@@ -326,7 +326,7 @@ public class UserService {
             app.add("UPDATE_PASSWORD");
             // Esegui l'azione di reset della password
             //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
-            usersResource.get(userId).executeActionsEmail(app);
+            usersResource.get(userId).executeActionsEmail(clientId,"http://irccs.infocube.it/login", app);
 
 
         } catch (Exception e) {
