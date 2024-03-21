@@ -327,8 +327,6 @@ public class UserService {
             // Esegui l'azione di reset della password
             //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
             usersResource.get(userId).executeActionsEmail(app);
-            System.out.println("Seconda prova");
-            usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
 
 
         } catch (Exception e) {
