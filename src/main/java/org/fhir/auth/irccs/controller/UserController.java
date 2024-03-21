@@ -1,10 +1,12 @@
 package org.fhir.auth.irccs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.fhir.auth.irccs.entity.User;
+import org.keycloak.representations.AccessTokenResponse;
 
 import java.util.HashMap;
 
@@ -19,7 +21,7 @@ public interface UserController {
     Response getAllUsers(@QueryParam("email") @DefaultValue("") String email);
     @Path("/signup")
     @POST
-    Response signUp(User user);
+    String signUp(String user);
 
     @Path("/create")
     @POST
@@ -28,7 +30,7 @@ public interface UserController {
     @Path("/token")
     @Consumes("application/x-www-form-urlencoded")
     @POST
-    Response tokenExchange(String payload);
+    AccessTokenResponse tokenExchange(String payload);
     @Path("/logout")
     @Consumes("application/x-www-form-urlencoded")
     @POST

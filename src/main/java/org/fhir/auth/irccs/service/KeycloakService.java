@@ -1,6 +1,7 @@
 package org.fhir.auth.irccs.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.impl.URIDecoder;
 import io.vertx.core.parsetools.JsonParser;
@@ -16,6 +17,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +37,17 @@ public class KeycloakService {
     @ConfigProperty(name = "keycloak-client_id")
     String clientId;
 
+    @ConfigProperty(name = "keycloak-admin-username")
+    String adminUsername;
+
+    @ConfigProperty(name = "keycloak-admin-password")
+    String adminPassword;
+
     @ConfigProperty(name = "quarkus.oidc.auth-server-url")
     String authServer;
 
 
-    public Response exchangeToken(String payload) {
+    public AccessTokenResponse exchangeToken(String payload) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOG.info("Asking for access token to: " + authServer + "/protocol/openid-connect/token");
             HttpPost request = new HttpPost(authServer + "/protocol/openid-connect/token");
@@ -46,12 +55,12 @@ public class KeycloakService {
             StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_FORM_URLENCODED);
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
-            HttpEntity responseEntity = response.getEntity();
+            AccessTokenResponse responseEntity = new ObjectMapper().readValue(EntityUtils.toString(response.getEntity()), AccessTokenResponse.class);
             LOG.info("Response is: " + responseEntity);
-            return Response.status(response.getStatusLine().getStatusCode()).entity(null != responseEntity ? EntityUtils.toString(responseEntity) : null).build();
+            return responseEntity;
         } catch (IOException e) {
             e.printStackTrace();
-            return Response.serverError().entity(e.getMessage()).build();
+            return new AccessTokenResponse();
         }
     }
 
@@ -69,6 +78,25 @@ public class KeycloakService {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
+
+
+    public AccessTokenResponse getAdminToken() {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            LOG.info("Asking for access token to: " + authServer + "/protocol/openid-connect/token");
+            HttpPost request = new HttpPost(authServer + "/protocol/openid-connect/token");
+            String payload = String.format("client_id=%s&client_secret=%s&grant_type=password&username=%s&password=%s", clientId, clientSecret, adminUsername, adminPassword);
+            StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_FORM_URLENCODED);
+            request.setEntity(entity);
+            HttpResponse response = httpClient.execute(request);
+            AccessTokenResponse responseEntity = new ObjectMapper().readValue(EntityUtils.toString(response.getEntity()), AccessTokenResponse.class);
+            LOG.info("Response is: " + responseEntity);
+            return responseEntity;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new AccessTokenResponse();
+        }
+    }
+
 
 }
 
