@@ -2,9 +2,7 @@ package org.fhir.auth.irccs.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import org.quarkus.irccs.annotations.models.User;
 import org.quarkus.irccs.common.constants.FhirConst;
 
 @ApplicationScoped
