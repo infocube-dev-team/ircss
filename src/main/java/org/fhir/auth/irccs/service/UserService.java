@@ -37,7 +37,8 @@ public class UserService {
     FhirClient<Practitioner> practitionerController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
-
+    @ConfigProperty(name = "quarkus.keycloak.admin-client.client-id")
+    String clientId;
 
     private RealmResource getRealm() {
         return keycloak.realm(realm);
@@ -326,7 +327,7 @@ public class UserService {
 
             // Esegui l'azione di reset della password
             //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
-            usersResource.get(userId).sendVerifyEmail();
+            usersResource.get(userId).sendVerifyEmail(clientId);
 
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
