@@ -24,9 +24,7 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @ApplicationScoped
 public class UserService {
@@ -324,10 +322,9 @@ public class UserService {
         try {
             // Ottieni l'ID dell'utente
             String userId = users.get(0).getId();
-
             // Esegui l'azione di reset della password
-            //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
-            usersResource.get(userId).sendVerifyEmail(clientId);
+            //usersResource.get(userId).executeActionsEmail();
+            usersResource.get(userId).executeActionsEmail(clientId,"http://irccs.infocube.it/",10, Arrays.asList("UPDATE_PASSWORD"));
 
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
