@@ -5,6 +5,7 @@ import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import org.fhir.auth.irccs.entity.User;
 import org.keycloak.representations.AccessTokenResponse;
 
@@ -27,10 +28,14 @@ public interface UserController {
     @POST
     Response createUser(User user);
 
+    @Path("/me")
+    @GET
+    String me(SecurityContext cx);
+
     @Path("/token")
     @Consumes("application/x-www-form-urlencoded")
     @POST
-    AccessTokenResponse tokenExchange(String payload);
+    Response tokenExchange(String payload);
     @Path("/logout")
     @Consumes("application/x-www-form-urlencoded")
     @POST

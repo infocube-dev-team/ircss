@@ -47,7 +47,7 @@ public class KeycloakService {
     String authServer;
 
 
-    public AccessTokenResponse exchangeToken(String payload) {
+    public Response exchangeToken(String payload) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOG.info("Asking for access token to: " + authServer + "/protocol/openid-connect/token");
             HttpPost request = new HttpPost(authServer + "/protocol/openid-connect/token");
@@ -57,10 +57,10 @@ public class KeycloakService {
             HttpResponse response = httpClient.execute(request);
             AccessTokenResponse responseEntity = new ObjectMapper().readValue(EntityUtils.toString(response.getEntity()), AccessTokenResponse.class);
             LOG.info("Response is: " + responseEntity);
-            return responseEntity;
+            return Response.status(response.getStatusLine().getStatusCode()).entity(responseEntity).build();
         } catch (IOException e) {
             e.printStackTrace();
-            return new AccessTokenResponse();
+            return Response.status(403).build();
         }
     }
 
@@ -80,20 +80,20 @@ public class KeycloakService {
     }
 
 
-    public AccessTokenResponse getAdminToken() {
+    public Response getAdminToken() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             LOG.info("Asking for access token to: " + authServer + "/protocol/openid-connect/token");
             HttpPost request = new HttpPost(authServer + "/protocol/openid-connect/token");
-            String payload = String.format("client_id=%s&client_secret=%s&grant_type=password&username=%s&password=%s", clientId, clientSecret, adminUsername, adminPassword);
+            String payload = String.format("client_id=%s&client_secret=%s&grant_type=client_credentials", clientId, clientSecret, adminUsername, adminPassword);
             StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_FORM_URLENCODED);
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
             AccessTokenResponse responseEntity = new ObjectMapper().readValue(EntityUtils.toString(response.getEntity()), AccessTokenResponse.class);
             LOG.info("Response is: " + responseEntity);
-            return responseEntity;
+            return Response.status(response.getStatusLine().getStatusCode()).entity(responseEntity).build();
         } catch (IOException e) {
             e.printStackTrace();
-            return new AccessTokenResponse();
+            return Response.status(403).build();
         }
     }
 

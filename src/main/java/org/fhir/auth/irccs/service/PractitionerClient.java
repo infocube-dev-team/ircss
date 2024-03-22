@@ -15,4 +15,6 @@ public interface PractitionerClient {
     @POST
     String createUser(@HeaderParam("Authorization") String jwtToken, String practitioner);
 
+    @GET
+    String getCurrentPractitioner(@HeaderParam("Authorization") String jwtToken, @QueryParam("email") String email);
 }
