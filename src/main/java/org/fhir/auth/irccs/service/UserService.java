@@ -394,17 +394,16 @@ public class UserService {
 
     public String signUp(String user){
         Response token = keycloakService.getAdminToken();
-        List<UserRepresentation> users = getRealm().users().search(user);
 
-        if (users.isEmpty()) {
-            System.out.println("L'utente non è stato trovato.");
-            return null;
-        }
         if(token.hasEntity()){
-            String userId = users.get(0).getId();
-
             String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
             String response = practitionerClient.createUser(jwtToken, user);
+            List<UserRepresentation> users = getRealm().users().search(user);
+            String userId = users.get(0).getId();
+            if (users.isEmpty()) {
+                System.out.println("L'utente non è stato trovato.");
+                return null;
+            }
             getRealm().users().get(userId).sendVerifyEmail();
             return response;
         }
