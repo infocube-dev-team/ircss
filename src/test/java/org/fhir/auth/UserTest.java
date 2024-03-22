@@ -485,17 +485,19 @@ public class UserTest {
     @Test
     @Order(10)
     public void sendLinkResetPassword() {
-
-        User res = RestAssured
+        /*UserRepresentation test = new UserRepresentation();
+        test.setUsername("francescototti@gmail.com");*/
+        HashMap<String, String> test = new HashMap<>();
+        test.put("username","pascale@admin.it");
+        Response res = RestAssured
                 .given()
                 .contentType("application/json")
                 .when()
-                .body("{\"username\":\"francescototti@gmail.com\"}")
+                .body(test)
                 .post("/fhir/auth/users/forgotPassword")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().response().as(new TypeRef<>() {
-                });
+                .extract().response();
 
         Assertions.assertNotNull(res);
         System.out.println("User successfully reset psw by email!:"+res.toString());

@@ -24,9 +24,7 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @ApplicationScoped
 public class UserService {
@@ -37,7 +35,8 @@ public class UserService {
     FhirClient<Practitioner> practitionerController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
-
+    @ConfigProperty(name = "quarkus.keycloak.admin-client.client-id")
+    String clientId;
 
     private RealmResource getRealm() {
         return keycloak.realm(realm);
@@ -315,7 +314,7 @@ public class UserService {
 
         if (users.isEmpty()) {
             System.out.println("L'utente non è stato trovato.");
-            return Response.ok().build();
+            return Response.status(RestResponse.Status.NOT_FOUND).build();
         }
 
 
@@ -323,10 +322,12 @@ public class UserService {
         try {
             // Ottieni l'ID dell'utente
             String userId = users.get(0).getId();
-
+            List<String> app = new ArrayList<>();
+            app.add("UPDATE_PASSWORD");
             // Esegui l'azione di reset della password
-            //usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
-            usersResource.get(userId).sendVerifyEmail();
+            usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+            //usersResource.get(userId).executeActionsEmail(clientId,"http://irccs.infocube.it/login", app);
+
 
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
@@ -349,7 +350,7 @@ public class UserService {
 
         if (users.isEmpty()) {
             System.out.println("L'utente non è stato trovato.");
-            return Response.ok().build();
+            return Response.status(RestResponse.Status.NOT_FOUND).build();
         }
 
 
