@@ -164,8 +164,9 @@ public class UserService {
                 userResource.resetPassword(credentialPassword);
 
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
+               /* azione non possibile per utenti disabilitati - va pensata una welcome mail
                 getRealm().users().get(user.getId()).sendVerifyEmail();
-                LOG.info("Send verify email");
+                LOG.info("Send verify email");*/
             }else{
                 LOG.info("Creating from admin Keycloak User: " + user.getEmail());
                 //caso di registrazione del practiotioner no da signup ma tramite admin
