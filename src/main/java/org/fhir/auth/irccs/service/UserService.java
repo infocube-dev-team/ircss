@@ -164,9 +164,11 @@ public class UserService {
                 userResource.resetPassword(credentialPassword);
 
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
+                getRealm().users().get(user.getId()).sendVerifyEmail();
+                LOG.info("Send verify email");
             }else{
                 //caso di registrazione del practiotioner no da signup ma tramite admin
-                user.setEnabled(true);
+                user.setEnabled(true); //necessario per l'invio email di reset password
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
                 user.setId(CreatedResponseUtil.getCreatedId(response));
@@ -394,20 +396,11 @@ public class UserService {
 
     public String signUp(String user){
         Response token = keycloakService.getAdminToken();
-
         if(token.hasEntity()){
             String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
-            String response = practitionerClient.createUser(jwtToken, user);
-            List<UserRepresentation> users = getRealm().users().search(user);
-            String userId = users.get(0).getId();
-            if (users.isEmpty()) {
-                System.out.println("L'utente non è stato trovato.");
-                return null;
-            }
-            getRealm().users().get(userId).sendVerifyEmail();
-            return response;
+            return practitionerClient.createUser(jwtToken, user);
         }
-        return null;  //FIXME
+        return null;
     }
 
     public String me(@Context SecurityContext ctx){
