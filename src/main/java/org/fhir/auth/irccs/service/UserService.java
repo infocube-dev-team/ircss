@@ -141,11 +141,11 @@ public class UserService {
 
     public Response createKeycloakUser(User user) {
         try {
-            LOG.info("Creating Keycloak User: " + user.getEmail());
+
             UsersResource usersResource = getRealm().users();
 
-
             if(null != user.getPassword()){
+                LOG.info("Creating SIGNUP Keycloak User: " + user.getEmail());
                 user.setEnabled(false); //necessario per l'invio email di reset password
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
@@ -167,6 +167,7 @@ public class UserService {
                 getRealm().users().get(user.getId()).sendVerifyEmail();
                 LOG.info("Send verify email");
             }else{
+                LOG.info("Creating from admin Keycloak User: " + user.getEmail());
                 //caso di registrazione del practiotioner no da signup ma tramite admin
                 user.setEnabled(true); //necessario per l'invio email di reset password
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
