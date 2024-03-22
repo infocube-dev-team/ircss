@@ -3,8 +3,11 @@ package org.fhir.auth.irccs.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.fhir.auth.irccs.RollbackSystem.Command;
 import org.fhir.auth.irccs.RollbackSystem.RollbackManager;
 import org.fhir.auth.irccs.entity.User;
@@ -17,6 +20,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -35,8 +39,11 @@ public class UserService {
     FhirClient<Practitioner> practitionerController;
     @ConfigProperty(name = "quarkus.keycloak.admin-client.realm")
     String realm;
-    @ConfigProperty(name = "quarkus.keycloak.admin-client.client-id")
-    String clientId;
+    @Inject
+    KeycloakService keycloakService;
+
+    @RestClient
+    PractitionerClient practitionerClient;
 
     private RealmResource getRealm() {
         return keycloak.realm(realm);
@@ -158,6 +165,15 @@ public class UserService {
                 userResource.resetPassword(credentialPassword);
 
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
+            }else{
+                //caso di registrazione del practiotioner no da signup ma tramite admin
+                try {
+                    // Esegui l'azione di reset della password
+                    usersResource.get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+                } catch (Exception e) {
+                    LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", user.getEmail(), e);
+                    return Response.serverError().build();
+                }
             }
 
 
@@ -322,12 +338,8 @@ public class UserService {
         try {
             // Ottieni l'ID dell'utente
             String userId = users.get(0).getId();
-            List<String> app = new ArrayList<>();
-            app.add("UPDATE_PASSWORD");
             // Esegui l'azione di reset della password
             usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
-            //usersResource.get(userId).executeActionsEmail(clientId,"http://irccs.infocube.it/login", app);
-
 
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
@@ -372,6 +384,38 @@ public class UserService {
         }
         return Response.ok().build();
 
+    }
+
+    public String signUp(String user){
+        Response token = keycloakService.getAdminToken();
+        List<UserRepresentation> users = getRealm().users().search(user);
+
+        if (users.isEmpty()) {
+            System.out.println("L'utente non è stato trovato.");
+            return null;
+        }
+        if(token.hasEntity()){
+            String userId = users.get(0).getId();
+
+            String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
+            String response = practitionerClient.createUser(jwtToken, user);
+            getRealm().users().get(userId).sendVerifyEmail();
+            return response;
+        }
+        return null;  //FIXME
+    }
+
+    public String me(@Context SecurityContext ctx){
+
+        String email = ctx.getUserPrincipal().getName();
+        if(null != email){
+            Response token = keycloakService.getAdminToken();
+            if(token.hasEntity()) {
+                String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
+                return practitionerClient.getCurrentPractitioner(jwtToken, email);
+            }
+        }
+        return null;
     }
 
 }
