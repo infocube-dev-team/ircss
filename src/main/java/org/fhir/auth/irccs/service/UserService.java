@@ -142,17 +142,16 @@ public class UserService {
     public Response createKeycloakUser(User user) {
         try {
             LOG.info("Creating Keycloak User: " + user.getEmail());
-
-            user.setEnabled(false);
-            UserRepresentation userRepresentation = User.toUserRepresentation(user);
             UsersResource usersResource = getRealm().users();
-            Response response = usersResource.create(userRepresentation);
-            user.setId(CreatedResponseUtil.getCreatedId(response));
-            Objects.requireNonNull(user.getId(), "User ID cannot be null after creation.");
 
-            LOG.info("Keycloak User created: " + user.getEmail() + ". Setting password...");
 
             if(null != user.getPassword()){
+
+                UserRepresentation userRepresentation = User.toUserRepresentation(user);
+                Response response = usersResource.create(userRepresentation);
+                user.setId(CreatedResponseUtil.getCreatedId(response));
+                Objects.requireNonNull(user.getId(), "User ID cannot be null after creation.");
+
                 // Prepare the credential for the user's password
                 CredentialRepresentation credentialPassword = new CredentialRepresentation();
                 credentialPassword.setTemporary(false);
@@ -167,6 +166,13 @@ public class UserService {
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
             }else{
                 //caso di registrazione del practiotioner no da signup ma tramite admin
+                user.setEnabled(true);
+                UserRepresentation userRepresentation = User.toUserRepresentation(user);
+                Response response = usersResource.create(userRepresentation);
+                user.setId(CreatedResponseUtil.getCreatedId(response));
+                Objects.requireNonNull(user.getId(), "User ID cannot be null after creation.");
+
+                LOG.info("Keycloak User created: " + user.getEmail() + ". Send reset password...");
                 try {
                     // Esegui l'azione di reset della password
                     usersResource.get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
