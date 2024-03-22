@@ -146,7 +146,7 @@ public class UserService {
 
 
             if(null != user.getPassword()){
-
+                user.setEnabled(true); //necessario per l'invio email di reset password
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
                 user.setId(CreatedResponseUtil.getCreatedId(response));
