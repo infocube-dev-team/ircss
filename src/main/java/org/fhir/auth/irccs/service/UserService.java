@@ -173,10 +173,10 @@ public class UserService {
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
                 mailer.send(
                         Mail.withText(user.getEmail(),
-                                "WELCOME New User",
+                                "WELCOME IN IRCCS - GESTIONE STUDI CLINICI ",
                                 "La tua registrazione è andata a buon fine. A valle dell'abilitazione da parte " +
                                         "dell'amministratore di sistema, potrai accedere al portale irccs.infocube.it" +
-                                        "\n Cordiali saluti"
+                                        " \n Cordiali saluti"
                         )).subscribe().with(
                         success -> System.out.println("Email sent successfully to: " + user.getEmail()),
                         failure -> System.out.println("Failed to send email to: " + user.getEmail() + ", Reason: " + failure.getMessage())
