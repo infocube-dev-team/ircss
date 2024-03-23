@@ -1,6 +1,8 @@
 package org.fhir.auth.irccs.service;
 
 
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.reactive.ReactiveMailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
@@ -44,6 +46,9 @@ public class UserService {
 
     @RestClient
     PractitionerClient practitionerClient;
+
+    @Inject
+    ReactiveMailer mailer;
 
     private RealmResource getRealm() {
         return keycloak.realm(realm);
@@ -121,11 +126,11 @@ public class UserService {
 
         rollbackManager.addCommand(new Command(
                 () -> {
-                 try {
-                     deleteFhirPractitioner(email);
-                 } catch (IndexOutOfBoundsException e){
-                     LOG.info("No such Fhir Practitioner: " + email);
-                 }
+                    try {
+                        deleteFhirPractitioner(email);
+                    } catch (IndexOutOfBoundsException e){
+                        LOG.info("No such Fhir Practitioner: " + email);
+                    }
                 },
                 () -> {}
         ));
@@ -164,6 +169,14 @@ public class UserService {
                 userResource.resetPassword(credentialPassword);
 
                 LOG.info("Password set for Keycloak User: " + user.getEmail());
+                mailer.send(
+                        Mail.withText(user.getEmail(),
+                                "WELCOME New User",
+                                "La tua registrazione è andata a buon fine. A valle dell'abilitazione da parte " +
+                                        "dell'amministratore di sistema, potrai accedere al portale irccs.infocube.it" +
+                                        "\n Cordiali saluti"
+                        ));
+
                /* azione non possibile per utenti disabilitati - va pensata una welcome mail
                 getRealm().users().get(user.getId()).sendVerifyEmail();
                 LOG.info("Send verify email");*/
