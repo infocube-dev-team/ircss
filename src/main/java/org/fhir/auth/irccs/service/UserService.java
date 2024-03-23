@@ -3,6 +3,8 @@ package org.fhir.auth.irccs.service;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.subscription.Cancellable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
@@ -175,7 +177,11 @@ public class UserService {
                                 "La tua registrazione è andata a buon fine. A valle dell'abilitazione da parte " +
                                         "dell'amministratore di sistema, potrai accedere al portale irccs.infocube.it" +
                                         "\n Cordiali saluti"
-                        ));
+                        )).subscribe().with(
+                        success -> System.out.println("Email sent successfully to: " + user.getEmail()),
+                        failure -> System.out.println("Failed to send email to: " + user.getEmail() + ", Reason: " + failure.getMessage())
+                );
+                ;
 
                /* azione non possibile per utenti disabilitati - va pensata una welcome mail
                 getRealm().users().get(user.getId()).sendVerifyEmail();
