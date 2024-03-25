@@ -171,7 +171,13 @@ public class GroupService {
     }*/
 
     private Response getGroupByName(String name) {
-        return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getGroupByName_representation(name), getRealm())).build();
+        try {
+            return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getGroupByName_representation(name), getRealm())).build();
+        }  catch (Exception e) {
+            LOG.error("ERROR: Couldn't find Keycloak Group: {}", name);
+            e.printStackTrace();
+            throw new OperationException("Couldn't find Keycloak group", OperationOutcome.IssueSeverity.ERROR);
+        }
     }
 
     public GroupRepresentation getGroupByName_representation(String name) {
