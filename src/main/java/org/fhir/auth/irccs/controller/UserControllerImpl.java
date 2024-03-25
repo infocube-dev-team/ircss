@@ -41,10 +41,6 @@ public class UserControllerImpl implements UserController{
         return keycloakService.logout(payload);
     }
 
-    public Response enableUser(String email) {
-        return userService.enableKeycloakUser(email);
-    }
-
     public Response updateUser(User user) {
         return userService.updateKeycloakUser(user);
     }
