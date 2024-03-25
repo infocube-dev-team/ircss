@@ -63,8 +63,11 @@ public class UserService {
                             .map(User::fromUserRepresentation)
                             .toList())
                     .build();
-
-        return Response.ok(User.fromUserRepresentation(getUserByEmail_keycloak(email).readEntity(UserRepresentation.class))).build();
+        Response getUser = getUserByEmail_keycloak(email);
+        if(getUser.hasEntity()){
+            return Response.ok(User.fromUserRepresentation(getUser.readEntity(UserRepresentation.class))).build();
+        }
+        return Response.status(404).build();
     }
     public Response createKeycloakUser(User user) {
         try {
@@ -166,7 +169,7 @@ public class UserService {
                 return Response.status(200).entity(users.get(0)).build();
             }
 
-            return Response.status(404).entity(users).build();
+            return Response.status(404).build();
 
 
     }
