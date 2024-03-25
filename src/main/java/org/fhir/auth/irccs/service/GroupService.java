@@ -127,49 +127,6 @@ public class GroupService {
         }
     }
 
-    /*public Response createGroup(org.fhir.auth.irccs.entity.Group group) {
-        // Creating Keycloak Group Representation
-
-        GroupRepresentation groupRepresentation = new GroupRepresentation();
-        groupRepresentation.setName(group.getName());
-
-        GroupsResource groupsResource = getRealm().groups();
-        Response KCgroupCreated = groupsResource.add(groupRepresentation);
-
-        String keycloakGroupId = CreatedResponseUtil.getCreatedId(KCgroupCreated);
-
-
-        GroupRepresentation foundGroup = groupsResource.groups(group.getName(), 0, 1).get(0);
-        Objects.requireNonNull(foundGroup);
-
-
-        List<Group.GroupMemberComponent> practitionerReferences = new ArrayList<>();
-        for(String email : group.getMembers()){
-            userService.joinGroup(email, foundGroup);
-            try {
-                practitionerReferences.add(new Group.GroupMemberComponent().setEntity(new Reference(userService.getUserByEmail_fhir(email).getId())));
-            } catch (Exception e){
-                e.printStackTrace();
-                throw new OperationException("Couldn't find FHIR practitioner", OperationOutcome.IssueSeverity.ERROR);
-            }
-        }
-
-        Group fhirGroup = new Group();
-        fhirGroup.setName(group.getName());
-        fhirGroup.setMember(practitionerReferences);
-        fhirGroup.setIdentifier(List.of(new Identifier().setUse(Identifier.IdentifierUse.SECONDARY).setValue(keycloakGroupId)));
-
-        try {
-            IIdType groupCreated = groupController.create(fhirGroup);
-            LOG.info("Group created: {}", groupCreated);
-        } catch (Exception e){
-            groupsResource.group(keycloakGroupId).remove();
-        }
-
-        return Response.ok().status(Response.Status.CREATED).build();
-
-    }*/
-
     private Response getGroupByName(String name) {
         try {
             return Response.ok(org.fhir.auth.irccs.entity.Group.fromGroupRepresentation(getGroupByName_representation(name), getRealm())).build();

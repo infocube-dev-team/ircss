@@ -3,8 +3,6 @@ package org.fhir.auth.irccs.service;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.subscription.Cancellable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
@@ -12,8 +10,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.fhir.auth.irccs.RollbackSystem.Command;
-import org.fhir.auth.irccs.RollbackSystem.RollbackManager;
 import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.exceptions.OperationException;
 import org.hl7.fhir.r5.model.OperationOutcome;
@@ -32,7 +28,9 @@ import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class UserService {
@@ -66,86 +64,8 @@ public class UserService {
                             .toList())
                     .build();
 
-        return Response.ok(User.fromUserRepresentation(getUserByEmail_keycloak(email))).build();
+        return Response.ok(User.fromUserRepresentation(getUserByEmail_keycloak(email).readEntity(UserRepresentation.class))).build();
     }
-
-    public Response enableUser(String email) {
-        RollbackManager rollbackManager = new RollbackManager();
-
-        User user = User.fromUserRepresentation(getUserByEmail_keycloak(email));
-        rollbackManager.addCommand(new Command(
-                () -> enableKeycloakUser(email).close(),
-                () -> disableKeycloakUser(email).close()
-        ));
-
-        rollbackManager.addCommand(new Command(
-                () -> createFhirPractitioner(user).close(),
-                () -> {}
-        ));
-
-        try {
-            rollbackManager.executeCommands();
-        } catch (Exception e){
-            return Response.status(RestResponse.Status.EXPECTATION_FAILED).build();
-        }
-
-        user.setEnabled(true);
-        return Response.ok(user).build();
-    }
-
-    public Response updateUser(User user) {
-        RollbackManager rollbackManager = new RollbackManager();
-
-        User foundUser = User.fromUserRepresentation(getUserByEmail_keycloak(user.getEmail()));
-        rollbackManager.addCommand(new Command(
-                () -> updateKeycloakUser(user).close(),
-                () -> updateKeycloakUser(foundUser).close()
-        ));
-
-        rollbackManager.addCommand(new Command(
-                () -> updateFhirPractitioner(user).close(),
-                () -> {}
-        ));
-
-        try {
-            rollbackManager.executeCommands();
-        } catch (Exception e){
-            return Response.status(RestResponse.Status.EXPECTATION_FAILED).build();
-        }
-
-        return Response.ok(user).build();
-    }
-
-    public Response deleteUser(String email) {
-        RollbackManager rollbackManager = new RollbackManager();
-
-        User foundUser = User.fromUserRepresentation(getUserByEmail_keycloak(email));
-
-        rollbackManager.addCommand(new Command(
-                () -> deleteKeycloakUser(email),
-                () -> createKeycloakUser(foundUser).close()
-        ));
-
-        rollbackManager.addCommand(new Command(
-                () -> {
-                    try {
-                        deleteFhirPractitioner(email);
-                    } catch (IndexOutOfBoundsException e){
-                        LOG.info("No such Fhir Practitioner: " + email);
-                    }
-                },
-                () -> {}
-        ));
-
-        try {
-            rollbackManager.executeCommands();
-        } catch (Exception e){
-            return Response.status(RestResponse.Status.EXPECTATION_FAILED).build();
-        }
-
-        return Response.ok().build();
-    }
-
     public Response createKeycloakUser(User user) {
         try {
 
@@ -181,7 +101,6 @@ public class UserService {
                         success -> System.out.println("Email sent successfully to: " + user.getEmail()),
                         failure -> System.out.println("Failed to send email to: " + user.getEmail() + ", Reason: " + failure.getMessage())
                 );
-                ;
 
                /* azione non possibile per utenti disabilitati - va pensata una welcome mail
                 getRealm().users().get(user.getId()).sendVerifyEmail();
@@ -198,7 +117,7 @@ public class UserService {
                 LOG.info("Keycloak User created: " + user.getEmail() + ". Send reset password...");
                 try {
                     // Esegui l'azione di reset della password
-                    usersResource.get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+                    usersResource.get(user.getId()).executeActionsEmail(List.of("UPDATE_PASSWORD"));
                 } catch (Exception e) {
                     LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", user.getEmail(), e);
                     return Response.serverError().build();
@@ -212,48 +131,6 @@ public class UserService {
             throw e;
         }
     }
-
-    public Response enableKeycloakUser(String email) {
-        LOG.info("Enabling user {}...", email);
-        try {
-            UserRepresentation userRepresentation = getUserByEmail_keycloak(email);
-            Objects.requireNonNull(userRepresentation);
-            userRepresentation.setEnabled(true);
-            getRealm().users().get(userRepresentation.getId()).update(userRepresentation);
-            return Response.ok(getUserByEmail_keycloak(email)).build();
-        } catch (Exception e) {
-            LOG.error("Error enabling Keycloak user: " + email, e);
-            throw e;
-        }
-    }
-
-    public Response disableKeycloakUser(String email) {
-        LOG.info("Disabling user {}...", email);
-        try {
-            UserRepresentation userRepresentation = getUserByEmail_keycloak(email);
-            Objects.requireNonNull(userRepresentation);
-            userRepresentation.setEnabled(false);
-            getRealm().users().get(userRepresentation.getId()).update(userRepresentation);
-            return Response.ok(getUserByEmail_keycloak(email)).build();
-        } catch (Exception e) {
-            LOG.error("Error enabling Keycloak user: " + email, e);
-            throw e;
-        }
-    }
-
-    public Response createFhirPractitioner(User user) {
-        LOG.info("Creating FHIR practitioner {}...", user.getEmail());
-
-        try {
-            String practitionerId = practitionerController.create(User.toPractitioner(user).setActive(true)).getIdPart();
-            Objects.requireNonNull(practitionerId);
-            return Response.ok(practitionerController.encodeResourceToString(practitionerController.read(practitionerId))).build();
-        } catch (NullPointerException e) {
-            LOG.error("Error creating FHIR practitioner: " + user.getEmail(), e);
-            throw e;
-        }
-    }
-
     public Response updateKeycloakUser(User user) {
         UserResource userResource = getRealm().users().get(user.getId());
 
@@ -268,25 +145,10 @@ public class UserService {
         }
     }
 
-
-    public Response updateFhirPractitioner(User user) {
-        // Updating Fhir Practitioner Resource
-        try {
-            String practitioner = getUserByEmail_fhir(user.getEmail()).getIdPart();
-            Objects.requireNonNull(practitioner);
-            String practitionerUpdated = practitionerController.encodeResourceToString(practitionerController.update(practitioner, User.toPractitioner(user)));
-            LOG.info("Practitioner updated: {}", practitionerUpdated);
-            return Response.ok(practitionerUpdated).status(Response.Status.ACCEPTED).build();
-        } catch (Exception e) {
-            LOG.error("Error retrieving FHIR practitioner: " + user.getEmail(), e);
-            throw e;
-        }
-    }
-
     public Response deleteKeycloakUser(String email) {
         try {
             UsersResource usersResource = getRealm().users();
-            UserRepresentation userRepresentation = getUserByEmail_keycloak(email);
+            UserRepresentation userRepresentation = getUserByEmail_keycloak(email).readEntity(UserRepresentation.class);
             Objects.requireNonNull(userRepresentation);
             String userId = userRepresentation.getId();
             UserResource userResource = usersResource.get(userId);
@@ -298,34 +160,15 @@ public class UserService {
         }
     }
 
-    public void deleteFhirPractitioner(String email) {
-        try {
-            Practitioner practitioner = getUserByEmail_fhir(email);
-            Objects.requireNonNull(practitioner);
-            practitionerController.delete(practitioner.getIdPart());
-        } catch (Exception e) {
-            LOG.error("ERROR: Couldn't remove FHIR Practitioner: {}.", email, e);
-            throw e;
-        }
-    }
+    public Response getUserByEmail_keycloak(String email) throws OperationException {
+            List<UserRepresentation> users = getRealm().users().search(email);
+            if(users.size() > 0){
+                return Response.status(200).entity(users.get(0)).build();
+            }
 
-    public void joinGroup(String email, GroupRepresentation group) {
-        getRealm().users().get(getUserByEmail_keycloak(email).getId()).joinGroup(group.getId());
-    }
+            return Response.status(404).entity(users).build();
 
-    public void leaveGroup(String email, GroupRepresentation group) {
-        System.out.println(group.getName());
-        getRealm().users().get(getUserByEmail_keycloak(email).getId()).leaveGroup(group.getId());
-    }
 
-    public UserRepresentation getUserByEmail_keycloak(String email) throws OperationException {
-        try {
-            return getRealm().users().search(email).get(0);
-        } catch (Exception e) {
-            LOG.error("ERROR: Couldn't find Keycloak user: {}", email);
-            e.printStackTrace();
-            throw new OperationException("Couldn't find Keycloak user", OperationOutcome.IssueSeverity.ERROR);
-        }
     }
 
     public Practitioner getUserByEmail_fhir(String email) throws OperationException {
@@ -339,6 +182,14 @@ public class UserService {
         }
     }
 
+    public void joinGroup(String email, GroupRepresentation group) {
+        getRealm().users().get(getUserByEmail_keycloak(email).readEntity(UserRepresentation.class).getId()).joinGroup(group.getId());
+    }
+
+    public void leaveGroup(String email, GroupRepresentation group) {
+        System.out.println(group.getName());
+        getRealm().users().get(getUserByEmail_keycloak(email).readEntity(UserRepresentation.class).getId()).leaveGroup(group.getId());
+    }
 
 
     public Response forgotPassword(HashMap<String,String> payload) {
@@ -353,8 +204,8 @@ public class UserService {
         // Trova l'utente di cui si vuole recuperare la password
         String username = payload.get("username");
 
-        System.out.println("payload:"+payload.toString());
-        System.out.println("L'utente:"+username);
+        System.out.println("payload:"+ payload);
+        System.out.println("L'utente:"+ username);
         List<UserRepresentation> users = usersResource.search(username);
 
         if (users.isEmpty()) {
@@ -368,7 +219,7 @@ public class UserService {
             // Ottieni l'ID dell'utente
             String userId = users.get(0).getId();
             // Esegui l'azione di reset della password
-            usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+            usersResource.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD"));
 
         } catch (Exception e) {
             LOG.error("ERROR: Couldn't send reset psw Keycloak User: {}.", payload.get("username"), e);
