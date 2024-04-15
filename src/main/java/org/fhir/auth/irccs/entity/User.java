@@ -202,6 +202,9 @@ public class User {
                 ", enabled=" + enabled +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", organizationRequest=" + organizationRequest +
+                ", structure=" + structure +
+                ", role=" + role +
+                ", unitName=" + unitName +
                 '}';
     }
 }
