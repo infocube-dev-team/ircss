@@ -21,6 +21,9 @@ public class User {
     private Boolean enabled;
     private String phoneNumber;
     private List<String> organizationRequest;
+    private List<String> structure;
+    private List<String> role;
+    private List<String> unitName;
 
     public static UserRepresentation toUserRepresentation(User user){
         UserRepresentation userRepresentation = new UserRepresentation();
@@ -36,6 +39,15 @@ public class User {
             }
             if(null != user.getPhoneNumber()){
                 put("phoneNumber", List.of(user.getPhoneNumber()));
+            }
+            if(null != user.getRole()){
+                put("role", user.getRole());
+            }
+            if(null != user.getStructure()){
+                put("structure", user.getStructure());
+            }
+            if(null != user.getUnitName()){
+                put("unitName", user.getUnitName());
             }
         }});
 
@@ -73,6 +85,9 @@ public class User {
         user.setSurname(userRepresentation.getLastName());
         user.setPhoneNumber(userRepresentation.getAttributes().get("phoneNumber").get(0));
         user.setOrganizationRequest(userRepresentation.getAttributes().get("organizationRequest"));
+        user.setRole(userRepresentation.getAttributes().get("role"));
+        user.setStructure(userRepresentation.getAttributes().get("structure"));
+        user.setUnitName(userRepresentation.getAttributes().get("unitName"));
         user.setEmail(userRepresentation.getEmail());
         user.setEnabled(userRepresentation.isEnabled());
         return user;
@@ -150,6 +165,30 @@ public class User {
 
     public void setOrganizationRequest(List<String> organizationRequest) {
         this.organizationRequest = organizationRequest;
+    }
+
+    public List<String> getStructure() {
+        return structure;
+    }
+
+    public void setStructure(List<String> structure) {
+        this.structure = structure;
+    }
+
+    public List<String> getRole() {
+        return role;
+    }
+
+    public void setRole(List<String> role) {
+        this.role = role;
+    }
+
+    public List<String> getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(List<String> unitName) {
+        this.unitName = unitName;
     }
 
     @Override
