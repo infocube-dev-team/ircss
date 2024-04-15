@@ -114,7 +114,7 @@
       </snapshots>
       <id>nexus-release</id>
       <name>i3 Repository</name>
-      <url>https://nexus.infocube.it:444/repository/irccs-common-release</url>
+      <url>https://nexus.infocube.it/repository/irccs-common-release</url>
     </repository>
     <repository>
       <releases>
@@ -125,7 +125,7 @@
       </snapshots>
       <id>nexus-snapshot</id>
       <name>i3 Repository</name>
-      <url>https://nexus.infocube.it:444/repository/irccs-common-snapshot</url>
+      <url>https://nexus.infocube.it/repository/irccs-common-snapshot</url>
     </repository>
   </repositories>
   <build>

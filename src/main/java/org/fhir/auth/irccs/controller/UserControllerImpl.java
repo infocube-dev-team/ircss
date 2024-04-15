@@ -6,13 +6,18 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.service.KeycloakService;
+import org.fhir.auth.irccs.service.OrganizationService;
 import org.fhir.auth.irccs.service.UserService;
 import java.util.HashMap;
+import java.util.List;
 
 public class UserControllerImpl implements UserController{
 
     @Inject
     UserService userService;
+
+    @Inject
+    OrganizationService organizationService;
 
     @Inject
     KeycloakService keycloakService;
@@ -31,6 +36,10 @@ public class UserControllerImpl implements UserController{
 
     public String me(@Context SecurityContext ctx){
         return userService.me(ctx);
+    }
+
+    public List<String> organizations() {
+        return organizationService.getOrganizations();
     }
 
     public Response tokenExchange(String payload) {

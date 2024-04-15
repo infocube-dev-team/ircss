@@ -10,6 +10,7 @@ import org.fhir.auth.irccs.entity.User;
 import org.keycloak.representations.AccessTokenResponse;
 
 import java.util.HashMap;
+import java.util.List;
 
 
 @Path("/fhir/auth/users")
@@ -31,6 +32,10 @@ public interface UserController {
     @Path("/me")
     @GET
     String me(SecurityContext cx);
+
+    @Path("/organizations")
+    @GET
+    List<String> organizations();
 
     @Path("/token")
     @Consumes("application/x-www-form-urlencoded")
