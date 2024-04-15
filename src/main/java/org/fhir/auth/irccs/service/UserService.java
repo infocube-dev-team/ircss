@@ -152,7 +152,7 @@ public class UserService {
             UsersResource usersResource = getRealm().users();
 
             if(null != user.getPassword()){
-                LOG.info("Creating SIGNUP Keycloak User: " + user.getEmail());
+                LOG.info("Creating SIGNUP Keycloak User: " + user.toString());
                 user.setEnabled(false); //necessario per l'invio email di reset password
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
