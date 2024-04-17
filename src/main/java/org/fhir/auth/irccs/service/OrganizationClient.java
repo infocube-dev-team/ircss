@@ -1,5 +1,6 @@
 package org.fhir.auth.irccs.service;
 
+import ca.uhn.fhir.rest.annotation.OptionalParam;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -12,5 +13,9 @@ import org.quarkus.irccs.common.constants.FhirConst;
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface OrganizationClient {
     @GET
-    String getOrganizations(@HeaderParam("Authorization") String jwtToken, @QueryParam("_count") Integer count, @QueryParam("_offset") Integer offset );
+    String getOrganizations(@HeaderParam("Authorization") String jwtToken, @QueryParam("_count") Integer count, @QueryParam("_offset") Integer offset);
+
+    @GET
+    String getOrganizationsByName(@HeaderParam("Authorization") String jwtToken, @QueryParam("_count") Integer count, @QueryParam("_offset") Integer offset, @QueryParam("name") String name );
+
 }
