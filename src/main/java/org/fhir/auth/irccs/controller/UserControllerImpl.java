@@ -38,8 +38,8 @@ public class UserControllerImpl implements UserController{
         return userService.me(ctx);
     }
 
-    public List<String> organizations() {
-        return organizationService.getOrganizations();
+    public List<String> organizations(Integer count, Integer offset) {
+        return organizationService.getOrganizations(count, offset);
     }
 
     public Response tokenExchange(String payload) {

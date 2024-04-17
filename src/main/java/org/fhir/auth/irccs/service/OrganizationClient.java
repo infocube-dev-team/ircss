@@ -12,5 +12,5 @@ import org.quarkus.irccs.common.constants.FhirConst;
 @Produces(FhirConst.FHIR_MEDIA_TYPE)
 public interface OrganizationClient {
     @GET
-    String getOrganizations(@HeaderParam("Authorization") String jwtToken);
+    String getOrganizations(@HeaderParam("Authorization") String jwtToken, @QueryParam("_count") Integer count, @QueryParam("_offset") Integer offset );
 }

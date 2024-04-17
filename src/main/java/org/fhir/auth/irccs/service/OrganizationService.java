@@ -45,14 +45,13 @@ public class OrganizationService {
     @Inject
     FhirClient<Bundle> bundleClient;
 
-    public List<String> getOrganizations(){
-
+    public List<String> getOrganizations(Integer count, Integer offset){
             Response token = keycloakService.getAdminToken();
             if(token.hasEntity()) {
                 String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
-                Bundle organizations = bundleClient.parseResource(Bundle.class, organizationClient.getOrganizations(jwtToken));
+                Bundle organizations = bundleClient.parseResource(Bundle.class, organizationClient.getOrganizations(jwtToken, count, offset));
                 if(organizations.getEntry().size() > 0){
-                    return organizations.getEntry().stream().map(entry -> ((Organization) entry.getResource()).getName()).toList();
+                    return organizations.getEntry().stream().filter(entry -> null != ((Organization) entry.getResource()).getName() ).map(entry -> ((Organization) entry.getResource()).getName()).toList();
                 } else new ArrayList<>();
             }
         return null;

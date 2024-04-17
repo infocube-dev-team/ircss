@@ -35,7 +35,7 @@ public interface UserController {
 
     @Path("/organizations")
     @GET
-    List<String> organizations();
+    List<String> organizations(@QueryParam("_count") @DefaultValue("3000") Integer count, @QueryParam("_offset") @DefaultValue("0") Integer offset);
 
     @Path("/token")
     @Consumes("application/x-www-form-urlencoded")
