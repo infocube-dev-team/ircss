@@ -30,17 +30,32 @@ public class PermissionService {
         return keycloak.realm(realmName);
     }
 
-    public Response getPermission(String groupName){
+    public Response getPermission(String groupId){
         GroupRepresentation group = new GroupRepresentation();
-        String groupId = getRealm().groups().groups(groupName,  0,  1, false).get(0).getId();
-        group = getRealm().groups().group(groupId).toRepresentation();
-        return Response.ok(PermissionWrapper.toPermissionWrapper(groupId, groupName, group.getRealmRoles())).build();
+        try {
+            group = getRealm().groups().group(groupId).toRepresentation();
+        } catch (ClientWebApplicationException e){
+            if(e.getResponse().getStatus() == 404){
+                LOG.info("Couldn\'t find Group by ID.");
+                return Response.status(404).build();
+            }
+        }
+
+        return Response.ok(PermissionWrapper.toPermissionWrapper(groupId, getRealm().groups().group(groupId).toRepresentation().getName(), group.getRealmRoles())).build();
     }
     public Response addRoles(PermissionWrapper permission) {
         GroupResource group = null;
         List<String> roles = permission.getPermissions().stream().flatMap(role -> IntStream.range(0, role.calcTruePermissions().size()).mapToObj(i -> role.getResource().toLowerCase() + ":" + role.calcTruePermissions().get(i))).toList();
-        String groupId = getRealm().groups().groups(permission.getGroupName(),  0,  1, false).get(0).getId();
-        group = getRealm().groups().group(groupId);
+        group = getRealm().groups().group(permission.getGroupId());
+        try {
+            GroupRepresentation groupRepresentation = group.toRepresentation();
+        } catch (ClientWebApplicationException e){
+            if(e.getResponse().getStatus() == 404){
+                LOG.info("Couldn\'t find Group by ID.");
+                return Response.status(404).build();
+            }
+        }
+
 
         List<RoleRepresentation> mappedRoles = roles.stream().map(role -> getRealm().roles().get(role).toRepresentation()).toList();
        try {

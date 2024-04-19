@@ -13,7 +13,7 @@ import org.fhir.auth.irccs.entity.PermissionWrapper;
 public interface PermissionController {
 
     @GET
-    Response getPermission(@QueryParam("name") String groupName);
+    Response getPermission(@QueryParam("groupId") String groupId);
     @POST
     Response addRoles(PermissionWrapper permissions);
 
