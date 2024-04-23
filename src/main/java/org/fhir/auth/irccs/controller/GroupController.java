@@ -23,5 +23,5 @@ public interface GroupController {
     Response updateGroup(Group group);
 
     @DELETE
-    Response deleteGroup(@QueryParam("name") String name);
+    Response deleteGroup(@QueryParam("id") String id);
 }

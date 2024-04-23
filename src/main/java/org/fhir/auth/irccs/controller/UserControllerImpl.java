@@ -58,8 +58,8 @@ public class UserControllerImpl implements UserController{
         return userService.updateKeycloakUser(user);
     }
 
-    public Response deleteUser(String email) {
-        return userService.deleteKeycloakUser(email);
+    public Response deleteUser(String id) {
+        return userService.deleteKeycloakUser(id);
     }
 
     public Response forgotPassword(HashMap<String,String> payload) {

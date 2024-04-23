@@ -22,8 +22,8 @@ public class GroupControllerImpl implements GroupController {
         return groupService.updateKeycloakGroup(group);
     }
 
-    public Response deleteGroup(String name) {
-        return groupService.deleteGroup(name);
+    public Response deleteGroup(String id) {
+        return groupService.deleteKeycloakGroup(id);
     }
 
 }
