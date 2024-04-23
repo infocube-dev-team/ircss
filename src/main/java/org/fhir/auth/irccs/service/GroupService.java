@@ -237,7 +237,7 @@ public class GroupService {
             GroupResource groupResource = getRealm().groups().group(id);
             groupResource.remove();
         } catch (Exception e){
-            LOG.error("ERROR: Couldn't remove Keycloak User: {}.", id, e);
+            LOG.error("ERROR: Couldn't remove Keycloak Group: {}.", id, e);
             throw e;
         }
 

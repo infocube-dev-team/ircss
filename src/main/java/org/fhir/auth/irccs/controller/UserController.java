@@ -52,7 +52,7 @@ public interface UserController {
     Response updateUser(User user);
 
     @DELETE
-    Response deleteUser(@QueryParam("email") String email);
+    Response deleteUser(String id);
 
     @Path("/forgotPassword")
     @Consumes("application/json")
