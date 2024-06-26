@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.fhir.auth.irccs.entity.OfficeType;
 import org.fhir.auth.irccs.entity.PermissionWrapper;
 import org.jboss.resteasy.reactive.ClientWebApplicationException;
 import org.keycloak.admin.client.Keycloak;
@@ -14,6 +15,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -28,6 +30,35 @@ public class PermissionService {
 
     private RealmResource getRealm() {
         return keycloak.realm(realmName);
+    }
+
+    public Response setOfficeType(OfficeType officeType){
+        GroupResource group = getRealm().groups().group(officeType.getGroupId());
+        try {
+            GroupRepresentation groupRepresentation = group.toRepresentation();
+            List<RoleRepresentation> roleNames = new ArrayList<>();
+
+            RoleResource backOfficeRole = getRealm().roles().get("backOffice");
+            RoleResource frontOfficeRole = getRealm().roles().get("frontOffice");
+
+            if(officeType.isBackOffice()){
+                roleNames.add(backOfficeRole.toRepresentation());
+            }
+            if(officeType.isFrontOffice()){
+                roleNames.add(frontOfficeRole.toRepresentation());
+            }
+
+            group.roles().realmLevel().remove(List.of(backOfficeRole.toRepresentation(), frontOfficeRole.toRepresentation()));
+            group.roles().realmLevel().add(roleNames);
+            group.update(groupRepresentation);
+            return Response.ok(group).build();
+        } catch (ClientWebApplicationException e){
+            if(e.getResponse().getStatus() == 404){
+                LOG.info("Couldn\'t find Group by ID.");
+                return Response.status(404).build();
+            }
+            return Response.status(e.getResponse().getStatus()).build();
+        }
     }
 
     public Response getPermission(String groupId){

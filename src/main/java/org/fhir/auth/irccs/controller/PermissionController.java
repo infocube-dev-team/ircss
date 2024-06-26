@@ -1,9 +1,9 @@
 package org.fhir.auth.irccs.controller;
 
-import io.quarkus.security.Authenticated;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.fhir.auth.irccs.entity.OfficeType;
 import org.fhir.auth.irccs.entity.PermissionWrapper;
 
 
@@ -16,5 +16,9 @@ public interface PermissionController {
     Response getPermission(@QueryParam("groupId") String groupId);
     @POST
     Response addRoles(PermissionWrapper permissions);
+    @POST
+    @Path("/officeType")
+    @Consumes("application/json")
+    Response setOfficeType(OfficeType officeType);
 
 }
