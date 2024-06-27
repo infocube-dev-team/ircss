@@ -21,4 +21,9 @@ public interface PermissionController {
     @Consumes("application/json")
     Response setOfficeType(OfficeType officeType);
 
+    @GET
+    @Path("/officeType")
+    @Consumes("application/json")
+    Response getOfficeType(@QueryParam("groupId") String groupId);
+
 }

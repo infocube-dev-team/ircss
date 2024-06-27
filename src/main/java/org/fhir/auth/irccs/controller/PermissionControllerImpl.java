@@ -25,4 +25,9 @@ public class PermissionControllerImpl implements PermissionController{
     public Response setOfficeType(OfficeType officeType) {
         return permissionService.setOfficeType(officeType);
     }
+
+    public Response getOfficeType(String groupId) {
+        return permissionService.getOfficeType(groupId);
+    }
+
 }

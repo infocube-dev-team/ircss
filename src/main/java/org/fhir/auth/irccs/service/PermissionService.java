@@ -61,6 +61,24 @@ public class PermissionService {
         }
     }
 
+    public Response getOfficeType(String groupId){
+        GroupResource group = getRealm().groups().group(groupId);
+        try {
+            List<String> groupRoles = group.roles().realmLevel().listAll().stream().map(RoleRepresentation::getName).toList();
+            OfficeType officeType = new OfficeType();
+            officeType.setGroupId(groupId);
+            officeType.setFrontOffice(groupRoles.contains("frontOffice"));
+            officeType.setBackOffice(groupRoles.contains("backOffice"));
+            return Response.ok(officeType).build();
+        } catch (ClientWebApplicationException e){
+            if(e.getResponse().getStatus() == 404){
+                LOG.info("Couldn\'t find Group by ID.");
+                return Response.status(404).build();
+            }
+            return Response.status(e.getResponse().getStatus()).build();
+        }
+    }
+
     public Response getPermission(String groupId){
         GroupRepresentation group = new GroupRepresentation();
         try {
