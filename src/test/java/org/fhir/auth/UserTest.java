@@ -563,4 +563,64 @@ public class UserTest {
         return " Bearer " + token;
     }
 
+    @Test
+    @Order(11)
+    public void registrationUserAndVerifyEmail() {
+        String devenabled = ConfigProvider.getConfig().getConfigValue("quarkus.devservices.enabled").getValue();
+        System.err.println(devenabled);
+        String url = ConfigProvider.getConfig()
+                .getConfigValue("quarkus.keycloak.policy-enforcer.paths.0.path")
+                .getValue();
+
+        System.err.println(url);
+        String enforce =
+                ConfigProvider.getConfig()
+                        .getConfigValue("quarkus.keycloak.policy-enforcer.paths.0.enforcement-mode")
+                        .getValue();
+        System.err.println(enforce);
+        long temp = System.currentTimeMillis();
+        // Testing what happens when a new Keycloak User signs up.
+        User user = new User();
+        user.setEmail("testmail"+temp+"@yopmail.com");
+        user.setPhoneNumber("+393388888888");
+        user.setName("Jhon");
+        user.setSurname("Doe");
+        user.setPassword("JhonDoe123");
+        user.setEnabled(false);
+        user.setOrganizationRequest(List.of("Pascale"));
+
+        User res = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/fhir/auth/users/signup")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().response().as(User.class);
+
+        Assertions.assertEquals(res.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getPhoneNumber(), user.getPhoneNumber());
+        Assertions.assertEquals(res.getName(), user.getName());
+        Assertions.assertEquals(res.getSurname(), user.getSurname());
+        Assertions.assertEquals(res.getEnabled(), false);
+
+
+        User res2 = RestAssured
+                    .given()
+                    .contentType("application/json")
+                    .body(user)
+                    .when()
+                    .post("/fhir/auth/users/signup")
+                    .then()
+                    .statusCode(HttpStatus.SC_BAD_REQUEST)
+                    .extract().response().as(User.class);
+
+        Assertions.assertEquals(res2.getEmail(), user.getEmail());
+        Assertions.assertEquals(res.getPhoneNumber(), user.getPhoneNumber());
+        Assertions.assertEquals(res.getName(), user.getName());
+        Assertions.assertEquals(res.getSurname(), user.getSurname());
+        Assertions.assertEquals(res.getEnabled(), false);
+        System.out.println("User successfully created! " + res.getEmail());
+    }
 }

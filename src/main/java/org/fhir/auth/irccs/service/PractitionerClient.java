@@ -17,4 +17,8 @@ public interface PractitionerClient {
 
     @GET
     String getCurrentPractitioner(@HeaderParam("Authorization") String jwtToken, @QueryParam("email") String email);
+
+    @GET
+    @Path("/_search")
+    String practitionerExist(@HeaderParam("Authorization") String jwtToken, @QueryParam("email") String email);
 }

@@ -1,10 +1,9 @@
 package org.fhir.auth.irccs.service;
 
 
+import ca.uhn.fhir.parser.DataFormatException;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.subscription.Cancellable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
@@ -16,6 +15,9 @@ import org.fhir.auth.irccs.RollbackSystem.Command;
 import org.fhir.auth.irccs.RollbackSystem.RollbackManager;
 import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.exceptions.OperationException;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.ContactPoint;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -415,9 +417,19 @@ public class UserService {
         Response token = keycloakService.getAdminToken();
         if(token.hasEntity()){
             String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
+            //verifico che l'email non sia già registrata su fhir
+            IBaseResource resource = practitionerController.parseResource(Practitioner.class, user);
+            Practitioner practitioner = (Practitioner) resource;
+            String practitionerEmail =  practitioner.getTelecom().stream().filter(x -> x.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)).toList().get(0).getValue();
+            String result = practitionerClient.practitionerExist(jwtToken, practitionerEmail);
+            Bundle bundle = practitionerController.parseResource(Bundle.class, result);
+            if(bundle.getTotal() > 0){
+                 throw new DataFormatException("Email già in uso");//TODO da internazionalizzare
+            }
             return practitionerClient.createUser(jwtToken, user);
         }
         return null;
+
     }
 
     public String me(@Context SecurityContext ctx){
@@ -430,7 +442,9 @@ public class UserService {
                 return practitionerClient.getCurrentPractitioner(jwtToken, email);
             }
         }
-        return null;
+        return Response
+                .status(jakarta.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode(),jakarta.ws.rs.core.Response.Status.UNAUTHORIZED.getReasonPhrase())
+                .build().toString();
     }
 
 }
