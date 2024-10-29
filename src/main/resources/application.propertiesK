@@ -1,14 +1,14 @@
 %prod.quarkus.http.port=9090
 
 # FHIR R5 Server configuration - PROD
-%prod.org.quarkus.irccs.fhir-server=http://10.99.88.210:8080/fhir
+%prod.org.quarkus.irccs.fhir-server=http://services:8080/fhir
 %prod.org.quarkus.irccs.query.limit=100
 
 %prod.quarkus.rest-client.practitioner-microservice-client.url=http://irccs-practitioner:8384
 %prod.quarkus.rest-client.organization-microservice-client.uri=http://irccs-centro-ricerca:8181
 
 # FHIR R5 Server configuration - DEV
-org.quarkus.irccs.fhir-server=http://10.99.88.210/fhir
+org.quarkus.irccs.fhir-server=http://services/fhir
 org.quarkus.irccs.query.limit=100
 
 # Index Dependencies needed for I3-COMMON library
@@ -24,15 +24,15 @@ quarkus.ssl.native=true
 
 # Keycloak Variables - PROD
 %prod.keycloak-port=9445
-%prod.keycloak-domain=http://10.99.88.210
-%prod.keycloak-url=http://10.99.88.210:9445
+%prod.keycloak-domain=http://services
+%prod.keycloak-url=http://services:9445
 # Keycloak Variables - DEV
 keycloak-port=9445
-keycloak-domain=http://10.99.88.210
+keycloak-domain=http://services
 
 # Variables
-hapi.base-url=http://10.99.88.210
-keycloak-url=http://10.99.88.210:9445
+hapi.base-url=http://services
+keycloak-url=http://services:9445
 keycloak-client_id=irccs
 keycloak-client_secret=cwvB6qAn5iFl7pa9r04WxkordJyy3tjS
 keycloak-realm=pascale
