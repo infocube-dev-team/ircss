@@ -1,0 +1,186 @@
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["Organization"],
+  "type" : "string",
+  "expression" : "Organization.extension.where(url='group_ids').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["PlanDefinition"],
+  "type" : "string",
+  "expression" : "PlanDefinition.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["Group"],
+  "type" : "string",
+  "expression" : "Group.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["Practitioner"],
+  "type" : "string",
+  "expression" : "Practitioner.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["ResearchStudy"],
+  "type" : "string",
+  "expression" : "ResearchStudy.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["Patient"],
+  "type" : "string",
+  "expression" : "Patient.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["CarePlan"],
+  "type" : "string",
+  "expression" : "CarePlan.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["Questionnaire"],
+  "type" : "string",
+  "expression" : "Questionnaire.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["QuestionnaireResponse"],
+  "type" : "string",
+  "expression" : "QuestionnaireResponse.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
+
+
+curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType" : "SearchParameter",
+  "name" : "group-id",
+  "title" : "group-id",
+  "status" : "active",
+  "experimental" : true,
+  "publisher" : "Infocube",
+  "description" : "Search by extension value",
+  "code" : "group-id",
+  "base" : ["ResearchSubject"],
+  "type" : "string",
+  "expression" : "ResearchSubject.extension.where(url='\''group_ids'\'').value",
+  "processingMode" : "normal",
+  "modifier": ["exact"]
+} '
