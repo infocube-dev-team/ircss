@@ -1,7 +1,9 @@
 package org.fhir.auth.irccs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.quarkus.oidc.BearerTokenAuthentication;
 import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.PermitAll;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -40,6 +42,7 @@ public interface UserController {
     @Path("/token")
     @Consumes("application/x-www-form-urlencoded")
     @POST
+    @PermitAll
     Response tokenExchange(String payload);
     @Path("/logout")
     @Consumes("application/x-www-form-urlencoded")
