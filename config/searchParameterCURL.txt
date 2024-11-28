@@ -11,7 +11,7 @@ curl --location 'http://{{substitute with ip server}}:8080/fhir/SearchParameter'
   "code" : "group-id",
   "base" : ["Organization"],
   "type" : "string",
-  "expression" : "Organization.extension.where(url='group_ids').value",
+  "expression" : "Organization.extension.where(url='\''group_ids'\'').value",
   "processingMode" : "normal",
   "modifier": ["exact"]
 } '

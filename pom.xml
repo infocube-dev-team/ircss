@@ -4,18 +4,18 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.quarkus</groupId>
   <artifactId>quarkus-project</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <properties>
-    <hapi.version>6.6.2</hapi.version>
-    <i3.common.version>2.0.4-SNAPSHOT</i3.common.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <hapi.version>7.4.3</hapi.version>
+    <i3.common.version>2.1.0-SNAPSHOT</i3.common.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <maven.home>${user.home}/.m2/settings.xml</maven.home>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.7.4</quarkus.platform.version>
+    <quarkus.platform.version>3.15.1</quarkus.platform.version>
     <surefire.version>3.0.0-M7</surefire.version>
   </properties>
   <dependencyManagement>
@@ -32,7 +32,8 @@
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
+      <artifactId>quarkus-rest-jackson</artifactId>
+      <version>3.15.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -40,11 +41,13 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive</artifactId>
+      <artifactId>quarkus-rest</artifactId>
+      <version>3.15.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-keycloak-admin-client-reactive</artifactId>
+      <artifactId>quarkus-keycloak-admin-rest-client</artifactId>
+      <version>3.15.0</version>
     </dependency>
     <dependency>
       <groupId>ca.uhn.hapi.fhir</groupId>
@@ -79,7 +82,7 @@
     <dependency>
       <groupId>org.hapi</groupId>
       <artifactId>hapi-devservice</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${i3.common.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
