@@ -21,6 +21,7 @@ import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.quarkus.irccs.client.restclient.FhirClient;
 import org.slf4j.Logger;
@@ -61,37 +62,24 @@ public class GroupService {
         return getGroupByName(name);
     }
 
-    public Response createGroup(org.fhir.auth.irccs.entity.Group group) throws OperationException{
-        RollbackManager rollbackManager = new RollbackManager();
-
-        AtomicReference<org.fhir.auth.irccs.entity.Group> keycloakGroupRef = new AtomicReference<>();
-
-        rollbackManager.addCommand(new Command(
-                () -> {
-                    Response keycloakGroup = createKeycloakGroup(group);
-                    keycloakGroupRef.set(keycloakGroup.readEntity(org.fhir.auth.irccs.entity.Group.class)); // Set the result in the AtomicReference
-                    keycloakGroup.close();
-                },
-                () -> {}
-        ));
-
-        rollbackManager.addCommand(new Command(
-                () -> createFhirGroup(keycloakGroupRef.get()).close(),
-                () -> {}
-        ));
-
+    public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group, String parentGroupId) {
         try {
-            rollbackManager.executeCommands();
-        } catch (Exception e){
-            throw new OperationException(e.getMessage(), OperationOutcome.IssueSeverity.ERROR);
-        }
 
-        return Response.ok(group).build();
-    }
+            GroupRepresentation groupRepresentation = org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm(), parentGroupId);
+            String createdId = groupRepresentation.getId();
+            group.setId(createdId);
+            List<String> roles = new ArrayList<>();
 
-    public Response createKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
-        try {
-            group.setId(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()).getId());
+            if(group.getDataManager()){
+                roles.add("datamanager");
+            }
+            if(group.getOrgAdmin()){
+                roles.add("orgadmin");
+            }
+
+            List<RoleRepresentation> mappedRoles = roles.stream().map(role -> getRealm().roles().get(role).toRepresentation()).toList();
+            GroupResource groupResource = getRealm().groups().group(createdId);
+            groupResource.roles().realmLevel().add(mappedRoles);
             return Response.ok(group).build();
         } catch (Exception e) {
             LOG.error("Error creating Keycloak group: " + group.getName(), e);
@@ -101,7 +89,8 @@ public class GroupService {
 
     public Response updateKeycloakGroup(org.fhir.auth.irccs.entity.Group group) {
         try {
-            getRealm().groups().group(group.getId()).update(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm()));
+            System.out.println(keycloak.tokenManager().getAccessToken().getToken());
+            getRealm().groups().group(group.getId()).update(org.fhir.auth.irccs.entity.Group.toGroupRepresentation(group, getRealm(), null));
             return Response.ok(group).build();
         } catch (Exception e) {
             LOG.error("Error updating Keycloak group: " + group.getName(), e);

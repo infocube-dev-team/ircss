@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.fhir.auth.irccs.entity.OrganizationRequest;
 import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.service.KeycloakService;
 import org.fhir.auth.irccs.service.OrganizationService;
@@ -38,7 +39,7 @@ public class UserControllerImpl implements UserController{
         return userService.me(ctx);
     }
 
-    public List<String> organizations(Integer count, Integer offset, String name) {
+    public List<OrganizationRequest> organizations(Integer count, Integer offset, String name) {
         return organizationService.getOrganizations(count, offset, name);
     }
 

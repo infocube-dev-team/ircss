@@ -15,7 +15,7 @@ public class GroupControllerImpl implements GroupController {
     }
 
     public Response createGroup(Group group) {
-        return groupService.createKeycloakGroup(group);
+        return groupService.createKeycloakGroup(group, group.getParentGroupId());
     }
 
     public Response updateGroup(Group group) {

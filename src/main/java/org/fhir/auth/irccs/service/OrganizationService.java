@@ -12,12 +12,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.fhir.auth.irccs.RollbackSystem.Command;
 import org.fhir.auth.irccs.RollbackSystem.RollbackManager;
+import org.fhir.auth.irccs.entity.OrganizationRequest;
 import org.fhir.auth.irccs.entity.User;
 import org.fhir.auth.irccs.exceptions.OperationException;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.OperationOutcome;
-import org.hl7.fhir.r5.model.Organization;
-import org.hl7.fhir.r5.model.Practitioner;
+import org.hl7.fhir.r5.model.*;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -45,7 +43,7 @@ public class OrganizationService {
     @Inject
     FhirClient<Bundle> bundleClient;
 
-    public List<String> getOrganizations(Integer count, Integer offset, String name){
+    public List<OrganizationRequest> getOrganizations(Integer count, Integer offset, String name){
             Response token = keycloakService.getAdminToken();
             if(token.hasEntity()) {
                 String jwtToken = "Bearer " + token.readEntity(AccessTokenResponse.class).getToken();
@@ -56,8 +54,9 @@ public class OrganizationService {
                     organizations = bundleClient.parseResource(Bundle.class, organizationClient.getOrganizationsByName(jwtToken, count, offset, name));
                 }
                 if(organizations.getEntry().size() > 0){
-                    return organizations.getEntry().stream().filter(entry -> null != ((Organization) entry.getResource()).getName() ).map(entry -> ((Organization) entry.getResource()).getName()).toList();
-                } else new ArrayList<>();
+                    return organizations.getEntry().stream()
+                            .map(entry -> new OrganizationRequest(((Organization) entry.getResource()).getName(), ((Organization) entry.getResource()).getIdentifier().stream().filter(ext -> ext.getUse().equals(Identifier.IdentifierUse.SECONDARY)).toList().get(0).getValue())).toList();
+                } else return new ArrayList<>();
             }
         return null;
     }
