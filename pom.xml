@@ -7,7 +7,7 @@
   <version>1.0.0</version>
   <properties>
     <hapi.version>6.6.2</hapi.version>
-    <i3.common.version>2.0.4-SNAPSHOT</i3.common.version>
+    <i3.common.version>2.1.0-SNAPSHOT</i3.common.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <maven.home>${user.home}/.m2/settings.xml</maven.home>
