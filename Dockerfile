@@ -2,7 +2,7 @@ FROM eclipse-temurin:21-jre-ubi9-minimal
 WORKDIR /app
 ARG folder
 COPY $folder/quarkus-app/ /app/
-RUN microdnf update && microdnf install -y dos2unix iputils procps nano
+RUN microdnf install -y dos2unix iputils procps nano
 
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo '' >> /app/start.sh && \
