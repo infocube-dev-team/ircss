@@ -1,8 +1,8 @@
-FROM eclipse-temurin:19.0.2_7-jre-focal
+FROM eclipse-temurin:21-jre-ubi9-minimal
 WORKDIR /app
 ARG folder
 COPY $folder/quarkus-app/ /app/
-RUN apt-get update && apt-get install -y dos2unix iputils-ping curl procps nano
+RUN microdnf install -y dos2unix iputils procps nano
 
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'echo "Starting application..."' >> /app/start.sh && \
