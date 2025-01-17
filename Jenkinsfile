@@ -19,6 +19,7 @@ stage('Clone Repository') {
             steps {
                 script {
 			sh 'env'
+			 echo "Building branch ${env.GIT_BRANCH}..."
                 }
             }
         }
