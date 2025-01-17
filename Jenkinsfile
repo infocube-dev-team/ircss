@@ -18,13 +18,6 @@ pipeline
 stage('Clone Repository') {
             steps {
                 script {
-   // capture scm variables
-                    def scmVars = checkout scm
-                    String branch = scmVars.GIT_BRANCH
-
-                    // or use the environment variable
-                    branch = env.GIT_BRANCH
-                    echo ${branch}
 			sh 'env'
                 }
             }
