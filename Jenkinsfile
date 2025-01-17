@@ -25,6 +25,7 @@ stage('Clone Repository') {
                     // or use the environment variable
                     branch = env.GIT_BRANCH
                     echo ${branch}
+			sh 'env'
                 }
             }
         }
