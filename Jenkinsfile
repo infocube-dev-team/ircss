@@ -6,7 +6,9 @@ pipeline
         maven "M3"
     }
    
-  
+  environment {
+        BRANCH_NAME = "${env.BRANCH_NAME}" // The current branch name
+    }
     stages 
     {
         stage('Workspace Cleaning') {
@@ -15,25 +17,30 @@ pipeline
                    }
         }
         
-stage('Clone Repository') {
+    stages {
+        stage('Process Branch') {
             steps {
-                script {
-			sh 'env'
-			 echo "Building branch ${env.GIT_BRANCH}..."
-                }
+                echo "Processing branch: ${params.BRANCH_NAME}"
             }
         }
-
-        
-        /*stage('Test') {
+    
+stage('Clone Repository') {
+            steps {
+                //checkout scmGit(branches: [[name: '*/develop']], extensions: [], 
+                checkout scmGit(branches: [[name: "*/${BRANCH_NAME}"]], extensions: [],
+                //checkout scmGit(branches: [[name: '*/PASTRL-337']], extensions: [], 
+                userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
+            }
+        }
+          /*
+        stage('Test') {
             steps {
                 script {
                     sh(script: "sed -i 's|hapi.base-url=http://localhost|hapi.base-url=http://10.99.88.146|g' ./src/main/resources/application.properties")
                     sh(script: 'mvn test')
                 }
             }
-        }*/
-        
+        } */
                 stage('Build package') {
                 steps {
                     sh(script: "sed -i 's|prod.keycloak-domain=http://irccs-keycloak|prod.keycloak-domain=http://10.99.88.146:9445|g' ./src/main/resources/application.properties")
@@ -47,7 +54,7 @@ stage('Clone Repository') {
                     sh('docker build  --no-cache -t "irccs-auth":latest --build-arg folder=target .')
                     sh('echo "Docker image irccs-auth has been built successfully."')
                     sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                    sh('docker tag irccs-auth:latest nexus.infocube.it:443/i3/irccs/irccs-auth')
+                    sh('docker tag irccs-auth:${BRANCH_NAME} nexus.infocube.it:443/i3/irccs/irccs-auth')
                     sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
             }
         }
