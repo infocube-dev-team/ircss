@@ -159,6 +159,8 @@ public class UserService {
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
                 user.setId(CreatedResponseUtil.getCreatedId(response));
+                getRealm().users().get(user.getId()).joinGroup(user.getOrganizationRequest().get(0));
+
                 Objects.requireNonNull(user.getId(), "User ID cannot be null after creation.");
 
                 // Prepare the credential for the user's password
@@ -195,6 +197,9 @@ public class UserService {
                 UserRepresentation userRepresentation = User.toUserRepresentation(user);
                 Response response = usersResource.create(userRepresentation);
                 user.setId(CreatedResponseUtil.getCreatedId(response));
+                if( null != user.getOrganizationRequest()){
+                    getRealm().users().get(user.getId()).joinGroup(user.getOrganizationRequest().get(0));
+                }
                 Objects.requireNonNull(user.getId(), "User ID cannot be null after creation.");
 
                 LOG.info("Keycloak User created: " + user.getEmail() + ". Send reset password...");

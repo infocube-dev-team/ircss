@@ -2,7 +2,9 @@ package org.fhir.auth.irccs.entity;
 
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
 import org.fhir.auth.irccs.service.GroupService;
+import org.jboss.resteasy.reactive.ClientWebApplicationException;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -25,6 +27,12 @@ public class Group {
     private String name;
     private List<String> members;
     private List<String> organizations;
+    private String parentGroupId;
+    private String organizationId;
+    private Boolean isOrganization;
+    private String groupId;
+    private Boolean isDataManager = false;
+    private Boolean isOrgAdmin = false;
 
     public String getId() {
         return id;
@@ -40,6 +48,30 @@ public class Group {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getParentGroupId() {
+        return parentGroupId;
+    }
+
+    public void setParentGroupId(String parentGroupId) {
+        this.parentGroupId = parentGroupId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Boolean getOrganization() {
+        return isOrganization;
+    }
+
+    public void setOrganization(Boolean organization) {
+        isOrganization = organization;
     }
 
     public List<String> getMembers() {
@@ -58,6 +90,30 @@ public class Group {
         this.organizations = organizations;
     }
 
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public Boolean getDataManager() {
+        return isDataManager;
+    }
+
+    public void setDataManager(Boolean dataManager) {
+        isDataManager = dataManager;
+    }
+
+    public Boolean getOrgAdmin() {
+        return isOrgAdmin;
+    }
+
+    public void setOrgAdmin(Boolean orgAdmin) {
+        isOrgAdmin = orgAdmin;
+    }
+
     public static Group fromGroupRepresentation(GroupRepresentation groupRepresentation, RealmResource realmResource){
         Group group = new Group();
         group.setId(groupRepresentation.getId());
@@ -74,31 +130,52 @@ public class Group {
         return group;
     }
 
-    public static GroupRepresentation toGroupRepresentation(Group group, RealmResource realm){
+    public static GroupRepresentation toGroupRepresentation(Group group, RealmResource realm, String parentGroupId){
 
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         String createdId = group.getId();
+        Map<String, List<String>> attributes = new HashMap<>();
+
+        if(groupRepresentation.getAttributes() != null){
+            attributes = groupRepresentation.getAttributes();
+        }
 
         if(null != group.getName()){
             groupRepresentation.setName(group.getName());
         }
+        if(group.isOrganization){
+            if(group.getOrganizationId() != null){
+                attributes.put("organizationId", List.of(group.getOrganizationId()));;
+            } else {
+                throw new ClientWebApplicationException("Tried to create a group with no organization id", Response.Status.BAD_REQUEST);
+            }
+        }
+
+        if(!group.getGroupId().isEmpty()){
+            attributes.put("groupId", List.of(group.getGroupId()));;
+        }
+
+        attributes.put("isOrganization", List.of(group.getOrganization().toString()));
+        if(group.getOrganizations() != null && !group.getOrganizations().isEmpty()){
+            attributes.put("organizations", group.getOrganizations());
+        }
+        groupRepresentation.setAttributes(attributes);
+
         if(null != createdId){
             groupRepresentation.setId(group.getId());
             List<UserRepresentation> users = realm.groups().group(group.getId()).members();
             users.forEach(member -> realm.users().get(member.getId()).leaveGroup(group.getId()) );
         } else {
-            createdId = CreatedResponseUtil.getCreatedId(realm.groups().add(groupRepresentation));
+            if(parentGroupId != null && !parentGroupId.isEmpty()){
+                createdId = CreatedResponseUtil.getCreatedId(realm.groups().group(parentGroupId).subGroup(groupRepresentation));
+                realm.groups().group(createdId).roles().realmLevel().remove(realm.groups().group(parentGroupId).roles().realmLevel().listEffective());
+            } else {
+                createdId = CreatedResponseUtil.getCreatedId(realm.groups().add(groupRepresentation));
+            }
         }
-        if(group.getMembers().size() > 0){
+        if(group.getMembers() != null && !group.getMembers().isEmpty()){
             String finalCreatedId = createdId;
             group.getMembers().forEach(member -> realm.users().get(member).joinGroup(finalCreatedId) );
-        }
-        if(group.getOrganizations().size() > 0){
-            groupRepresentation.setAttributes(new HashMap<>(){{
-                put("organizations", group.getOrganizations());
-            }});
-        } else {
-            groupRepresentation.setAttributes(new HashMap<>());
         }
         groupRepresentation.setId(createdId);
 
