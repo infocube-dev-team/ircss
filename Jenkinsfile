@@ -17,7 +17,6 @@ pipeline
                    }
         }
         
-    stages {
         stage('Process Branch') {
             steps {
                 echo "Processing branch: ${params.BRANCH_NAME}"
@@ -131,4 +130,3 @@ stage('Clone Repository') {
            
         }
     }
-}
