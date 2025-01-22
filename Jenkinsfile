@@ -5,7 +5,7 @@ pipeline {
         maven "M3"
     }
     environment {
-        BRANCH_NAME = "${env.BRANCH_NAME}.toLowerCase()"
+        BRANCH_NAME = "${env.BRANCH_NAME}".toLowerCase()
 
     }
     stages {
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     if (env.CHANGE_ID != null) {
-                        BRANCH_NAME = "${env.CHANGE_BRANCH}.toLowerCase()"
+                        BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()
                     }
                 }
                 checkout scmGit(branches: [[name: "*/${BRANCH_NAME}"]], extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
