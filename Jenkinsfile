@@ -51,7 +51,7 @@ pipeline {
         stage('Docker image build and push') {
             steps {
                 sh'''
-                BRANCH=$(git rev-parse --abbrev-ref HEAD | tr "[:upper:]" "[:lower:]")
+                BRANCH=$(git symbolic-ref --short HEAD | tr "[:upper:]" "[:lower:]")
                 VER=$(/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/M3/bin/mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
                 imageName=$(echo irccs-auth_${BRANCH}:${VER})
                 docker build --no-cache -t ${imageName} --build-arg folder=target .
