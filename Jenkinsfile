@@ -56,8 +56,8 @@ pipeline {
                     echo "Artifact Version: ${ARTIFACT_VER}"
                 }
 
-                echo ${env.ARTIFACT_VER}
-                echo ${env.BRANCH}
+                echo "${env.ARTIFACT_VER}"
+                echo "${env.BRANCH}"
                 
                 sh('docker build  --no-cache -t "irccs-auth_${VERSION}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
