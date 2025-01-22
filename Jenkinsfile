@@ -36,7 +36,7 @@ pipeline {
                         BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()
                     }
                 }
-                checkout scmGit(branches: [[name: "*/${BRANCH_NAME}"]], extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
+                checkout scmGit(branches: [[name: "*/${BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
             }
         }
 
