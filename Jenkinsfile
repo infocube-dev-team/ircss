@@ -55,8 +55,9 @@ pipeline {
                 ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                 echo "${ARTIFACT_VER}"
                 echo "${env.BRANCH}"
-                def imageName = "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}"
+                export imageName = "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}"
                 echo "Image Name: ${imageName}"
+                    sh('.env')
                 sh'''
                 docker build --no-cache -t ${imageName} --build-arg folder=target .
                 //sh('echo "Docker image irccs-auth has been built successfully.')"
