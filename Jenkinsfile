@@ -51,14 +51,10 @@ pipeline {
         stage('Docker image build and push') {
             steps {
                 sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
-                script {
-                    VERSION = "-${env.BRANCH}:${env.ARTIFACT_VER}"
-                    echo "VERSION is: ${VERSION}"
-                }
                 sh('docker build  --no-cache -t "irccs-auth_${VERSION}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                sh('docker tag irccs-auth_${VERSION} nexus.infocube.it:443/i3/irccs/irccs-auth')
+                sh('docker tag irccs-auth_${env.BRANCH}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
             }
         }
@@ -66,14 +62,10 @@ pipeline {
         stage('Build immagine Kubernetes') {
             steps {
                 sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
-                script {
-                    VERSION = "-${env.BRANCH}:${env.ARTIFACT_VER}"
-                    echo "VERSION is: ${VERSION}"
-                }
                 sh('rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties')
                 sh('rm Dockerfile && mv DockerfileK Dockerfile')
                 sh('mvn clean package -DskipTests -U')
-                sh('docker build  --no-cache -t "irccs-auth_k8s${VERSION}" --build-arg folder=target .')
+                sh('docker build  --no-cache -t "irccs-auth_k8s_${env.BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
                 sh('docker tag irccs-auth_k8s_${VERSION} nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
