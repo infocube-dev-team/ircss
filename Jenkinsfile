@@ -50,7 +50,14 @@ pipeline {
 
         stage('Docker image build and push') {
             steps {
-                sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
+                
+                script{ 
+                    ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+                }
+
+                echo ${env.ARTIFACT_VER}
+                echo ${env.BRANCH}
+                
                 sh('docker build  --no-cache -t "irccs-auth_${VERSION}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
