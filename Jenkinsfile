@@ -5,8 +5,8 @@ pipeline {
         maven "M3"
     }
     environment {
-        BRANCH_NAME = "${env.CHANGE_BRANCH}"
-        $BRANCH_NAME = ${BRANCH_NAME}.toLowerCase()
+        BRANCH_NAME = "${env.CHANGE_BRANCH}.toLowerCase()"
+
     }
     stages {
         stage('Workspace Cleaning') {
