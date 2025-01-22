@@ -56,10 +56,10 @@ pipeline {
                     echo "Artifact Version: ${ARTIFACT_VER}"
                 }
 
-                echo "${env.ARTIFACT_VER}"
+                echo "${ARTIFACT_VER}"
                 echo "${env.BRANCH}"
                 
-                sh('docker build  --no-cache -t "irccs-auth_${VERSION}" --build-arg folder=target .')
+                sh('docker build  --no-cache -t "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
                 sh('docker tag irccs-auth_${env.BRANCH}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth')
@@ -69,6 +69,13 @@ pipeline {
 
         stage('Build immagine Kubernetes') {
             steps {
+                script{ 
+                    def ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                    echo "Artifact Version: ${ARTIFACT_VER}"
+                }
+
+                echo "${ARTIFACT_VER}"
+                echo "${env.BRANCH}"
                 sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
                 sh('rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties')
                 sh('rm Dockerfile && mv DockerfileK Dockerfile')
