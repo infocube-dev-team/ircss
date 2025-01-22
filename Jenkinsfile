@@ -126,8 +126,8 @@ stage('Clone Repository') {
     when { expression { env.CHANGE_ID != null } }
     sh('git clone git@github.com:infocube-dev-team/irccs-deploy.git')
     sh('cd irccs-deploy && git checkout ${env.CHANGE_TARGET}')
-    sh('cd irccs-deploy && cd kubernetes && sed -i "s|\(image: nexus\.infocube\.it/i3/irccs/irccs:\)[^[:space:]]*|\1${BRANCH_NAME}:${ARTIFACT_VER}|" auth.yaml')
-    sh('cd irccs-deploy && cd docker && sed -i "s|\(image: nexus\.infocube\.it/i3/irccs/irccs:\)[^[:space:]]*|\1${BRANCH_NAME}:${ARTIFACT_VER}|" auth.yaml')
+    sh('cd irccs-deploy && cd kubernetes && sed -i "s|\\(image: nexus\\.infocube\\.it/i3/irccs/irccs:\\)[^[:space:]]*|\\1${BRANCH_NAME}:${ARTIFACT_VER}|" auth.yaml')
+    sh('cd irccs-deploy && cd docker && sed -i "s|\\(image: nexus\\.infocube\\.it/i3/irccs/irccs:\\)[^[:space:]]*|\\1${BRANCH_NAME}:${ARTIFACT_VER}|" auth.yaml')
     sh('cd irccs-deploy && git add * && git commit -m "Source updated" && git push')
     DEPLOY_JOB = "${env.JOB_NAME.replaceAll('build', 'deploy')}"
     build job: "${env.DEPLOY_JOB}"
