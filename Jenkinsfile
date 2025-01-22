@@ -44,8 +44,9 @@ pipeline {
             steps {
                 sh(script: "sed -i 's|prod.keycloak-domain=http://irccs-keycloak|prod.keycloak-domain=http://10.99.88.146:9445|g' ./src/main/resources/application.properties")
                 sh(script: """
-                ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
-                echo "ARTIFACT_VER=$ARTIFACT_VER" >> \$WORKSPACE/.env
+                    ARTIFACT_VER=\$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+                    echo "Artifact Version: \$ARTIFACT_VER"
+                    echo "ARTIFACT_VER=\$ARTIFACT_VER" >> \$WORKSPACE/.env
                 """)
                 sh('mvn clean package -DskipTests -U')
             }
