@@ -5,7 +5,7 @@ pipeline {
         maven "M3"
     }
     environment {
-        BRANCH_NAME = "${env.BRANCH_NAME}".toLowerCase()
+        BRANCH = "${env.BRANCH_NAME}".toLowerCase()
 
     }
     stages {
@@ -33,7 +33,8 @@ pipeline {
             steps {
                 script {
                     if (env.CHANGE_ID != null) {
-                        BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()
+                        BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
+                        BRANCH_NAME = "${env.CHANGE_BRANCH}"
                     }
                 }
                 checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
@@ -50,10 +51,10 @@ pipeline {
         stage('Docker image build and push') {
             steps {
                 sh('ARTIFACT_VER=\$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
-                sh('docker build  --no-cache -t "irccs-auth_${BRANCH_NAME}:${ARTIFACT_VER}" --build-arg folder=target .')
+                sh('docker build  --no-cache -t "irccs-auth_${BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                sh('docker tag irccs-auth_${BRANCH_NAME}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth')
+                sh('docker tag irccs-auth_${BRANCH}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
             }
         }
@@ -64,9 +65,9 @@ pipeline {
                 sh('rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties')
                 sh('rm Dockerfile && mv DockerfileK Dockerfile')
                 sh('mvn clean package -DskipTests -U')
-                sh('docker build  --no-cache -t "irccs-auth_k8s_${BRANCH_NAME}:${ARTIFACT_VER}" --build-arg folder=target .')
+                sh('docker build  --no-cache -t "irccs-auth_k8s_${BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                sh('docker tag irccs-auth_k8s_${BRANCH_NAME}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
+                sh('docker tag irccs-auth_k8s_${BRANCH}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
             }
         }
