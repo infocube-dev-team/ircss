@@ -52,7 +52,8 @@ pipeline {
             steps {
                 
                 script{ 
-                    ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+                    def ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                    echo "Artifact Version: ${ARTIFACT_VER}"
                 }
 
                 echo ${env.ARTIFACT_VER}
