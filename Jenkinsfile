@@ -5,7 +5,8 @@ pipeline {
         maven "M3"
     }
     environment {
-        BRANCH_NAME = "${env.BRANCH_NAME}"
+        BRANCH_NAME = env.CHANGE_BRANCH.toLowerCase()
+
         ARTIFACT_VER =""
     }
     stages {
