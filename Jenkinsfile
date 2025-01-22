@@ -5,9 +5,8 @@ pipeline {
         maven "M3"
     }
     environment {
-        BRANCH_NAME = "${env.CHANGE_BRANCH.toLowerCase()}"
-
-        ARTIFACT_VER =""
+        BRANCH_NAME = ${env.CHANGE_BRANCH}
+        BRANCH_NAME = BRANCH_NAME.toLowerCase()
     }
     stages {
         stage('Workspace Cleaning') {
