@@ -58,7 +58,6 @@ pipeline {
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
                 sh('docker tag ${imageName} nexus.infocube.it:443/i3/irccs/irccs-auth')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
-                '''
                      }
             }
         }
