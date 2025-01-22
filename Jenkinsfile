@@ -52,18 +52,15 @@ pipeline {
             steps {
                 
                 script{ 
-                    def ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
-                    echo "Artifact Version: ${ARTIFACT_VER}"
-                }
-
+                ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                 echo "${ARTIFACT_VER}"
                 echo "${env.BRANCH}"
-                sh('docker build  --no-cache -t "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
-                sh "docker build --no-cache -t irccs-auth_${env.BRANCH}:${ARTIFACT_VER} --build-arg folder=target ."
-                //sh('echo "Docker image irccs-auth has been built successfully."')
-                sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                sh('docker tag "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}" nexus.infocube.it:443/i3/irccs/irccs-auth')
-                sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
+                docker build --no-cache -t irccs-auth_k8s_${env.BRANCH}:${ARTIFACT_VER} --build-arg folder=target .
+                //sh('echo "Docker image irccs-auth has been built successfully."
+                docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443
+                docker tag "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}" nexus.infocube.it:443/i3/irccs/irccs-auth
+                docker push nexus.infocube.it:443/i3/irccs/irccs-auth
+                     }
             }
         }
 
