@@ -35,6 +35,7 @@ pipeline {
                     if (env.CHANGE_ID != null) {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}"
+                        echo $BRANCH > branch
                     }
                 }
                 checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
@@ -51,7 +52,7 @@ pipeline {
         stage('Docker image build and push') {
             steps {
                 sh'''
-                BRANCH=$(git symbolic-ref --short HEAD | tr "[:upper:]" "[:lower:]")
+                BRANCH=$(cat branch)
                 VER=$(/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/M3/bin/mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
                 imageName=$(echo irccs-auth_${BRANCH}:${VER})
                 docker build --no-cache -t ${imageName} --build-arg folder=target .
