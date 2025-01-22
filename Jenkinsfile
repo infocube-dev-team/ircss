@@ -44,8 +44,9 @@ stage('Clone Repository') {
                 steps {
                     sh(script: "sed -i 's|prod.keycloak-domain=http://irccs-keycloak|prod.keycloak-domain=http://10.99.88.146:9445|g' ./src/main/resources/application.properties")
                     //sh(script: "sed -i 's|prod.keycloak-port=9445|prod.keycloak-port=|g' ./src/main/resources/application.properties")
-			
-					sh('mvn clean package -DskipTests -U')
+		    sh('artifact_ver=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
+                    sh('echo $ARTIFACT_VER')
+		    sh('mvn clean package -DskipTests -U')
             }
         }
          stage('Docker image build and push') {
@@ -53,7 +54,7 @@ stage('Clone Repository') {
                     sh('docker build  --no-cache -t "irccs-auth":latest --build-arg folder=target .')
                     sh('echo "Docker image irccs-auth has been built successfully."')
                     sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
-                    sh('docker tag irccs-auth:${BRANCH_NAME} nexus.infocube.it:443/i3/irccs/irccs-auth')
+                    sh('docker tag irccs-auth:${BRANCH_NAME}:${ARTIFACT_VER} nexus.infocube.it:443/i3/irccs/irccs-auth')
                     sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth')
             }
         }
