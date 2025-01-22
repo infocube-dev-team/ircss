@@ -50,7 +50,7 @@ pipeline {
 
         stage('Docker image build and push') {
             steps {
-                sh('ARTIFACT_VER=\$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
+                sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
                 sh('docker build  --no-cache -t "irccs-auth_${BRANCH}:${ARTIFACT_VER}" --build-arg folder=target .')
                 sh('echo "Docker image irccs-auth has been built successfully."')
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
@@ -61,7 +61,7 @@ pipeline {
 
         stage('Build immagine Kubernetes') {
             steps {
-                sh('ARTIFACT_VER=\$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
+                sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
                 sh('rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties')
                 sh('rm Dockerfile && mv DockerfileK Dockerfile')
                 sh('mvn clean package -DskipTests -U')
