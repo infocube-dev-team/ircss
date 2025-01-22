@@ -57,7 +57,7 @@ pipeline {
                 echo "${env.BRANCH}"
                 def imageName = "irccs-auth_${env.BRANCH}:${ARTIFACT_VER}"
                 echo "Image Name: ${imageName}"
-                sh('docker build --no-cache -t ${imageName} --build-arg folder=target .')
+                sh('docker build --no-cache -t "${imageName}" --build-arg folder=target .')
                 //sh('echo "Docker image irccs-auth has been built successfully.')"
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
                 sh('docker tag ${imageName} nexus.infocube.it:443/i3/irccs/irccs-auth')
