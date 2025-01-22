@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         BRANCH_NAME = ${env.CHANGE_BRANCH}
-        BRANCH_NAME = BRANCH_NAME.toLowerCase()
+        BRANCH_NAME = ${BRANCH_NAME}.toLowerCase()
     }
     stages {
         stage('Workspace Cleaning') {
