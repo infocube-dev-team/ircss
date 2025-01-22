@@ -35,7 +35,8 @@ pipeline {
                     if (env.CHANGE_ID != null) {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}"
-                        echo $BRANCH > branch
+                        echo "branch_name" > "${WORKSPACE}/branch"
+
                     }
                 }
                 checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
