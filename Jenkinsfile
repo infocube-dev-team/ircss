@@ -6,6 +6,7 @@ pipeline {
     }
     environment {
         BRANCH_NAME = "${env.BRANCH_NAME}"
+        ARTIFACT_VER =""
     }
     stages {
         stage('Workspace Cleaning') {
@@ -43,7 +44,6 @@ pipeline {
             steps {
                 sh(script: "sed -i 's|prod.keycloak-domain=http://irccs-keycloak|prod.keycloak-domain=http://10.99.88.146:9445|g' ./src/main/resources/application.properties")
                 ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
-                echo $ARTIFACT_VER
                 sh('mvn clean package -DskipTests -U')
             }
         }
