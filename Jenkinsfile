@@ -120,8 +120,8 @@ stage ('Deploy source file update')
                     DEPLOY_JOB = 'test-deploy'
                     build job: "${DEPLOY_JOB}", parameters: [
                     //string(name: 'DEPLOYBRANCH', value: ${CHANGE_TARGET})
-                    string(name: 'DEPLOYBRANCH', value: 'develop')
-                }
+                    string(name: 'DEPLOYBRANCH', value: 'develop')]
+                
             }
         }
     }
