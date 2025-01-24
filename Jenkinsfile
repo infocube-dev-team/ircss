@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Build package') {
+        stage('Build Java package') {
             steps {
                 sh(script: "sed -i 's|prod.keycloak-domain=http://irccs-keycloak|prod.keycloak-domain=http://10.99.88.146:9445|g' ./src/main/resources/application.properties")
                 sh('mvn clean package -DskipTests -U')
@@ -80,7 +80,7 @@ pipeline {
                 }
         }
 
-stage ('Deploy source update')
+stage ('Deploy source file update')
 {
     steps {
                            // when {
@@ -130,7 +130,7 @@ stage ('Deploy source update')
                             body: "The 'Build' stage of the job '${env.JOB_NAME}' '${env.BUILD_NUMBER}' failed. Please check the logs.",
                             to: 'claudio.poli,michele.marrandino@infocube.it,gennaro.aurilia@infocube.it'
                         )
-                        error("Build failed, stopping pipeline execution.")  // Stops pipeline execution
+                        error("Build failed, stopping pipeline execution.")
                     }
                 }
             }
