@@ -33,6 +33,7 @@ pipeline {
             }
         }
 
+        /*
         stage('Clone Repository') {
             steps {
                 checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
@@ -110,16 +111,18 @@ stage ('Deploy source file update')
                             
 
         }
-}
-        /*stage('Deploy') {
+}*/
+        stage('Deploy') {
             steps {
                 script {
-                    DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
+                    //DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
+                    DEPLOY_JOB = 'test-deploy'
                     build job: "${DEPLOY_JOB}", parameters: [
-                    string(name: 'DEPLOYBRANCH', value: ${CHANGE_TARGET})
+                    //string(name: 'DEPLOYBRANCH', value: ${CHANGE_TARGET})
+                    string(name: 'DEPLOYBRANCH', value: 'develop')
                 }
             }
-        }*/
+        }
 
         stage('Notify') {
             steps {
