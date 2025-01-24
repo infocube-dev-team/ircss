@@ -42,12 +42,12 @@ pipeline {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()  
                     }
-                    IMAGE = readMavenPom().getArtifactId()
-                    VERSION = readMavenPom().getVersion()
-                    COMMITTER_EMAIL = sh(script: 'git log -1 --pretty=format:"%ae"', returnStdout: true).trim()
+                    //IMAGE = readMavenPom().getArtifactId()
+                    VER = readMavenPom().getVersion()
+                    //COMMITTER_EMAIL = sh(script: 'git log -1 --pretty=format:"%ae"', returnStdout: true).trim()
                 }
-                echo "ArtifactID --->>  ${IMAGE}"
-                echo "VersionID  --->>  ${VERSION}"
+                //echo "ArtifactID --->>  ${IMAGE}"
+                echo "VersionID  --->>  ${VER}"
             }
         }
 
@@ -61,7 +61,7 @@ pipeline {
         stage('Docker image build and push') {
             steps {
                 script{ 
-                def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()    
+                //def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()    
                 sh "docker build -t ${IMAGENAME}-${BRANCH}:${VER} --build-arg folder=target ."
                 sh "docker login -u ${NEXUSERNAME} -p ${NEXPASSWORD} ${DOCKER_REPOSITORY}"
                 sh "docker tag ${IMAGENAME}-${BRANCH}:${VER} ${DOCKER_REPOSITORY}/${IMAGENAME}-${BRANCH}:${VER}"
@@ -73,7 +73,7 @@ pipeline {
         stage('Build immagine Kubernetes') {
             steps {
                 script{ 
-                def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                //def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                 sh "rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties"
                 sh "rm Dockerfile && mv DockerfileK Dockerfile"
                 sh "mvn clean package -DskipTests -U"
@@ -93,7 +93,7 @@ stage ('Deploy source update')
                         //expression { env.CHANGE_ID != null }
                         //}
                             script{
-                            def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                            //def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                             sh "git clone git@github.com:infocube-dev-team/irccs-deploy.git"
                             //sh "cd irccs-deploy && git checkout ${CHANGE_TARGET}"
                             sh "cd irccs-deploy && git checkout develop"
