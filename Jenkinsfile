@@ -81,27 +81,26 @@ pipeline {
             }
         }
 
-/*stage ('Deploy source update')
+stage ('Deploy source update')
 {steps {
-                            when {
-                        expression { env.CHANGE_ID != null }
-                        }
+                           // when {
+                        //expression { env.CHANGE_ID != null }
+                        //}
 
-                            sh "git clone irccs-deploy"
-                            sh "cd irccs-deploy && git checkout ${CHANGE_TARGET}"
-                            sh "sed version new-version file docker"
-                            sh "sed version new-version file kubernetes"
+                            sh "git clone git@github.com:infocube-dev-team/irccs-deploy.git"
+                            //sh "cd irccs-deploy && git checkout ${CHANGE_TARGET}"
+                            sh "cd irccs-deploy && git checkout develop"
+                            //Version update for docker
+                            //sh "sed version new-version file docker"
+                            //Version update for Kubernetes
+                            sh "cd irccs-deploy/kubernetes && sed -i '/image:/s|image:.*|image: nexus.infocube.it/i3/irccs/${IMAGENAME}_k8s-${BRANCH}:${VER}|' auth.yaml"
                             sh "cd irccs-deploy && git add *"
-                            sh ('cd irccs-deploy && git commit -m "Source file updated after PR ${env.CHANGE_ID}')
+                            //sh ('cd irccs-deploy && git commit -m "Source file updated after PR ${env.CHANGE_ID}')
                             sh "cd irccs-deploy && git push"
                             
 
 }
-
-
-
-}
-        stage('Deploy') {
+        /*stage('Deploy') {
             steps {
                 script {
                     DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
