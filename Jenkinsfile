@@ -50,7 +50,10 @@ pipeline {
 
         stage('Docker image build and push') {
             steps {
-                sh "VER=$(/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/M3/bin/mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)"
+                script{ 
+                    def ARTIFACT_VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                    echo "Artifact Version: ${ARTIFACT_VER}"
+                }
                 sh "imageName=$(echo irccs-auth_${BRANCH}:${VER})"
                 sh "docker build -t irccs-auth:latest ."
                 sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
@@ -68,7 +71,6 @@ pipeline {
 
                 echo "${ARTIFACT_VER}"
                 echo "${env.BRANCH}"
-                sh('ARTIFACT_VER=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)')
                 sh('rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties')
                 sh('rm Dockerfile && mv DockerfileK Dockerfile')
                 sh('mvn clean package -DskipTests -U')
