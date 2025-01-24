@@ -38,10 +38,6 @@ pipeline {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}"    
                     }
-                    IMAGE = readMavenPom().getArtifactId()
-                    
-                
-                echo "ArtifactID --->>  ${IMAGE}"
                 }
             }
         }
@@ -63,7 +59,7 @@ pipeline {
                 sh "docker build -t irccs-auth-${BRANCH}:${VER} --build-arg folder=target ."
                 sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
                 sh "docker tag irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
-                sh "docker push irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
+                sh "docker push nexus.infocube.it:443/i3/irccs/irccs-auth-${BRANCH}:${VER}"
             }
             }
         }
