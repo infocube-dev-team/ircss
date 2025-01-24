@@ -53,12 +53,13 @@ pipeline {
                 script{ 
                     def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                     echo "Artifact Version: ${VER}"
-                }
+                
                 //sh "imageName=$(echo irccs-auth_${BRANCH}:${VER})"
                 sh "docker build -t irccs-auth:latest --build-arg folder=target ."
                 sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
                 sh "docker tag irccs-auth:latest irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
                 sh "docker push irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
+            }
             }
         }
 
