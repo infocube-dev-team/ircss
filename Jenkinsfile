@@ -4,6 +4,9 @@ pipeline {
         jdk "OpenJDK-21"
         maven "M3"
     }
+    environment {
+        BRANCH = "${env.BRANCH_NAME}".toLowerCase()
+    }
     
     stages {
         stage('Workspace Cleaning') {
