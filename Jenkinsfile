@@ -58,7 +58,7 @@ pipeline {
                 //sh "imageName=$(echo irccs-auth_${BRANCH}:${VER})"
                 sh "docker build -t irccs-auth-${BRANCH}:${VER} --build-arg folder=target ."
                 sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
-                sh "docker tag irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
+                sh "docker tag irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth-${BRANCH}:${VER}"
                 sh "docker push nexus.infocube.it:443/i3/irccs/irccs-auth-${BRANCH}:${VER}"
             }
             }
