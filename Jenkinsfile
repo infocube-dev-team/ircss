@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
     tools {
@@ -33,11 +34,11 @@ pipeline {
             }
         }
 
-        /*
-        stage('Clone Repository') {
-            steps {
-                checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
-            script {
+        
+        //stage('Clone Repository') {
+          //  steps {
+        //     checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
+         /*   script {
                     if (env.CHANGE_ID != null) {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()  
