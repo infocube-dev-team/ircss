@@ -95,7 +95,7 @@ stage ('Deploy source update')
                             //sh "sed version new-version file docker"
                             //Version update for Kubernetes
                             sh "cd irccs-deploy/kubernetes && sed -i '/image:/s|image:.*|image: nexus.infocube.it/i3/irccs/${IMAGENAME}_k8s-${BRANCH}:${VER}|' auth.yaml"
-                            sh "cd irccs-deploy && git add *"
+                            sh "cd irccs-deploy && git add ."
                             //sh ('cd irccs-deploy && git commit -m "Source file updated after PR ${env.CHANGE_ID}')
                             sh "cd irccs-deploy && git push"
                             }
