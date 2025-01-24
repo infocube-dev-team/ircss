@@ -34,9 +34,7 @@ pipeline {
                 script {
                     if (env.CHANGE_ID != null) {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
-                        BRANCH_NAME = "${env.CHANGE_BRANCH}"
-                        echo "branch_name" > "${WORKSPACE}/branch"
-
+                        BRANCH_NAME = "${env.CHANGE_BRANCH}"    
                     }
                 }
                 checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
@@ -52,15 +50,12 @@ pipeline {
 
         stage('Docker image build and push') {
             steps {
-                sh"""
-                VER=$(/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/M3/bin/mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
-                imageName=$(echo irccs-auth_${BRANCH}:${VER})
-                docker build --no-cache -t ${imageName} --build-arg folder=target .
-                //sh('echo "Docker image irccs-auth has been built successfully.')"
-                docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443
-                docker tag ${imageName} nexus.infocube.it:443/i3/irccs/irccs-auth
-                docker push nexus.infocube.it:443/i3/irccs/irccs-auth
-                """
+                sh "VER=$(/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/M3/bin/mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)"
+                sh "imageName=$(echo irccs-auth_${BRANCH}:${VER})"
+                sh "docker build -t irccs-auth:latest ."
+                sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
+                sh "docker tag irccs-auth:latest ${imageName} nexus.infocube.it:443/i3/irccs/irccs-auth"
+                sh "docker push ${imageName} nexus.infocube.it:443/i3/irccs/irccs-auth"
             }
         }
 
@@ -81,6 +76,17 @@ pipeline {
                 sh('docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443')
                 sh('docker tag irccs-auth_k8s_${VERSION} nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
                 sh('docker push nexus.infocube.it:443/i3/irccs/irccs-auth_k8s')
+
+
+
+
+
+
+
+
+
+                
+
             }
         }
 
