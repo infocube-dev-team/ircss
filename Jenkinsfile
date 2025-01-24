@@ -42,7 +42,12 @@ pipeline {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}".toLowerCase()  
                     }
+                    IMAGE = readMavenPom().getArtifactId()
+                    VERSION = readMavenPom().getVersion()
+                    COMMITTER_EMAIL = sh(script: 'git log -1 --pretty=format:"%ae"', returnStdout: true).trim()
                 }
+                echo "ArtifactID --->>  ${IMAGE}"
+                echo "VersionID  --->>  ${VERSION}"
             }
         }
 
@@ -82,7 +87,8 @@ pipeline {
         }
 
 stage ('Deploy source update')
-{steps {
+{
+    steps {
                            // when {
                         //expression { env.CHANGE_ID != null }
                         //}
@@ -101,13 +107,14 @@ stage ('Deploy source update')
                             }
                             
 
-}
+        }
 }
         /*stage('Deploy') {
             steps {
                 script {
                     DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
-                    build job: "${DEPLOY_JOB}"
+                    build job: "${DEPLOY_JOB}", parameters: [
+                    string(name: 'DEPLOYBRANCH', value: ${CHANGE_TARGET})
                 }
             }
         }*/
