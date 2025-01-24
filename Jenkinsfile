@@ -117,10 +117,11 @@ stage ('Deploy source file update')
             steps {
                 script {
                     //DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
-                    DEPLOY_JOB = 'test-deploy'
+                    DEPLOY_JOB = 'DeploySingleMicroservice'
                     build job: "${DEPLOY_JOB}", parameters: [
                     //string(name: 'DEPLOYBRANCH', value: ${CHANGE_TARGET})
-                    string(name: 'DEPLOYBRANCH', value: 'develop')]
+                    string(name: 'DEPLOYBRANCH', value: 'develop'),
+                    string(name: 'IMAGENAME', value: ${IMAGENAME})]
                 
             }
         }
