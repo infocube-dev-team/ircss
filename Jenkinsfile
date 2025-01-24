@@ -31,13 +31,18 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                script {
+                
+                checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
+            script {
                     if (env.CHANGE_ID != null) {
                         BRANCH = "${env.CHANGE_BRANCH}".toLowerCase()
                         BRANCH_NAME = "${env.CHANGE_BRANCH}"    
                     }
+                    IMAGE = readMavenPom().getArtifactId()
+                    
                 }
-                checkout scmGit(branches: [[name: "*/${env.BRANCH_NAME}"]],force: true, extensions: [], userRemoteConfigs: [[url: 'git@github.com:infocube-it/irccs-microservice-auth.git']])
+                echo "ArtifactID --->>  ${IMAGE}"
+                }
             }
         }
 
@@ -55,7 +60,7 @@ pipeline {
                     echo "Artifact Version: ${VER}"
                 
                 //sh "imageName=$(echo irccs-auth_${BRANCH}:${VER})"
-                sh "docker build -t irccs-auth --build-arg folder=target ."
+                sh "docker build -t irccs-auth-${BRANCH}:${VER} --build-arg folder=target ."
                 sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
                 sh "docker tag irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
                 sh "docker push irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth"
