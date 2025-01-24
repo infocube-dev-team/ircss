@@ -102,8 +102,17 @@ stage ('Deploy source update')
                             //Version update for Kubernetes
                             sh(script: "sed -i 's|image:.*|image: nexus.infocube.it/i3/irccs/${IMAGENAME}_k8s-${BRANCH}:${VER}|' irccs-deploy/kubernetes/auth.yaml")
                             sh "cd irccs-deploy && git add ."
-                            sh ('cd irccs-deploy && git commit -m "Source file updated || true"')
-                            sh "cd irccs-deploy && git push || true"
+                            sh '''
+                            cd irccs-deploy
+                            git diff --exit-code
+                            if [ $? -ne 0 ]; then
+                                git commit -m "Source updated"
+                                git push || true
+                            else
+                                echo "No changes to push"
+                            fi
+                            '''
+
                             }
                             
 
