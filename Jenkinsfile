@@ -6,6 +6,10 @@ pipeline {
     }
     environment {
         BRANCH = "${env.BRANCH_NAME}".toLowerCase()
+        IMAGENAME = "irccs-auth"
+        NEXUSERNAME = "docker_service_user"
+        NEXPASSWORD = "Infocube123"
+        DOCKER_REPOSITORY = "nexus.infocube.it:443/i3/irccs"
     }
     
     stages {
@@ -53,10 +57,10 @@ pipeline {
             steps {
                 script{ 
                 def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()    
-                sh "docker build -t irccs-auth-${BRANCH}:${VER} --build-arg folder=target ."
-                sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
-                sh "docker tag irccs-auth-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth-${BRANCH}:${VER}"
-                sh "docker push nexus.infocube.it:443/i3/irccs/irccs-auth-${BRANCH}:${VER}"
+                sh "docker build -t ${IMAGENAME}-${BRANCH}:${VER} --build-arg folder=target ."
+                sh "docker login -u ${NEXUSERNAME} -p ${NEXPASSWORD} ${DOCKER_REPOSITORY}"
+                sh "docker tag ${IMAGENAME}-${BRANCH}:${VER} ${DOCKER_REPOSITORY}/${IMAGENAME}-${BRANCH}:${VER}"
+                sh "docker push ${DOCKER_REPOSITORY}/${IMAGENAME}-${BRANCH}:${VER}"
             }
             }
         }
@@ -68,16 +72,36 @@ pipeline {
                 sh "rm src/main/resources/application.properties && mv src/main/resources/application.propertiesK src/main/resources/application.properties"
                 sh "rm Dockerfile && mv DockerfileK Dockerfile"
                 sh "mvn clean package -DskipTests -U"
-                sh "docker build -t irccs-auth_k8s-${BRANCH}:${VER} --build-arg folder=target ."
-                sh "docker login -u docker_service_user -p Infocube123 nexus.infocube.it:443"
-                sh "docker tag irccs-auth_k8s-${BRANCH}:${VER} nexus.infocube.it:443/i3/irccs/irccs-auth_k8s-${BRANCH}:${VER}"
-                sh "docker push nexus.infocube.it:443/i3/irccs/irccs-auth_k8s-${BRANCH}:${VER}"
+                sh "docker build -t ${IMAGENAME}_k8s-${BRANCH}:${VER} --build-arg folder=target ."
+                sh "docker login -u ${NEXUSERNAME} -p ${NEXPASSWORD} ${DOCKER_REPOSITORY}"
+                sh "docker tag ${IMAGENAME}_k8s-${BRANCH}:${VER} ${DOCKER_REPOSITORY}/${IMAGENAME}_k8s-${BRANCH}:${VER}"
+                sh "docker push ${DOCKER_REPOSITORY}/${IMAGENAME}_k8s-${BRANCH}:${VER}"
    }
 
             }
         }
 
-        /*stage('Deploy') {
+/*stage ('Deploy source update')
+{steps {
+                            when {
+                        expression { env.CHANGE_ID != null }
+                        }
+
+                            sh "git clone irccs-deploy"
+                            sh "cd irccs-deploy && git checkout ${CHANGE_TARGET}"
+                            sh "sed version new-version file docker"
+                            sh "sed version new-version file kubernetes"
+                            sh "cd irccs-deploy && git add *"
+                            sh ('cd irccs-deploy && git commit -m "Source file updated after PR ${env.CHANGE_ID}')
+                            sh "cd irccs-deploy && git push"
+                            
+
+}
+
+
+
+}
+        stage('Deploy') {
             steps {
                 script {
                     DEPLOY_JOB = env.JOB_NAME.replaceAll('build', 'deploy')
