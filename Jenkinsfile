@@ -4,8 +4,7 @@ pipeline {
         jdk "OpenJDK-21"
         maven "M3"
     }
-    environment {
-    }
+    
     stages {
         stage('Workspace Cleaning') {
             steps {
