@@ -40,7 +40,7 @@ pipeline {
                     }
                     IMAGE = readMavenPom().getArtifactId()
                     
-                }
+                
                 echo "ArtifactID --->>  ${IMAGE}"
                 }
             }
