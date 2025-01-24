@@ -124,6 +124,7 @@ stage ('Deploy source file update')
                 }
             }
         }
+    }
 
         stage('Notify') {
             steps {
