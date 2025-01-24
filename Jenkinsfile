@@ -86,7 +86,8 @@ stage ('Deploy source update')
                            // when {
                         //expression { env.CHANGE_ID != null }
                         //}
-
+                            script{
+                            def VER = sh(script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
                             sh "git clone git@github.com:infocube-dev-team/irccs-deploy.git"
                             //sh "cd irccs-deploy && git checkout ${CHANGE_TARGET}"
                             sh "cd irccs-deploy && git checkout develop"
@@ -97,6 +98,7 @@ stage ('Deploy source update')
                             sh "cd irccs-deploy && git add *"
                             //sh ('cd irccs-deploy && git commit -m "Source file updated after PR ${env.CHANGE_ID}')
                             sh "cd irccs-deploy && git push"
+                            }
                             
 
 }
