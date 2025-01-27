@@ -8,8 +8,6 @@ pipeline {
     environment {
         BRANCH = "${env.BRANCH_NAME}".toLowerCase()
         IMAGENAME = "irccs-auth"
-        NEXUSERNAME = "docker_service_user"
-        NEXPASSWORD = "Infocube123"
         DOCKER_REPOSITORY = "nexus.infocube.it:443/i3/irccs"
     }
     
@@ -60,9 +58,11 @@ pipeline {
             steps {
                 script{ 
                 sh "docker build -t ${IMAGENAME}-${BRANCH}:${VER} --build-arg folder=target ."
-                sh "docker login -u ${NEXUSERNAME} -p ${NEXPASSWORD} ${DOCKER_REPOSITORY}"
+                withCredentials([usernamePassword(credentialsId: 'docker-nexus-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh('docker login -u $DOCKER_USER -p $DOCKER_PASS nexus.infocube.it:443')
                 sh "docker tag ${IMAGENAME}-${BRANCH}:${VER} ${DOCKER_REPOSITORY}/${IMAGENAME}-${BRANCH}:${VER}"
                 sh "docker push ${DOCKER_REPOSITORY}/${IMAGENAME}-${BRANCH}:${VER}"
+                    }
                     }
             }
         }
@@ -74,9 +74,11 @@ pipeline {
                 sh "rm Dockerfile && mv DockerfileK Dockerfile"
                 sh "mvn clean package -DskipTests -U"
                 sh "docker build -t ${IMAGENAME}_k8s-${BRANCH}:${VER} --build-arg folder=target ."
-                sh "docker login -u ${NEXUSERNAME} -p ${NEXPASSWORD} ${DOCKER_REPOSITORY}"
+                withCredentials([usernamePassword(credentialsId: 'docker-nexus-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh('docker login -u $DOCKER_USER -p $DOCKER_PASS nexus.infocube.it:443')
                 sh "docker tag ${IMAGENAME}_k8s-${BRANCH}:${VER} ${DOCKER_REPOSITORY}/${IMAGENAME}_k8s-${BRANCH}:${VER}"
                 sh "docker push ${DOCKER_REPOSITORY}/${IMAGENAME}_k8s-${BRANCH}:${VER}"
+                }
                    }
 
                 }
